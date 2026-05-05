@@ -166,11 +166,13 @@ interface AppState {
   // V36: Inter-Persona Memo System
   memos: Memo[];
   memoNotification: string | null;
+  chatInputMention: string | null; // set to @personaName to insert into ChatPanel input
   sendMemo: (toPersonaId: string, content: string) => void;
   markMemoRead: (memoId: string) => void;
   markAllMemosReadForPersona: (personaId: string) => void;
   getUnreadMemosCount: (personaId: string) => number;
   setMemoNotification: (msg: string | null) => void;
+  setChatInputMention: (mention: string | null) => void;
 }
 
 // Default model templates
@@ -609,6 +611,7 @@ export const useStore = create<AppState>()(
       // V36: Inter-Persona Memo System
       memos: JSON.parse(localStorage.getItem('pixelpal_memos') || '[]'),
       memoNotification: null,
+      chatInputMention: null,
       sendMemo: (toPersonaId, content) => {
         const { activePersonaId, memos } = useStore.getState();
         const memo: Memo = {
@@ -642,6 +645,7 @@ export const useStore = create<AppState>()(
         return memos.filter((m) => m.toPersonaId === personaId && !m.read).length;
       },
       setMemoNotification: (msg) => set({ memoNotification: msg }),
+      setChatInputMention: (mention) => set({ chatInputMention: mention }),
     }),
     {
       name: 'pixelpal-storage',

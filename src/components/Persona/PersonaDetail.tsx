@@ -36,6 +36,7 @@ import {
   Download as DownloadIcon,
   Share as ShareIcon,
   Save as SaveIcon,
+  Mail as MailIcon,
 } from '@mui/icons-material';
 import { PersonaProfile } from './PersonaProfile';
 import { encodeTemplate, copyToClipboard } from '../../services/template/templateShare';
@@ -96,6 +97,13 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
   const [shareSnackbar, setShareSnackbar] = useState<string>('');
   const [profileOpen, setProfileOpen] = useState(false);
   const saveAsTemplate = useStore((s) => s.saveAsTemplate);
+
+  // V36: Memo dialog state
+  const [memoOpen, setMemoOpen] = useState(false);
+  const [memoTargetId, setMemoTargetId] = useState('');
+  const [memoContent, setMemoContent] = useState('');
+  const [memoSnackbar, setMemoSnackbar] = useState('');
+  const sendMemo = useStore((s) => s.sendMemo);
 
   // Stats from store
   const messages = useStore((s) => s.messages);
@@ -572,6 +580,22 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                 查看成长档案
               </Button>
             </Box>
+
+            {/* V36: Send Memo */}
+            <Box>
+              <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
+                便条
+              </Typography>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<MailIcon sx={{ fontSize: 14 }} />}
+                onClick={() => setMemoOpen(true)}
+                sx={{ fontSize: 10 }}
+              >
+                写便条
+              </Button>
+            </Box>
           </Box>
         )}
       </DialogContent>
@@ -608,6 +632,101 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
         personaId={persona.id}
         open={profileOpen}
         onClose={() => setProfileOpen(false)}
+      />
+      {/* V36: Send Memo Dialog */}
+      <Dialog
+        open={memoOpen}
+        onClose={() => {
+          setMemoOpen(false);
+          setMemoTargetId('');
+          setMemoContent('');
+        }}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <MailIcon sx={{ fontSize: 18 }} />
+          写便条
+        </DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '16px !important' }}>
+          <Box>
+            <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
+              发送给
+            </Typography>
+            <Select
+              value={memoTargetId}
+              onChange={(e) => setMemoTargetId(e.target.value)}
+              size="small"
+              fullWidth
+              displayEmpty
+            >
+              <MenuItem value="" disabled>
+                选择人格...
+              </MenuItem>
+              {(() => {
+                const allP = getAllPersonas();
+                return allP
+                  .filter((p) => p.id !== persona.id)
+                  .map((p) => (
+                    <MenuItem key={p.id} value={p.id}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography sx={{ fontSize: 16 }}>{p.avatar}</Typography>
+                        <Typography variant="body2" sx={{ fontSize: 13 }}>
+                          {p.name}
+                        </Typography>
+                      </Box>
+                    </MenuItem>
+                  ));
+              })()}
+            </Select>
+          </Box>
+          <TextField
+            label="便条内容"
+            value={memoContent}
+            onChange={(e) => setMemoContent(e.target.value.slice(0, 100))}
+            size="small"
+            fullWidth
+            multiline
+            rows={3}
+            placeholder="写下你想说的话..."
+            helperText={`${memoContent.length}/100`}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
+          <Button
+            onClick={() => {
+              setMemoOpen(false);
+              setMemoTargetId('');
+              setMemoContent('');
+            }}
+            size="small"
+          >
+            取消
+          </Button>
+          <Button
+            onClick={() => {
+              if (!memoTargetId || !memoContent.trim()) return;
+              sendMemo(memoTargetId, memoContent.trim());
+              setMemoSnackbar('便条已发送！');
+              setMemoOpen(false);
+              setMemoTargetId('');
+              setMemoContent('');
+            }}
+            variant="contained"
+            size="small"
+            disabled={!memoTargetId || !memoContent.trim()}
+          >
+            发送
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={!!memoSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setMemoSnackbar('')}
+        message={memoSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
     </Dialog>
   );
