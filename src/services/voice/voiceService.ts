@@ -23,6 +23,21 @@ export interface VoiceSettings {
   ttsVoice: string;      // Voice name from system
 }
 
+// V37: Persona voice config for per-personality voice differentiation
+export interface PersonaVoice {
+  rate: number;    // 0.5-2.0, default 1.0
+  pitch: number;   // 0.5-2.0, default 1.0
+  volume: number;  // 0-1, default 1.0
+  voiceName?: string;
+}
+
+// Current persona voice config (set by store on persona switch)
+let currentPersonaVoice: PersonaVoice = { rate: 1, pitch: 1, volume: 1 };
+
+export function setVoiceConfig(config: PersonaVoice): void {
+  currentPersonaVoice = config;
+}
+
 // Events emitted by the voice service
 export type VoiceEventType = 'stateChange' | 'transcription' | 'error';
 
@@ -242,20 +257,31 @@ class VoiceService {
 
   private createUtterance(text: string): SpeechSynthesisUtterance {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = this.settings.ttsRate;
-    utterance.pitch = this.settings.ttsPitch;
-    utterance.volume = this.settings.ttsVolume;
+    // V37: Apply persona voice config (rate/pitch/volume) — overrides global settings
+    utterance.rate = currentPersonaVoice.rate;
+    utterance.pitch = currentPersonaVoice.pitch;
+    utterance.volume = currentPersonaVoice.volume;
 
-    // Find the selected voice
-    if (this.settings.ttsVoice) {
-      const voice = this.getAvailableVoices().find(v => v.name === this.settings.ttsVoice);
+    // V37: Apply persona voice name if set
+    if (currentPersonaVoice.voiceName) {
+      const voice = this.getAvailableVoices().find(v => v.name === currentPersonaVoice.voiceName);
       if (voice) {
         utterance.voice = voice;
       }
-    } else {
-      const defaultVoice = this.getDefaultVoice();
-      if (defaultVoice) {
-        utterance.voice = defaultVoice;
+    }
+
+    // Fall back to global settings voice if no persona voice matched
+    if (!utterance.voice) {
+      if (this.settings.ttsVoice) {
+        const voice = this.getAvailableVoices().find(v => v.name === this.settings.ttsVoice);
+        if (voice) {
+          utterance.voice = voice;
+        }
+      } else {
+        const defaultVoice = this.getDefaultVoice();
+        if (defaultVoice) {
+          utterance.voice = defaultVoice;
+        }
       }
     }
 
