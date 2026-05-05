@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { Send as SendIcon, Mic as MicIcon, MicOff as MicOffIcon, VolumeUp as VolumeUpIcon, VolumeOff as VolumeOffIcon, Stop as StopIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
+import { MemoPanel } from '../Memo/MemoPanel';
 import { chatCompletion, chatCompletionWithTools, initModelRegistry, getDefaultModel } from '../../services/ai/model-registry-adapter';
 import { injectCompanionContext, autoSummarizeChat, adjustMoodForInteraction } from '../../services/companion';
 import { queryKnowledgeBase, buildRAGContext, isDocumentIndexed, reindexAllDocuments } from '../../services/rag';
@@ -130,6 +131,11 @@ export const ChatPanel: React.FC = () => {
   const addCollabMessage = useStore((s) => s.addCollabMessage);
   const saveCollabPreset = useStore((s) => s.saveCollabPreset);
   const loadCollabPreset = useStore((s) => s.loadCollabPreset);
+  const memoNotification = useStore((s) => s.memoNotification);
+  const setMemoNotification = useStore((s) => s.setMemoNotification);
+  const chatInputMention = useStore((s) => s.chatInputMention);
+  const setChatInputMention = useStore((s) => s.setChatInputMention);
+  const [memoOpen, setMemoOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const voiceUnsubscribeRef = useRef<(() => void) | null>(null);
@@ -180,6 +186,21 @@ export const ChatPanel: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, collabMessages, isAIThinking]);
+
+  // Prepend @mention when chatInputMention is set (from MemoPanel reply)
+  useEffect(() => {
+    if (chatInputMention) {
+      setInput(prev => chatInputMention + prev);
+      setChatInputMention(null);
+    }
+  }, [chatInputMention, setChatInputMention]);
+
+  // Clear memo notification when switching away
+  useEffect(() => {
+    if (memoNotification) {
+      setMemoNotification(null);
+    }
+  }, [activePersonaId]);
 
   const handleVoiceToggle = () => {
     if (isListening) {
@@ -863,6 +884,25 @@ export const ChatPanel: React.FC = () => {
         )}
       </Box>
 
+      {/* Memo Notification Banner */}
+      {memoNotification && (
+        <Box
+          sx={{
+            mx: 2, mt: 1, p: 1, borderRadius: 1,
+            bgcolor: 'primary.main', color: 'white',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            cursor: 'pointer', fontSize: 12,
+          }}
+          onClick={() => setMemoOpen(true)}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography sx={{ fontSize: 14 }}>📬</Typography>
+            <Typography sx={{ fontSize: 12 }}>{memoNotification}</Typography>
+          </Box>
+          <Button size="small" sx={{ color: 'white', minWidth: 'auto', fontSize: 11 }}>查看</Button>
+        </Box>
+      )}
+
       {/* Messages */}
       <Box sx={{
         flex: 1,
@@ -1121,6 +1161,12 @@ export const ChatPanel: React.FC = () => {
         </Box>
       )}
     </Box>
+
+    <MemoPanel
+      personaId={activePersonaId}
+      open={memoOpen}
+      onClose={() => setMemoOpen(false)}
+    />
   );
 };
 

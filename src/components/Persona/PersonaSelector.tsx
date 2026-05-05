@@ -14,6 +14,7 @@ import {
   Select,
   IconButton,
   Tooltip,
+  Badge,
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -58,6 +59,7 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
   const [detailPersona, setDetailPersona] = useState<Persona | null>(null);
   const setActivePersonaId = useStore((s) => s.setActivePersonaId);
   const personaIntimacy = useStore((s) => s.personaIntimacy);
+  const getUnreadMemosCount = useStore((s) => s.getUnreadMemosCount);
 
   useEffect(() => {
     setPersonas(getAllPersonas());
@@ -210,6 +212,24 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
                 {p.bio?.slice(0, 20) || VOICE_LABELS[p.voice]}
               </Typography>
             </Box>
+            {getUnreadMemosCount(p.id) > 0 && (
+              <Box
+                sx={{
+                  minWidth: 18,
+                  height: 18,
+                  borderRadius: '9px',
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  fontSize: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  px: 0.5,
+                }}
+              >
+                {getUnreadMemosCount(p.id)}
+              </Box>
+            )}
             {!p.isDefault && (
               <IconButton
                 size="small"
