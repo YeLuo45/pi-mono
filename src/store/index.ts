@@ -102,6 +102,8 @@ interface AppState {
   personaSystemPrompt: string;
   setActivePersonaId: (id: string) => void;
   clearMessagesForPersona: (personaId: string) => void;
+  setMessages: (messages: Message[]) => void;
+  loadMessagesForPersona: (personaId: string) => void;
 }
 
 // Default model templates
@@ -371,20 +373,39 @@ export const useStore = create<AppState>()(
         // Update active persona in localStorage (for personaStorage)
         const { setActivePersonaId: setStorageId } = require('../services/persona/personaStorage');
         setStorageId(id);
-        // Update store state
-        set({
+        // Update store state and load persona-specific messages
+        set((state) => ({
           activePersonaId: id,
           personaSystemPrompt: getPersonaSystemPrompt(require('../services/persona/personaStorage').getActivePersona()),
-        });
+          messages: state.messages.filter(
+            (m) => !m.personaId || m.personaId === id
+          ),
+        }));
       },
       clearMessagesForPersona: (personaId) =>
         set((state) => ({
           messages: state.messages.filter((m) => m.personaId !== personaId),
         })),
+      setMessages: (messages) => set({ messages }),
+      loadMessagesForPersona: (personaId) =>
+        set((state) => ({
+          messages: state.messages.filter(
+            (m) => !m.personaId || m.personaId === personaId
+          ),
+        })),
     }),
     {
       name: 'pixelpal-storage',
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        // After rehydration, filter messages by activePersonaId
+        // This ensures only the current persona's messages are loaded
+        if (state && state.activePersonaId) {
+          state.messages = state.messages.filter(
+            (m) => !m.personaId || m.personaId === state.activePersonaId
+          );
+        }
+      },
       partialize: (state) => ({
         aiConfig: state.aiConfig,
         events: state.events,
