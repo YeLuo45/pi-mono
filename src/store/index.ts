@@ -5,7 +5,8 @@ import type { EmotionState } from '../services/voice/emotionDetector';
 import { getActivePersona, getAllPersonas } from '../services/persona/personaStorage';
 import { applyPersonaTheme, resetPersonaTheme } from '../utils/personaTheme';
 import { getPersonaSystemPrompt } from '../services/persona/personaPrompt';
-import type { Persona } from '../services/persona/personaStorage';
+import type { Persona, PersonaVoice } from '../services/persona/personaStorage';
+import { setVoiceConfig as setVoiceServiceConfig } from '../services/voice/voiceService';
 import type { AppThemePreset } from '../utils/appTheme';
 
 const LOCAL_TEMPLATES_KEY = 'pixelpal_local_templates';
@@ -173,6 +174,10 @@ interface AppState {
   getUnreadMemosCount: (personaId: string) => number;
   setMemoNotification: (msg: string | null) => void;
   setChatInputMention: (mention: string | null) => void;
+
+  // V37: Voice personality differentiation
+  getActivePersonaVoice: () => PersonaVoice | null;
+  testVoice: (voice: PersonaVoice, personaName?: string) => void;
 }
 
 // Default model templates
@@ -464,6 +469,11 @@ export const useStore = create<AppState>()(
         // Update active persona in localStorage (for personaStorage)
         const { setActivePersonaId: setStorageId } = require('../services/persona/personaStorage');
         setStorageId(id);
+        // V37: Apply persona voice config immediately on switch
+        const persona = getAllPersonas().find((p) => p.id === id);
+        if (persona?.voice) {
+          setVoiceServiceConfig(persona.voice);
+        }
         // Apply persona theme if personaFollowTheme is enabled
         const { personaFollowTheme } = useStore.getState();
         if (personaFollowTheme) {
@@ -646,6 +656,27 @@ export const useStore = create<AppState>()(
       },
       setMemoNotification: (msg) => set({ memoNotification: msg }),
       setChatInputMention: (mention) => set({ chatInputMention: mention }),
+
+      // V37: Voice personality differentiation
+      getActivePersonaVoice: () => {
+        const activePersona = getActivePersona();
+        return activePersona?.voice || null;
+      },
+      testVoice: (voice: PersonaVoice, personaName?: string) => {
+        if (typeof window === 'undefined' || !window.speechSynthesis) return;
+        const name = personaName || getActivePersona().name || '我';
+        const text = `你好，我是${name}，很高兴和你聊天`;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = voice.rate;
+        utterance.pitch = voice.pitch;
+        utterance.volume = voice.volume;
+        if (voice.voiceName) {
+          const v = window.speechSynthesis.getVoices().find(vi => vi.name === voice.voiceName);
+          if (v) utterance.voice = v;
+        }
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+      },
     }),
     {
       name: 'pixelpal-storage',
@@ -680,6 +711,10 @@ export const useStore = create<AppState>()(
             }
           } else {
             resetPersonaTheme();
+          }
+          // V37: Apply initial persona voice after rehydration
+          if (persona?.voice) {
+            setVoiceServiceConfig(persona.voice);
           }
         }
       },
