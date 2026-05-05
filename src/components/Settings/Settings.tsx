@@ -12,6 +12,7 @@ import {
   Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon,
   DragIndicator as DragIcon, ExpandMore as ExpandIcon, ExpandLess as CollapseIcon,
   Download as DownloadIcon, Upload as UploadIcon,
+  Share as ShareIcon,
 } from '@mui/icons-material';
 import { useStore } from '../../store';
 import { testModel } from '../../services/ai/model-registry-adapter';
@@ -19,6 +20,9 @@ import { PERSONAS, MOODS } from '../../services/companion/personalityTypes';
 import { getMemoryStats, clearAllMemories, compactMemory } from '../../services/memory/memoryStorage';
 import { voiceService } from '../../services/voice/voiceService';
 import { WebhookSettings } from './WebhookSettings';
+import { decodeTemplate, templateToPersonaData, copyToClipboard } from '../../services/template/templateShare';
+import { ONLINE_TEMPLATES, type OnlineTemplate } from '../../services/template/onlineTemplates';
+import { createPersona } from '../../services/persona/personaStorage';
 import type { ModelConfig } from '../../services/ai/model-registry';
 import type { PersonaId } from '../../types';
 
@@ -88,6 +92,16 @@ export const Settings: React.FC = () => {
     notificationsEnabled: true,
   });
 
+  // Template Management state (V31)
+  const [activeTemplateTab, setActiveTemplateTab] = useState<'local' | 'online' | 'install'>('local');
+  const localTemplates = useStore((s) => s.localTemplates);
+  const removeLocalTemplate = useStore((s) => s.removeLocalTemplate);
+  const setActivePersonaId = useStore((s) => s.setActivePersonaId);
+  const [installCode, setInstallCode] = useState('');
+  const [installPreview, setInstallPreview] = useState<ReturnType<typeof templateToPersonaData> | null>(null);
+  const [installError, setInstallError] = useState('');
+  const [installSuccess, setInstallSuccess] = useState('');
+
   // Load desktop settings on mount
   useEffect(() => {
     if (!isElectron) return;
@@ -129,6 +143,66 @@ export const Settings: React.FC = () => {
       }
     } catch (err) {
       console.error('Failed to update desktop setting:', err);
+    }
+  };
+
+  // Template management handlers (V31)
+  const handleDecodeInstallCode = () => {
+    setInstallError('');
+    setInstallPreview(null);
+    if (!installCode.trim()) {
+      setInstallError('请输入分享码');
+      return;
+    }
+    const payload = decodeTemplate(installCode.trim());
+    if (!payload) {
+      setInstallError('无效的分享码');
+      return;
+    }
+    setInstallPreview(templateToPersonaData(payload));
+  };
+
+  const handleInstallTemplate = () => {
+    if (!installPreview) return;
+    try {
+      const newPersona = createPersona(installPreview);
+      setActivePersonaId(newPersona.id);
+      setInstallSuccess(`已创建人格: ${newPersona.name}`);
+      setInstallCode('');
+      setInstallPreview(null);
+      setTimeout(() => setInstallSuccess(''), 3000);
+    } catch (err) {
+      setInstallError(`安装失败: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleInstallOnlineTemplate = (template: OnlineTemplate) => {
+    try {
+      const personaData = {
+        name: template.name,
+        avatar: template.avatar,
+        bio: template.bio,
+        voice: template.voice,
+        theme: template.theme,
+      };
+      const newPersona = createPersona(personaData);
+      setActivePersonaId(newPersona.id);
+      setInstallSuccess(`已创建人格: ${newPersona.name}`);
+      setTimeout(() => setInstallSuccess(''), 3000);
+    } catch (err) {
+      setInstallError(`安装失败: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleCreateFromLocalTemplate = (template: typeof localTemplates[0]) => {
+    try {
+      const { id, createdAt, updatedAt, isDefault, ...templateData } = template;
+      const newPersona = createPersona(templateData);
+      setActivePersonaId(newPersona.id);
+      setInstallSuccess(`已创建人格: ${newPersona.name}`);
+      setTimeout(() => setInstallSuccess(''), 3000);
+    } catch (err) {
+      setInstallError(`创建失败: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 
@@ -601,6 +675,208 @@ export const Settings: React.FC = () => {
             </Typography>
             {error && <Alert severity="error" sx={{ fontSize: 11 }}>{error}</Alert>}
           </Box>
+        </Paper>
+
+        <Divider sx={{ opacity: 0.1 }} />
+
+        {/* Template Management — V31 */}
+        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+          <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
+            🎭 人格模板管理
+          </Typography>
+
+          {/* Template tab buttons */}
+          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+            {([
+              { key: 'local', label: '我的模板' },
+              { key: 'online', label: '在线模板库' },
+              { key: 'install', label: '安装模板' },
+            ] as const).map(tab => (
+              <Button
+                key={tab.key}
+                size="small"
+                variant={activeTemplateTab === tab.key ? 'contained' : 'outlined'}
+                onClick={() => setActiveTemplateTab(tab.key)}
+                sx={{ fontSize: 10, flex: 1 }}
+              >
+                {tab.label}
+              </Button>
+            ))}
+          </Box>
+
+          {/* Local Templates tab */}
+          {activeTemplateTab === 'local' && (
+            <Box>
+              {localTemplates.length === 0 ? (
+                <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 11 }}>
+                  暂无本地模板。在人格详情中点击"保存到模板库"可添加模板。
+                </Typography>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {localTemplates.map(template => (
+                    <Box
+                      key={template.id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        p: 1,
+                        bgcolor: 'rgba(0,0,0,0.2)',
+                        borderRadius: 1,
+                      }}
+                    >
+                      <Typography sx={{ fontSize: 18 }}>{template.avatar}</Typography>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="body2" sx={{ fontSize: 12, fontWeight: 500 }}>
+                          {template.name}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {template.bio}
+                        </Typography>
+                      </Box>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleCreateFromLocalTemplate(template)}
+                        sx={{ fontSize: 9, minWidth: 'auto', p: 0.5 }}
+                      >
+                        创建人格
+                      </Button>
+                      <IconButton
+                        size="small"
+                        onClick={() => removeLocalTemplate(template.id)}
+                        sx={{ p: 0.5 }}
+                      >
+                        <DeleteIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          )}
+
+          {/* Online Templates tab */}
+          {activeTemplateTab === 'online' && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {ONLINE_TEMPLATES.map(template => (
+                <Box
+                  key={template.id}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    p: 1,
+                    bgcolor: 'rgba(0,0,0,0.2)',
+                    borderRadius: 1,
+                  }}
+                >
+                  <Typography sx={{ fontSize: 18 }}>{template.avatar}</Typography>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.25 }}>
+                      <Typography variant="body2" sx={{ fontSize: 12, fontWeight: 500 }}>
+                        {template.name}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 0.5 }}>
+                        {template.tags.slice(0, 2).map(tag => (
+                          <Chip
+                            key={tag}
+                            label={tag}
+                            size="small"
+                            sx={{ height: 14, fontSize: 8 }}
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10, display: 'block' }}>
+                      {template.description}
+                    </Typography>
+                  </Box>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={() => handleInstallOnlineTemplate(template)}
+                    sx={{ fontSize: 9, minWidth: 'auto', p: 0.5 }}
+                  >
+                    安装
+                  </Button>
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          {/* Install from code tab */}
+          {activeTemplateTab === 'install' && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <TextField
+                  size="small"
+                  placeholder="粘贴分享码"
+                  value={installCode}
+                  onChange={(e) => {
+                    setInstallCode(e.target.value);
+                    setInstallPreview(null);
+                    setInstallError('');
+                  }}
+                  fullWidth
+                  sx={{ fontSize: 11 }}
+                />
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={handleDecodeInstallCode}
+                  sx={{ fontSize: 10, minWidth: 'auto', whiteSpace: 'nowrap' }}
+                >
+                  解析
+                </Button>
+              </Box>
+
+              {/* Preview */}
+              {installPreview && (
+                <Box
+                  sx={{
+                    p: 1.5,
+                    bgcolor: 'rgba(0,0,0,0.2)',
+                    borderRadius: 1,
+                    border: '1px solid rgba(255,255,255,0.1)',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Typography sx={{ fontSize: 20 }}>{installPreview.avatar}</Typography>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontSize: 13, fontWeight: 600 }}>
+                        {installPreview.name}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10 }}>
+                        {installPreview.voice === 'warm' ? '温暖' : installPreview.voice === 'rational' ? '理性' : installPreview.voice === 'humorous' ? '幽默' : '严肃'}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10, display: 'block' }}>
+                    {installPreview.bio}
+                  </Typography>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={handleInstallTemplate}
+                    sx={{ mt: 1, fontSize: 10 }}
+                  >
+                    安装此模板
+                  </Button>
+                </Box>
+              )}
+
+              {installError && <Alert severity="error" sx={{ fontSize: 10 }}>{installError}</Alert>}
+              {installSuccess && <Alert severity="success" sx={{ fontSize: 10 }}>{installSuccess}</Alert>}
+            </Box>
+          )}
+
+          {(installSuccess || installError) && (
+            <Box sx={{ mt: 1 }}>
+              {installSuccess && <Alert severity="success" sx={{ fontSize: 10 }}>{installSuccess}</Alert>}
+              {installError && <Alert severity="error" sx={{ fontSize: 10 }}>{installError}</Alert>}
+            </Box>
+          )}
         </Paper>
 
         <Divider sx={{ opacity: 0.1 }} />

@@ -34,7 +34,10 @@ import {
   BarChart as StatsIcon,
   Settings as SettingsIcon,
   Download as DownloadIcon,
+  Share as ShareIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
+import { encodeTemplate, copyToClipboard } from '../../services/template/templateShare';
 import { getPersonaSystemPrompt, updatePersona, type Persona } from '../../services/persona';
 import { useStore } from '../../store';
 import { queryMemories } from '../../services/memory/memoryStorage';
@@ -89,6 +92,8 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
   const [activeTab, setActiveTab] = useState(0);
   const [saving, setSaving] = useState(false);
   const [exportSnackbar, setExportSnackbar] = useState<string>('');
+  const [shareSnackbar, setShareSnackbar] = useState<string>('');
+  const saveAsTemplate = useStore((s) => s.saveAsTemplate);
 
   // Stats from store
   const messages = useStore((s) => s.messages);
@@ -164,6 +169,21 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
     } catch (err) {
       setExportSnackbar(`导出失败: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
+  };
+
+  const handleShare = async () => {
+    const code = encodeTemplate(persona);
+    const success = await copyToClipboard(code);
+    if (success) {
+      setShareSnackbar('分享码已复制！');
+    } else {
+      setShareSnackbar('复制失败，请手动复制');
+    }
+  };
+
+  const handleSaveAsTemplate = () => {
+    saveAsTemplate(persona);
+    setShareSnackbar('已保存到模板库！');
   };
 
   const handleClose = () => {
@@ -507,6 +527,33 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                 导出该人格的聊天记录和记忆
               </Typography>
             </Box>
+
+            {/* Share & Save Template */}
+            <Box>
+              <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
+                分享与模板
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<ShareIcon sx={{ fontSize: 14 }} />}
+                  onClick={handleShare}
+                  sx={{ fontSize: 10 }}
+                >
+                  分享
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<SaveIcon sx={{ fontSize: 14 }} />}
+                  onClick={handleSaveAsTemplate}
+                  sx={{ fontSize: 10 }}
+                >
+                  保存到模板库
+                </Button>
+              </Box>
+            </Box>
           </Box>
         )}
       </DialogContent>
@@ -530,6 +577,13 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
         autoHideDuration={3000}
         onClose={() => setExportSnackbar('')}
         message={exportSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
+      <Snackbar
+        open={!!shareSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setShareSnackbar('')}
+        message={shareSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
     </Dialog>

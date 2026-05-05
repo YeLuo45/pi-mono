@@ -5,6 +5,9 @@ import type { EmotionState } from '../services/voice/emotionDetector';
 import { getActivePersona, getAllPersonas } from '../services/persona/personaStorage';
 import { applyPersonaTheme, resetPersonaTheme } from '../utils/personaTheme';
 import { getPersonaSystemPrompt } from '../services/persona/personaPrompt';
+import type { Persona } from '../services/persona/personaStorage';
+
+const LOCAL_TEMPLATES_KEY = 'pixelpal_local_templates';
 
 // CollabSession — multi-persona collaboration (not persisted)
 export interface CollabSession {
@@ -135,6 +138,11 @@ interface AppState {
   saveCollabPreset: (name: string, participants: string[]) => void;
   loadCollabPreset: (name: string) => string[] | null;
   deleteCollabPreset: (name: string) => void;
+
+  // Local Template Storage (V31)
+  localTemplates: Persona[];
+  saveAsTemplate: (persona: Persona) => void;
+  removeLocalTemplate: (templateId: string) => void;
 }
 
 // Default model templates
@@ -497,6 +505,26 @@ export const useStore = create<AppState>()(
         delete presets[name];
         localStorage.setItem('pixelpal_collab_presets', JSON.stringify(presets));
         set({ collabPresets: presets });
+      },
+
+      // Local Template Storage (V31)
+      localTemplates: JSON.parse(localStorage.getItem(LOCAL_TEMPLATES_KEY) || '[]'),
+      saveAsTemplate: (persona) => {
+        // Strip id, createdAt, updatedAt, isDefault — add as a local template
+        const { id, createdAt, updatedAt, isDefault, ...templateData } = persona;
+        const templates = JSON.parse(localStorage.getItem(LOCAL_TEMPLATES_KEY) || '[]') as Persona[];
+        // Avoid duplicates by id
+        if (!templates.find((t) => t.id === persona.id)) {
+          templates.push({ ...templateData, id: persona.id } as Persona);
+          localStorage.setItem(LOCAL_TEMPLATES_KEY, JSON.stringify(templates));
+          set({ localTemplates: templates });
+        }
+      },
+      removeLocalTemplate: (templateId) => {
+        const templates = JSON.parse(localStorage.getItem(LOCAL_TEMPLATES_KEY) || '[]') as Persona[];
+        const filtered = templates.filter((t) => t.id !== templateId);
+        localStorage.setItem(LOCAL_TEMPLATES_KEY, JSON.stringify(filtered));
+        set({ localTemplates: filtered });
       },
     }),
     {
