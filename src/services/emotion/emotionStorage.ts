@@ -138,6 +138,144 @@ export function deleteEmotionLog(id: string): void {
 }
 
 /**
+ * Get emotion logs aggregated by week (for weekly chart)
+ * Returns an array of weekly aggregates with start date, avg intensity, and dominant emotion
+ */
+export function getEmotionLogsByWeek(weeks: number = 4): {
+  weekStart: string;
+  avgIntensity: number | null;
+  dominantEmotion: TextEmotion | null;
+  totalCount: number;
+}[] {
+  const logs = getEmotionLogs();
+  const result: {
+    weekStart: string;
+    avgIntensity: number | null;
+    dominantEmotion: TextEmotion | null;
+    totalCount: number;
+  }[] = [];
+
+  for (let w = weeks - 1; w >= 0; w--) {
+    const weekEnd = new Date();
+    weekEnd.setDate(weekEnd.getDate() - w * 7);
+    weekEnd.setHours(23, 59, 59, 999);
+
+    const weekStart = new Date(weekEnd);
+    weekStart.setDate(weekStart.getDate() - 6);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const weekLogs = logs.filter(log => {
+      const t = log.timestamp;
+      return t >= weekStart.getTime() && t <= weekEnd.getTime();
+    });
+
+    if (weekLogs.length === 0) {
+      result.push({
+        weekStart: weekStart.toISOString().split('T')[0],
+        avgIntensity: null,
+        dominantEmotion: null,
+        totalCount: 0,
+      });
+    } else {
+      const avgIntensity = Math.round(weekLogs.reduce((s, l) => s + l.intensity, 0) / weekLogs.length);
+      const emotionCounts: Record<TextEmotion, number> = {} as any;
+      for (const l of weekLogs) {
+        emotionCounts[l.emotion] = (emotionCounts[l.emotion] || 0) + 1;
+      }
+      const dominantEmotion = (Object.entries(emotionCounts) as [TextEmotion, number][])
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown';
+
+      result.push({
+        weekStart: weekStart.toISOString().split('T')[0],
+        avgIntensity,
+        dominantEmotion,
+        totalCount: weekLogs.length,
+      });
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Get emotion logs for a specific month
+ */
+export function getEmotionLogsForMonth(year: number, month: number): EmotionLogEntry[] {
+  const logs = getEmotionLogs();
+  const startDate = new Date(year, month, 1);
+  const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
+
+  return logs.filter(log => {
+    const t = log.timestamp;
+    return t >= startDate.getTime() && t <= endDate.getTime();
+  });
+}
+
+/**
+ * Get daily aggregates for the last N days (for chart data)
+ */
+export function getDailyEmotionAggregates(days: number = 30): {
+  date: string;
+  avgIntensity: number | null;
+  maxIntensity: number | null;
+  dominantEmotion: TextEmotion | null;
+  count: number;
+}[] {
+  const logs = getEmotionLogs();
+  const result: {
+    date: string;
+    avgIntensity: number | null;
+    maxIntensity: number | null;
+    dominantEmotion: TextEmotion | null;
+    count: number;
+  }[] = [];
+
+  for (let d = days - 1; d >= 0; d--) {
+    const date = new Date();
+    date.setDate(date.getDate() - d);
+    date.setHours(0, 0, 0, 0);
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1);
+
+    const dayLogs = logs.filter(log => {
+      const t = log.timestamp;
+      return t >= date.getTime() && t < nextDate.getTime();
+    });
+
+    if (dayLogs.length === 0) {
+      result.push({
+        date: date.toISOString().split('T')[0],
+        avgIntensity: null,
+        maxIntensity: null,
+        dominantEmotion: null,
+        count: 0,
+      });
+    } else {
+      const intensities = dayLogs.map(l => l.intensity);
+      const avgIntensity = Math.round(intensities.reduce((s, i) => s + i, 0) / intensities.length);
+      const maxIntensity = Math.max(...intensities);
+
+      const emotionCounts: Record<TextEmotion, number> = {} as any;
+      for (const l of dayLogs) {
+        emotionCounts[l.emotion] = (emotionCounts[l.emotion] || 0) + 1;
+      }
+      const dominantEmotion = (Object.entries(emotionCounts) as [TextEmotion, number][])
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown';
+
+      result.push({
+        date: date.toISOString().split('T')[0],
+        avgIntensity,
+        maxIntensity,
+        dominantEmotion,
+        count: dayLogs.length,
+      });
+    }
+  }
+
+  return result;
+}
+
+/**
  * Get emotion statistics for analytics
  */
 export function getEmotionStats(logs: EmotionLogEntry[]): {
