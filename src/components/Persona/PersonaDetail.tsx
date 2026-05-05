@@ -4,7 +4,7 @@
  * and live system prompt preview.
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -38,11 +38,13 @@ import {
   Share as ShareIcon,
   Save as SaveIcon,
   Mail as MailIcon,
+  CameraAlt as CameraAltIcon,
+  Face as FaceIcon,
   VolumeUp as VolumeUpIcon,
 } from '@mui/icons-material';
 import { PersonaProfile } from './PersonaProfile';
 import { encodeTemplate, copyToClipboard } from '../../services/template/templateShare';
-import { getPersonaSystemPrompt, updatePersona, type Persona } from '../../services/persona';
+import { getPersonaSystemPrompt, updatePersona, type Persona, type PersonaAppearance, AVATAR_PRESETS } from '../../services/persona';
 import { useStore } from '../../store';
 import { queryMemories } from '../../services/memory/memoryStorage';
 import { getIntimacyLevel, getIntimacyColor } from '../../store';
@@ -93,11 +95,13 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
   const [bio, setBio] = useState(persona.bio);
   const [voice, setVoice] = useState<Persona['voice']>(persona.voice);
   const [avatar, setAvatar] = useState(persona.avatar);
+  const [appearance, setAppearance] = useState<PersonaAppearance>(persona.appearance);
   const [activeTab, setActiveTab] = useState(0);
   const [saving, setSaving] = useState(false);
   const [exportSnackbar, setExportSnackbar] = useState<string>('');
   const [shareSnackbar, setShareSnackbar] = useState<string>('');
   const [profileOpen, setProfileOpen] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const saveAsTemplate = useStore((s) => s.saveAsTemplate);
 
   // V36: Memo dialog state
@@ -120,6 +124,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
     setBio(persona.bio);
     setVoice(persona.voice);
     setAvatar(persona.avatar);
+    setAppearance(persona.appearance);
   }, [persona]);
 
   // Memory count (async)
@@ -150,7 +155,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
   const handleSave = async () => {
     setSaving(true);
     try {
-      const updated = updatePersona(persona.id, { bio, voice, avatar });
+      const updated = updatePersona(persona.id, { bio, voice, avatar, appearance });
       if (updated && onPersonaUpdated) {
         onPersonaUpdated(updated);
       }
@@ -203,10 +208,14 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
     setBio(persona.bio);
     setVoice(persona.voice);
     setAvatar(persona.avatar);
+    setAppearance(persona.appearance);
     onClose();
   };
 
-  const isModified = bio !== persona.bio || voice !== persona.voice || avatar !== persona.avatar;
+  const isModified = bio !== persona.bio || voice !== persona.voice || avatar !== persona.avatar ||
+    appearance.expression !== persona.appearance.expression ||
+    appearance.accessory !== persona.appearance.accessory ||
+    appearance.outfit !== persona.appearance.outfit;
 
   return (
     <Dialog
@@ -222,7 +231,32 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
       }}
     >
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 1 }}>
-        <Typography sx={{ fontSize: 20 }}>{avatar}</Typography>
+        <Box sx={{ position: 'relative', width: 40, height: 40, flexShrink: 0 }}>
+          {avatar.startsWith('data:image') || avatar.startsWith('http') ? (
+            <img
+              src={avatar}
+              alt="avatar"
+              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+            />
+          ) : (
+            <Typography sx={{ fontSize: 32, lineHeight: 1 }}>{avatar}</Typography>
+          )}
+          <IconButton
+            size="small"
+            onClick={() => avatarInputRef.current?.click()}
+            sx={{
+              position: 'absolute',
+              bottom: -4,
+              right: -4,
+              bgcolor: 'primary.main',
+              color: 'white',
+              p: 0.25,
+              '&:hover': { bgcolor: 'primary.dark' },
+            }}
+          >
+            <CameraAltIcon sx={{ fontSize: 12 }} />
+          </IconButton>
+        </Box>
         <Typography variant="h6" sx={{ flex: 1, fontSize: 16 }}>
           {persona.name}
         </Typography>
@@ -230,6 +264,24 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
           <CloseIcon sx={{ fontSize: 18 }} />
         </IconButton>
       </DialogTitle>
+      {/* Hidden file input for avatar upload */}
+      <input
+        type="file"
+        accept="image/*"
+        ref={avatarInputRef}
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const base64 = ev.target?.result as string;
+            setAvatar(base64);
+          };
+          reader.readAsDataURL(file);
+          e.target.value = '';
+        }}
+      />
 
       <Tabs
         value={activeTab}
@@ -265,6 +317,12 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
           icon={<VolumeUpIcon sx={{ fontSize: 14 }} />}
           iconPosition="start"
           label="声音"
+          sx={{ minHeight: 36, fontSize: 12, gap: 0.5 }}
+        />
+        <Tab
+          icon={<FaceIcon sx={{ fontSize: 14 }} />}
+          iconPosition="start"
+          label="外貌"
           sx={{ minHeight: 36, fontSize: 12, gap: 0.5 }}
         />
       </Tabs>
@@ -618,6 +676,128 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
               }
             }}
           />
+        )}
+
+        {activeTab === 5 && (
+          /* Appearance tab - V38 */
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* Avatar presets */}
+            <Box>
+              <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
+                头像
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {AVATAR_PRESETS.map((emoji) => (
+                  <Box
+                    key={emoji}
+                    component="button"
+                    onClick={() => setAvatar(emoji)}
+                    sx={{
+                      border: avatar === emoji ? '2px solid' : '1px solid',
+                      borderColor: avatar === emoji ? 'primary.main' : 'divider',
+                      borderRadius: 1,
+                      bgcolor: avatar === emoji ? 'rgba(155,127,212,0.15)' : 'transparent',
+                      cursor: 'pointer',
+                      p: 0.5,
+                      fontSize: 18,
+                      lineHeight: 1,
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {emoji}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+
+            {/* Expression */}
+            <Box>
+              <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
+                表情
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {['😊', '😐', '😢', '🤔', '😠', '😄', '😎', '🤯', '😌'].map((e) => (
+                  <IconButton
+                    key={e}
+                    onClick={() => setAppearance({ ...appearance, expression: e })}
+                    size="small"
+                    sx={{
+                      border: appearance.expression === e ? '2px solid' : '1px solid gray',
+                      borderColor: appearance.expression === e ? 'primary.main' : 'divider',
+                      borderRadius: 1,
+                      bgcolor: appearance.expression === e ? 'rgba(155,127,212,0.15)' : 'transparent',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {e}
+                  </IconButton>
+                ))}
+              </Box>
+            </Box>
+
+            {/* Accessory */}
+            <Box>
+              <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
+                配饰
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {['👓', '🎧', '🎀', '💎', '🤍', '👒', '🎩', '🧣'].map((a) => (
+                  <IconButton
+                    key={a}
+                    onClick={() => setAppearance({ ...appearance, accessory: a })}
+                    size="small"
+                    sx={{
+                      border: appearance.accessory === a ? '2px solid' : '1px solid gray',
+                      borderColor: appearance.accessory === a ? 'primary.main' : 'divider',
+                      borderRadius: 1,
+                      bgcolor: appearance.accessory === a ? 'rgba(155,127,212,0.15)' : 'transparent',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {a}
+                  </IconButton>
+                ))}
+              </Box>
+            </Box>
+
+            {/* Outfit */}
+            <Box>
+              <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
+                服装
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {['👕', '👔', '🎽', '👗', '👟', '🩱', '🧥'].map((o) => (
+                  <IconButton
+                    key={o}
+                    onClick={() => setAppearance({ ...appearance, outfit: o })}
+                    size="small"
+                    sx={{
+                      border: appearance.outfit === o ? '2px solid' : '1px solid gray',
+                      borderColor: appearance.outfit === o ? 'primary.main' : 'divider',
+                      borderRadius: 1,
+                      bgcolor: appearance.outfit === o ? 'rgba(155,127,212,0.15)' : 'transparent',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {o}
+                  </IconButton>
+                ))}
+              </Box>
+            </Box>
+
+            {/* Preview */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1, bgcolor: 'rgba(255,255,255,0.04)', borderRadius: 1 }}>
+              <Typography sx={{ fontSize: 32 }}>{avatar}</Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10 }}>
+                  {appearance.expression} {appearance.accessory} {appearance.outfit}
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10 }}>
+                  表情:{appearance.expression} | 配饰:{appearance.accessory} | 服装:{appearance.outfit}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
         )}
       </DialogContent>
 

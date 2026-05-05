@@ -29,6 +29,7 @@ import {
   deletePersona,
   getActivePersona,
   type Persona,
+  type PersonaAppearance,
 } from '../../services/persona';
 import { useStore } from '../../store';
 import { PersonaDetail } from './PersonaDetail';
@@ -127,21 +128,37 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
           size="small"
           sx={{ mx: 'auto', my: 1 }}
         >
-          <Typography
-            sx={{
-              fontSize: 18,
-              ...((personaIntimacy[activePersona?.id || ''] || 0) >= 61
-                ? {
-                    filter: 'drop-shadow(0 0 6px #FFD700)',
-                    borderRadius: '50%',
-                    boxShadow: '0 0 8px 2px rgba(255, 215, 0, 0.6)',
-                    p: 0.5,
-                  }
-                : {}),
-            }}
-          >
-            {activePersona?.avatar || '🧑'}
-          </Typography>
+          <Box sx={{ position: 'relative' }}>
+            <Typography
+              sx={{
+                fontSize: 18,
+                lineHeight: 1,
+                ...((personaIntimacy[activePersona?.id || ''] || 0) >= 61
+                  ? {
+                      filter: 'drop-shadow(0 0 6px #FFD700)',
+                      borderRadius: '50%',
+                      boxShadow: '0 0 8px 2px rgba(255, 215, 0, 0.6)',
+                      p: 0.5,
+                    }
+                  : {}),
+              }}
+            >
+              {activePersona?.avatar || '🧑'}
+            </Typography>
+            {activePersona?.appearance && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: -2,
+                  right: -4,
+                  fontSize: 8,
+                  lineHeight: 1,
+                }}
+              >
+                {activePersona.appearance.expression}
+              </Box>
+            )}
+          </Box>
         </IconButton>
       </Tooltip>
     );
@@ -153,7 +170,16 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
       <Button
         fullWidth
         onClick={(e) => setAnchorEl(e.currentTarget)}
-        startIcon={<Typography sx={{ fontSize: 16 }}>{activePersona?.avatar || '🧑'}</Typography>}
+        startIcon={
+          <Box sx={{ position: 'relative', display: 'flex' }}>
+            <Typography sx={{ fontSize: 16, lineHeight: 1 }}>{activePersona?.avatar || '🧑'}</Typography>
+            {activePersona?.appearance && (
+              <Box sx={{ position: 'absolute', bottom: -3, right: -5, fontSize: 7, lineHeight: 1 }}>
+                {activePersona.appearance.expression}
+              </Box>
+            )}
+          </Box>
+        }
         endIcon={<PersonIcon sx={{ fontSize: 14, opacity: 0.5 }} />}
         sx={{
           justifyContent: 'flex-start',
@@ -189,21 +215,40 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
             onClick={() => handleSelect(p)}
             sx={{ gap: 1.5, py: 1 }}
           >
-            <Typography
-              sx={{
-                fontSize: 18,
-                ...((personaIntimacy[p.id] || 0) >= 61
-                  ? {
-                      filter: 'drop-shadow(0 0 6px #FFD700)',
-                      borderRadius: '50%',
-                      boxShadow: '0 0 8px 2px rgba(255, 215, 0, 0.6)',
-                      p: 0.5,
-                    }
-                  : {}),
-              }}
-            >
-              {p.avatar}
-            </Typography>
+            <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+              <Typography
+                sx={{
+                  fontSize: 18,
+                  lineHeight: 1,
+                  ...((personaIntimacy[p.id] || 0) >= 61
+                    ? {
+                        filter: 'drop-shadow(0 0 6px #FFD700)',
+                        borderRadius: '50%',
+                        boxShadow: '0 0 8px 2px rgba(255, 215, 0, 0.6)',
+                        p: 0.5,
+                      }
+                    : {}),
+                }}
+              >
+                {p.avatar}
+              </Typography>
+              {p.appearance && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: -2,
+                    right: -4,
+                    fontSize: 7,
+                    lineHeight: 1,
+                    bgcolor: 'background.paper',
+                    borderRadius: '50%',
+                    p: 0.25,
+                  }}
+                >
+                  {p.appearance.expression}
+                </Box>
+              )}
+            </Box>
             <Box sx={{ flex: 1 }}>
               <Typography variant="body2" sx={{ fontSize: 13, fontWeight: p.id === activePersona?.id ? 600 : 400 }}>
                 {p.name}
