@@ -19,6 +19,7 @@ import {
   Person as PersonIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -29,6 +30,7 @@ import {
   type Persona,
 } from '../../services/persona';
 import { useStore } from '../../store';
+import { PersonaDetail } from './PersonaDetail';
 
 interface PersonaSelectorProps {
   collapsed?: boolean;
@@ -51,6 +53,8 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
   const [newAvatar, setNewAvatar] = useState('😊');
   const [newBio, setNewBio] = useState('');
   const [newVoice, setNewVoice] = useState<'warm' | 'rational' | 'humorous' | 'serious'>('warm');
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailPersona, setDetailPersona] = useState<Persona | null>(null);
   const setActivePersonaId = useStore((s) => s.setActivePersonaId);
 
   useEffect(() => {
@@ -89,6 +93,25 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
       const next = getActivePersona();
       setActive(next);
       setActivePersonaId(next.id);
+    }
+  };
+
+  const handleOpenDetail = (e: React.MouseEvent, persona: Persona) => {
+    e.stopPropagation();
+    setDetailPersona(persona);
+    setDetailOpen(true);
+    setAnchorEl(null);
+  };
+
+  const handleDetailClose = () => {
+    setDetailOpen(false);
+    setDetailPersona(null);
+  };
+
+  const handleDetailUpdated = (updated: Persona) => {
+    setPersonas(getAllPersonas());
+    if (activePersona?.id === updated.id) {
+      setActive(updated);
     }
   };
 
@@ -166,6 +189,13 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
                 <DeleteIcon sx={{ fontSize: 14 }} />
               </IconButton>
             )}
+            <IconButton
+              size="small"
+              onClick={(e) => handleOpenDetail(e, p)}
+              sx={{ p: 0.5 }}
+            >
+              <SettingsIcon sx={{ fontSize: 14 }} />
+            </IconButton>
           </MenuItem>
         ))}
         <Divider />
@@ -226,6 +256,16 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
           <Button onClick={handleCreate} variant="contained" disabled={!newName.trim()}>创建</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Persona Detail dialog */}
+      {detailPersona && (
+        <PersonaDetail
+          open={detailOpen}
+          onClose={handleDetailClose}
+          persona={detailPersona}
+          onPersonaUpdated={handleDetailUpdated}
+        />
+      )}
     </Box>
   );
 };

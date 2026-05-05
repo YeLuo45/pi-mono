@@ -100,6 +100,7 @@ interface AppState {
   // Active Persona (multi-persona system)
   activePersonaId: string;
   personaSystemPrompt: string;
+  personaUsageCount: Record<string, number>;
   setActivePersonaId: (id: string) => void;
   clearMessagesForPersona: (personaId: string) => void;
   setMessages: (messages: Message[]) => void;
@@ -369,18 +370,25 @@ export const useStore = create<AppState>()(
       // Active Persona (multi-persona system)
       activePersonaId: 'preset-friend',
       personaSystemPrompt: getPersonaSystemPrompt(getActivePersona()),
+      personaUsageCount: {},
       setActivePersonaId: (id) => {
         // Update active persona in localStorage (for personaStorage)
         const { setActivePersonaId: setStorageId } = require('../services/persona/personaStorage');
         setStorageId(id);
         // Update store state and load persona-specific messages
-        set((state) => ({
-          activePersonaId: id,
-          personaSystemPrompt: getPersonaSystemPrompt(require('../services/persona/personaStorage').getActivePersona()),
-          messages: state.messages.filter(
-            (m) => !m.personaId || m.personaId === id
-          ),
-        }));
+        // Increment usage count for this persona
+        set((state) => {
+          const newUsageCount = { ...state.personaUsageCount };
+          newUsageCount[id] = (newUsageCount[id] || 0) + 1;
+          return {
+            activePersonaId: id,
+            personaSystemPrompt: getPersonaSystemPrompt(require('../services/persona/personaStorage').getActivePersona()),
+            messages: state.messages.filter(
+              (m) => !m.personaId || m.personaId === id
+            ),
+            personaUsageCount: newUsageCount,
+          };
+        });
       },
       clearMessagesForPersona: (personaId) =>
         set((state) => ({
@@ -421,6 +429,7 @@ export const useStore = create<AppState>()(
         voiceSettings: state.voiceSettings,
         language: state.language,
         activePersonaId: state.activePersonaId,
+        personaUsageCount: state.personaUsageCount,
       }),
     }
   )
