@@ -6,6 +6,7 @@ import { getActivePersona, getAllPersonas } from '../services/persona/personaSto
 import { applyPersonaTheme, resetPersonaTheme } from '../utils/personaTheme';
 import { getPersonaSystemPrompt } from '../services/persona/personaPrompt';
 import type { Persona } from '../services/persona/personaStorage';
+import type { AppThemePreset } from '../utils/appTheme';
 
 const LOCAL_TEMPLATES_KEY = 'pixelpal_local_templates';
 
@@ -143,6 +144,14 @@ interface AppState {
   localTemplates: Persona[];
   saveAsTemplate: (persona: Persona) => void;
   removeLocalTemplate: (templateId: string) => void;
+
+  // V33: App-Level Theme System
+  appThemeMode: 'light' | 'dark' | 'system';
+  appThemePresetId: string; // 'light' | 'dark' | 'sunset' | 'forest' | 'custom'
+  customTheme: AppThemePreset | null;
+  setAppThemeMode: (mode: 'light' | 'dark' | 'system') => void;
+  setAppThemePreset: (id: string) => void;
+  setCustomTheme: (theme: AppThemePreset | null) => void;
 }
 
 // Default model templates
@@ -416,6 +425,21 @@ export const useStore = create<AppState>()(
           personaIntimacy: { ...state.personaIntimacy, [personaId]: Math.min(100, Math.max(0, value)) },
         })),
       setActivePersonaId: (id) => {
+        // V33: First apply the current app theme (so persona theme overlays on top)
+        const { appThemeMode, appThemePresetId, customTheme } = useStore.getState();
+        const { getPresetById, getSystemTheme, applyAppTheme, resetToDefault, applyCustomTheme } = require('../utils/appTheme');
+        let effectivePresetId = appThemePresetId;
+        if (appThemeMode === 'system') {
+          effectivePresetId = getSystemTheme();
+        }
+        if (effectivePresetId === 'custom' && customTheme) {
+          applyCustomTheme(customTheme);
+        } else {
+          const preset = getPresetById(effectivePresetId);
+          if (preset) applyAppTheme(preset);
+          else resetToDefault();
+        }
+
         // Update active persona in localStorage (for personaStorage)
         const { setActivePersonaId: setStorageId } = require('../services/persona/personaStorage');
         setStorageId(id);
@@ -446,6 +470,20 @@ export const useStore = create<AppState>()(
       },
       setPersonaFollowTheme: (v) => {
         set({ personaFollowTheme: v });
+        // V33: Re-apply app theme first before persona theme
+        const { appThemeMode, appThemePresetId, customTheme } = useStore.getState();
+        const { getPresetById, getSystemTheme, applyAppTheme, resetToDefault, applyCustomTheme } = require('../utils/appTheme');
+        let effectivePresetId = appThemePresetId;
+        if (appThemeMode === 'system') {
+          effectivePresetId = getSystemTheme();
+        }
+        if (effectivePresetId === 'custom' && customTheme) {
+          applyCustomTheme(customTheme);
+        } else {
+          const preset = getPresetById(effectivePresetId);
+          if (preset) applyAppTheme(preset);
+          else resetToDefault();
+        }
         // If enabling, immediately apply current persona's theme
         if (v) {
           const { activePersonaId } = useStore.getState();
@@ -526,11 +564,34 @@ export const useStore = create<AppState>()(
         localStorage.setItem(LOCAL_TEMPLATES_KEY, JSON.stringify(filtered));
         set({ localTemplates: filtered });
       },
+
+      // V33: App-Level Theme System
+      appThemeMode: 'system',
+      appThemePresetId: 'dark', // default to dark
+      customTheme: null,
+      setAppThemeMode: (mode) => set({ appThemeMode: mode }),
+      setAppThemePreset: (id) => set({ appThemePresetId: id }),
+      setCustomTheme: (theme) => set({ customTheme: theme }),
     }),
     {
       name: 'pixelpal-storage',
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
+        // V33: Apply app theme after rehydration
+        if (state) {
+          const { getPresetById, getSystemTheme, applyAppTheme, resetToDefault, applyCustomTheme } = require('../utils/appTheme');
+          let effectivePresetId = state.appThemePresetId;
+          if (state.appThemeMode === 'system') {
+            effectivePresetId = getSystemTheme();
+          }
+          if (effectivePresetId === 'custom' && state.customTheme) {
+            applyCustomTheme(state.customTheme);
+          } else {
+            const preset = getPresetById(effectivePresetId);
+            if (preset) applyAppTheme(preset);
+            else resetToDefault();
+          }
+        }
         // After rehydration, filter messages by activePersonaId
         // This ensures only the current persona's messages are loaded
         if (state && state.activePersonaId) {
@@ -566,6 +627,10 @@ export const useStore = create<AppState>()(
         personaUsageCount: state.personaUsageCount,
         personaFollowTheme: state.personaFollowTheme,
         personaIntimacy: state.personaIntimacy,
+        // V33: theme
+        appThemeMode: state.appThemeMode,
+        appThemePresetId: state.appThemePresetId,
+        customTheme: state.customTheme,
       }),
     }
   )

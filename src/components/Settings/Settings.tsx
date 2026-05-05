@@ -25,6 +25,7 @@ import { ONLINE_TEMPLATES, type OnlineTemplate } from '../../services/template/o
 import { createPersona } from '../../services/persona/personaStorage';
 import type { ModelConfig } from '../../services/ai/model-registry';
 import type { PersonaId } from '../../types';
+import { APP_THEME_PRESETS, createCustomPreset, applyAppTheme, applyCustomTheme, getPresetById, getSystemTheme, resetToDefault } from '../../utils/appTheme';
 
 const PROVIDER_LABELS: Record<string, string> = {
   openai: 'OpenAI',
@@ -101,6 +102,28 @@ export const Settings: React.FC = () => {
   const [installPreview, setInstallPreview] = useState<ReturnType<typeof templateToPersonaData> | null>(null);
   const [installError, setInstallError] = useState('');
   const [installSuccess, setInstallSuccess] = useState('');
+
+  // V33: Theme settings state
+  const appThemeMode = useStore((s) => s.appThemeMode);
+  const appThemePresetId = useStore((s) => s.appThemePresetId);
+  const customTheme = useStore((s) => s.customTheme);
+  const setAppThemeMode = useStore((s) => s.setAppThemeMode);
+  const setAppThemePreset = useStore((s) => s.setAppThemePreset);
+  const setCustomTheme = useStore((s) => s.setCustomTheme);
+  const [customExpanded, setCustomExpanded] = useState(false);
+  const [customColors, setCustomColors] = useState({
+    background: '#121212',
+    text: '#e0e0e0',
+    accent: '#8b5cf6',
+    border: '#333333',
+  });
+
+  const handleSaveCustomTheme = () => {
+    const theme = createCustomPreset(customColors);
+    setAppThemePreset('custom');
+    setCustomTheme(theme);
+    applyCustomTheme(theme);
+  };
 
   // Load desktop settings on mount
   useEffect(() => {
@@ -455,6 +478,229 @@ export const Settings: React.FC = () => {
               </Typography>
             </Box>
           </Stack>
+        </Paper>
+
+        <Divider sx={{ opacity: 0.1 }} />
+
+        {/* V33: App Theme Settings */}
+        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+          <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
+            🎨 主题设置
+          </Typography>
+
+          {/* Theme Mode Toggle */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" sx={{ fontSize: 12, mb: 1, color: 'text.secondary' }}>
+              主题模式
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
+              {(['light', 'dark', 'system'] as const).map((mode) => {
+                const isActive = appThemeMode === mode;
+                const labels = { light: '明亮', dark: '暗黑', system: '跟随系统' };
+                return (
+                  <Box
+                    key={mode}
+                    onClick={() => {
+                      const { setAppThemeMode, appThemePresetId, customTheme, appThemeMode } = useStore.getState();
+                      setAppThemeMode(mode);
+                      // Immediately apply the new theme
+                      const { getPresetById, getSystemTheme, applyAppTheme, resetToDefault, applyCustomTheme } = require('../../utils/appTheme');
+                      let effectiveId = appThemePresetId;
+                      if (mode === 'system') {
+                        effectiveId = getSystemTheme();
+                      }
+                      if (effectiveId === 'custom' && customTheme) {
+                        applyCustomTheme(customTheme);
+                      } else {
+                        const preset = getPresetById(effectiveId);
+                        if (preset) applyAppTheme(preset);
+                        else resetToDefault();
+                      }
+                    }}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      cursor: 'pointer',
+                      border: `1px solid ${isActive ? 'var(--accent-color)' : 'rgba(255,255,255,0.15)'}`,
+                      bgcolor: isActive ? 'rgba(99,102,241,0.15)' : 'transparent',
+                      color: isActive ? 'var(--accent-color)' : 'text.secondary',
+                      fontSize: 12,
+                      fontWeight: isActive ? 600 : 400,
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      '&:hover': { borderColor: 'var(--accent-color)' },
+                    }}
+                  >
+                    {labels[mode]}
+                  </Box>
+                );
+              })}
+            </Box>
+          </Box>
+
+          {/* Theme Preset Selector */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" sx={{ fontSize: 12, mb: 1, color: 'text.secondary' }}>
+              主题风格
+            </Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1 }}>
+              {APP_THEME_PRESETS.map((preset) => {
+                const isActive = appThemePresetId === preset.id;
+                const previewBg = preset.variables['--bg-primary'];
+                const previewText = preset.variables['--text-primary'];
+                const previewAccent = preset.variables['--accent-color'];
+                return (
+                  <Box
+                    key={preset.id}
+                    onClick={() => {
+                      const { setAppThemePreset, setCustomTheme } = useStore.getState();
+                      setAppThemePreset(preset.id);
+                      setCustomTheme(null);
+                      const { applyAppTheme } = require('../../utils/appTheme');
+                      applyAppTheme(preset);
+                    }}
+                    sx={{
+                      p: 1,
+                      borderRadius: 1,
+                      cursor: 'pointer',
+                      border: `2px solid ${isActive ? previewAccent : 'rgba(255,255,255,0.1)'}`,
+                      bgcolor: previewBg,
+                      transition: 'all 0.2s',
+                      '&:hover': { borderColor: previewAccent, transform: 'scale(1.02)' },
+                    }}
+                  >
+                    {/* Color preview */}
+                    <Box sx={{ display: 'flex', gap: 0.5, mb: 0.5 }}>
+                      <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: previewBg, border: `1px solid ${previewText}22` }} />
+                      <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: previewText }} />
+                      <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: previewAccent }} />
+                    </Box>
+                    <Typography sx={{ fontSize: 9, color: previewText, fontWeight: isActive ? 600 : 400, lineHeight: 1.2 }}>
+                      {preset.label}
+                    </Typography>
+                  </Box>
+                );
+              })}
+              {/* Custom theme card */}
+              {appThemePresetId === 'custom' && (
+                <Box
+                  sx={{
+                    p: 1,
+                    borderRadius: 1,
+                    cursor: 'pointer',
+                    border: `2px solid var(--accent-color)`,
+                    bgcolor: 'rgba(99,102,241,0.15)',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', gap: 0.5, mb: 0.5 }}>
+                    <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: customTheme?.variables['--bg-primary'] || '#6366f1' }} />
+                    <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: customTheme?.variables['--text-primary'] || '#e0e0e0' }} />
+                    <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: customTheme?.variables['--accent-color'] || '#a78bfa' }} />
+                  </Box>
+                  <Typography sx={{ fontSize: 9, color: 'var(--accent-color)', fontWeight: 600, lineHeight: 1.2 }}>
+                    自定义
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Box>
+
+          {/* Custom Theme Editor (collapsible) */}
+          <Box>
+            <Box
+              onClick={() => setCustomExpanded(!customExpanded)}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                cursor: 'pointer',
+                color: 'text.secondary',
+                '&:hover': { color: 'text.primary' },
+              }}
+            >
+              <Typography variant="body2" sx={{ fontSize: 12 }}>
+                自定义主题
+              </Typography>
+              {customExpanded ? <CollapseIcon sx={{ fontSize: 18 }} /> : <ExpandIcon sx={{ fontSize: 18 }} />}
+            </Box>
+            <Collapse in={customExpanded}>
+              <Box sx={{ pt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                {/* Color pickers */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>背景色</Typography>
+                    <input
+                      type="color"
+                      value={customColors.background}
+                      onChange={(e) => setCustomColors({ ...customColors, background: e.target.value })}
+                      style={{ width: '100%', height: 32, border: 'none', borderRadius: 4, cursor: 'pointer', padding: 0 }}
+                    />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>文字色</Typography>
+                    <input
+                      type="color"
+                      value={customColors.text}
+                      onChange={(e) => setCustomColors({ ...customColors, text: e.target.value })}
+                      style={{ width: '100%', height: 32, border: 'none', borderRadius: 4, cursor: 'pointer', padding: 0 }}
+                    />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>强调色</Typography>
+                    <input
+                      type="color"
+                      value={customColors.accent}
+                      onChange={(e) => setCustomColors({ ...customColors, accent: e.target.value })}
+                      style={{ width: '100%', height: 32, border: 'none', borderRadius: 4, cursor: 'pointer', padding: 0 }}
+                    />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>边框色</Typography>
+                    <input
+                      type="color"
+                      value={customColors.border}
+                      onChange={(e) => setCustomColors({ ...customColors, border: e.target.value })}
+                      style={{ width: '100%', height: 32, border: 'none', borderRadius: 4, cursor: 'pointer', padding: 0 }}
+                    />
+                  </Box>
+                </Box>
+
+                {/* Preview */}
+                <Box
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 1,
+                    bgcolor: customColors.background,
+                    border: `1px solid ${customColors.border}`,
+                  }}
+                >
+                  <Typography sx={{ fontSize: 11, color: customColors.text, fontWeight: 600, mb: 0.5 }}>
+                    预览效果
+                  </Typography>
+                  <Typography sx={{ fontSize: 10, color: customColors.text, opacity: 0.7 }}>
+                    这是一个示例文本
+                  </Typography>
+                  <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
+                    <Box sx={{ px: 1, py: 0.5, borderRadius: 0.5, bgcolor: customColors.accent, color: '#fff', fontSize: 9 }}>
+                      按钮
+                    </Box>
+                  </Box>
+                </Box>
+
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleSaveCustomTheme}
+                  sx={{ fontSize: 12 }}
+                >
+                  保存我的主题
+                </Button>
+              </Box>
+            </Collapse>
+          </Box>
         </Paper>
 
         <Divider sx={{ opacity: 0.1 }} />

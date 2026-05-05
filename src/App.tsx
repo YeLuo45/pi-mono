@@ -9,6 +9,7 @@ import { checkGreeting, checkReminders } from './services/actions/ActionTrigger'
 import { applyPersonaTheme, resetPersonaTheme } from './utils/personaTheme';
 import { getAllPersonas } from './services/persona/personaStorage';
 import { generateYesterdaySummaryIfNeeded } from './services/summary/dailySummary';
+import { applyAppTheme, getPresetById, getSystemTheme, resetToDefault, applyCustomTheme } from './utils/appTheme';
 import './services/i18n';
 
 const darkTheme = createTheme({
@@ -131,6 +132,47 @@ function App() {
   const companion = useStore((s) => s.companion);
   const personaFollowTheme = useStore((s) => s.personaFollowTheme);
   const activePersonaId = useStore((s) => s.activePersonaId);
+
+  // V33: App theme state
+  const appThemeMode = useStore((s) => s.appThemeMode);
+  const appThemePresetId = useStore((s) => s.appThemePresetId);
+  const customTheme = useStore((s) => s.customTheme);
+
+  // V33: Apply app theme on mount + listen for system theme changes
+  useEffect(() => {
+    // Determine effective preset based on mode
+    let effectivePresetId = appThemePresetId;
+    if (appThemeMode === 'system') {
+      effectivePresetId = getSystemTheme(); // 'light' or 'dark'
+    }
+
+    // Apply the determined preset
+    if (effectivePresetId === 'custom' && customTheme) {
+      applyCustomTheme(customTheme);
+    } else {
+      const preset = getPresetById(effectivePresetId);
+      if (preset) {
+        applyAppTheme(preset);
+      } else {
+        resetToDefault();
+      }
+    }
+  }, [appThemeMode, appThemePresetId, customTheme]);
+
+  // V33: Listen for system theme changes when mode is 'system'
+  useEffect(() => {
+    if (appThemeMode !== 'system') return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => {
+      // Re-apply app theme with the new system theme
+      const preset = getPresetById(e.matches ? 'dark' : 'light');
+      if (preset) applyAppTheme(preset);
+    };
+
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, [appThemeMode]);
 
   // Initialize companion service and memory on startup
   useEffect(() => {

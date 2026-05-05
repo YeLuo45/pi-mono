@@ -33,3 +33,57 @@ body {
   background: rgba(155, 127, 212, 0.4);
   color: white;
 }
+
+/* ============================================
+   V33: App-Level Theme System CSS Variables
+   ============================================ */
+
+/* Default (light) theme variables */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --border-color: #e0e0e0;
+  --accent-color: #6366f1;
+  --shadow: 0 2px 8px rgba(0,0,0,0.1);
+  /* persona overlay - tinted on top of app theme */
+  --persona-primary: #6366f1;
+  --persona-secondary: #8b5cf6;
+  --persona-accent: #a78bfa;
+  --persona-bg: rgba(99,102,241,0.1);
+  --persona-text: #e0e7ff;
+}
+
+/* Dark theme */
+:root[data-theme="dark"] {
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #999999;
+  --border-color: #333333;
+  --accent-color: #8b5cf6;
+  --shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Sunset theme */
+:root[data-theme="sunset"] {
+  --bg-primary: #1a1410;
+  --bg-secondary: #2d1f15;
+  --text-primary: #f5e6d3;
+  --text-secondary: #b8998a;
+  --border-color: #4a3525;
+  --accent-color: #f97316;
+  --shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* Forest theme */
+:root[data-theme="forest"] {
+  --bg-primary: #0f1a14;
+  --bg-secondary: #1a2d20;
+  --text-primary: #e0f0e8;
+  --text-secondary: #8ab89a;
+  --border-color: #2d4a35;
+  --accent-color: #22c55e;
+  --shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
