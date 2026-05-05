@@ -596,11 +596,21 @@ export const ChatPanel: React.FC = () => {
     }
 
     // Text-based emotion detection
+    let detectedEmotion: string = 'unknown';
     try {
-      const { createEmotionLogEntry, addEmotionLog } = await import('../../services/emotion');
+      const { createEmotionLogEntry, addEmotionLog, emotionResponseEngine } = await import('../../services/emotion');
       const emotionEntry = createEmotionLogEntry(userMsg);
       addEmotionLog(emotionEntry);
+      detectedEmotion = emotionEntry.emotion;
       console.log('[Emotion] Text emotion detected:', emotionEntry.emotion, 'intensity:', emotionEntry.intensity);
+
+      // V21 Emotion Response: Check if AI should respond with emotion-aware message
+      if (emotionResponseEngine.shouldRespond(emotionEntry.emotion, emotionEntry.intensity)) {
+        const responseStyle = emotionResponseEngine.getResponseStyle(emotionEntry.emotion);
+        const behaviorGuidance = emotionResponseEngine.getBehaviorGuidance(emotionEntry.emotion, emotionEntry.intensity, responseStyle);
+        console.log('[EmotionResponse] Triggering emotion-aware response:', behaviorGuidance.toneHint);
+        // Emotion response guidance is injected via emotionContext in the API call below
+      }
     } catch (err) {
       console.warn('[Emotion] Text emotion detection failed:', err);
     }
@@ -692,7 +702,7 @@ export const ChatPanel: React.FC = () => {
       ];
 
       const emotionState = useStore.getState().currentEmotion;
-      const emotionContext = emotionState !== 'unknown' ? emotionState : undefined;
+      const emotionContext = detectedEmotion !== 'unknown' ? detectedEmotion : (emotionState !== 'unknown' ? emotionState : undefined);
 
       const currentIntimacy2 = personaIntimacy[activePersonaId] || 0;
       const intimacyLevel = getIntimacyLevel(currentIntimacy2);
