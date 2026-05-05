@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
 import { MainPage } from './pages/MainPage';
 import { useStore } from './store';
-import type { EmailAccount } from './types';
 import { initCompanion } from './services/companion';
 import { compactMemory } from './services/memory';
 import { checkGreeting, checkReminders } from './services/actions/ActionTrigger';
@@ -128,8 +127,6 @@ const darkTheme = createTheme({
 });
 
 function App() {
-  const setEmailAccount = useStore((s) => s.setEmailAccount);
-  const setActivePanel = useStore((s) => s.setActivePanel);
   const companion = useStore((s) => s.companion);
   const personaFollowTheme = useStore((s) => s.personaFollowTheme);
   const activePersonaId = useStore((s) => s.activePersonaId);
@@ -226,26 +223,6 @@ function App() {
     };
     init();
   }, []);
-
-  // Handle Gmail OAuth callback — tokens returned via URL hash fragment
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.includes('access_token=')) {
-      const params = new URLSearchParams(hash.replace('#', ''));
-      const account: EmailAccount = {
-        type: 'gmail',
-        email: 'Gmail User',
-        accessToken: params.get('access_token') || '',
-        refreshToken: params.get('refresh_token') || undefined,
-        expiresAt: Date.now() + parseInt(params.get('expires_in') || '3600', 10) * 1000,
-      };
-      setEmailAccount(account);
-      // Clean up URL hash without page reload
-      window.history.replaceState({}, '', window.location.pathname);
-      // Navigate to email panel
-      setActivePanel('email');
-    }
-  }, [setEmailAccount, setActivePanel]);
 
   return (
     <ThemeProvider theme={darkTheme}>

@@ -802,6 +802,7 @@ export const ChatPanel: React.FC = () => {
   const displayMessages = collabSession.active ? collabMessages : filteredMessages;
 
   return (
+    <>
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
       <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
@@ -943,7 +944,7 @@ export const ChatPanel: React.FC = () => {
             if (msg.personaId === 'system') {
               return (
                 <Box key={msg.id} sx={{ textAlign: 'center', my: 0.5 }}>
-                  <Typography variant="caption" sx={{ fontSize: 11, color: 'text.secondary', fontStyle: 'italic }}>
+                  <Typography variant="caption" sx={{ fontSize: 11, color: 'text.secondary', fontStyle: 'italic' }}>
                     {msg.content}
                   </Typography>
                 </Box>
@@ -1167,6 +1168,7 @@ export const ChatPanel: React.FC = () => {
       open={memoOpen}
       onClose={() => setMemoOpen(false)}
     />
+    </>
   );
 };
 
