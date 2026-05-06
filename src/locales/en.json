@@ -87,11 +87,16 @@
     "title": "Tasks",
     "pending": "pending",
     "done": "done",
+    "aiSuggestion": "AI Suggestions",
+    "todo": "Todo",
+    "inProgress": "In Progress",
+    "ai_suggestion": "AI Suggestions",
     "addTask": "Add Task",
     "editTask": "Edit Task",
     "taskTitle": "Task Title",
     "dueDate": "Due Date",
     "priority": "Priority",
+    "status": "Status",
     "priorityLow": "Low",
     "priorityMedium": "Medium",
     "priorityHigh": "High",
@@ -102,7 +107,9 @@
     "filterPending": "Pending",
     "filterCompleted": "Completed",
     "noTasks": "No tasks yet. Click + to add one!",
-    "overdue": "Overdue"
+    "noTasksInColumn": "Drop tasks here",
+    "overdue": "Overdue",
+    "dragHint": "Drag to move between columns"
   },
   "document": {
     "title": "Documents",

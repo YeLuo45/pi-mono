@@ -28,12 +28,14 @@ export interface Event {
   syncId?: string;
 }
 
+export type TaskStatus = 'ai_suggestion' | 'todo' | 'in_progress' | 'done';
+
 export interface Task {
   id: string;
   title: string;
   dueDate?: string; // ISO date string
   priority: 'low' | 'medium' | 'high';
-  status: 'pending' | 'completed';
+  status: TaskStatus;
   createdAt: string;
   completedAt?: string;
 }

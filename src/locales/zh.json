@@ -87,11 +87,16 @@
     "title": "任务",
     "pending": "待完成",
     "done": "已完成",
+    "aiSuggestion": "AI 建议",
+    "todo": "待办",
+    "inProgress": "进行中",
+    "ai_suggestion": "AI 建议",
     "addTask": "添加任务",
     "editTask": "编辑任务",
     "taskTitle": "任务标题",
     "dueDate": "截止日期",
     "priority": "优先级",
+    "status": "状态",
     "priorityLow": "低",
     "priorityMedium": "中",
     "priorityHigh": "高",
@@ -102,7 +107,9 @@
     "filterPending": "待完成",
     "filterCompleted": "已完成",
     "noTasks": "还没有任务。点击 + 添加一个！",
-    "overdue": "已逾期"
+    "noTasksInColumn": "拖拽任务到此处",
+    "overdue": "已逾期",
+    "dragHint": "拖拽以移动任务"
   },
   "document": {
     "title": "文档",

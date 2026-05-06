@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { AIConfig, Message, Event, Task, DocumentFile, PetStatus, EmailAccount, InteractionSettings, InteractionCooldowns, CompanionState, PersonaId, VoiceSettings } from '../types';
+import type { AIConfig, Message, Event, Task, DocumentFile, PetStatus, EmailAccount, InteractionSettings, InteractionCooldowns, CompanionState, PersonaId, VoiceSettings, TaskStatus } from '../types';
 import type { EmotionState } from '../services/voice/emotionDetector';
 import { getActivePersona, getAllPersonas } from '../services/persona/personaStorage';
 import { applyPersonaTheme, resetPersonaTheme } from '../utils/personaTheme';
@@ -78,7 +78,7 @@ interface AppState {
   addTask: (task: Task) => void;
   updateTask: (id: string, task: Partial<Task>) => void;
   deleteTask: (id: string) => void;
-  toggleTaskComplete: (id: string) => void;
+  moveTask: (id: string, newStatus: TaskStatus) => void;
 
   // Documents
   documents: DocumentFile[];
@@ -322,14 +322,14 @@ export const useStore = create<AppState>()(
           tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)),
         })),
       deleteTask: (id) => set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) })),
-      toggleTaskComplete: (id) =>
+      moveTask: (id: string, newStatus: TaskStatus) =>
         set((state) => ({
           tasks: state.tasks.map((t) =>
             t.id === id
               ? {
                   ...t,
-                  status: t.status === 'completed' ? 'pending' : 'completed',
-                  completedAt: t.status === 'completed' ? undefined : new Date().toISOString(),
+                  status: newStatus,
+                  completedAt: newStatus === 'done' ? new Date().toISOString() : undefined,
                 }
               : t
           ),
