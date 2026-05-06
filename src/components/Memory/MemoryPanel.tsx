@@ -836,6 +836,7 @@ interface AllMemoriesTabProps {
   tagCounts: Record<string, number>;
   onAddTag: (tag: string) => void;
   onRemoveTag: (tag: string) => void;
+  tagSearchQuery: string;
   tagSuggestions: string[];
   onTagSearchQueryChange: (v: string) => void;
   tagSearchAnchor: HTMLElement | null;
@@ -878,6 +879,7 @@ function AllMemoriesTab({
   tagCounts,
   onAddTag,
   onRemoveTag,
+  tagSearchQuery,
   tagSuggestions,
   onTagSearchQueryChange,
   tagSearchAnchor,
