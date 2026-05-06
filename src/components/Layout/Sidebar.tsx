@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Tooltip, Divider } from '@mui/material';
-import { Chat as ChatIcon, CalendarMonth as CalendarIcon, CheckBox as TaskIcon, Description as DocIcon, Email as EmailIcon, Edit as WriteIcon, Settings as SettingsIcon, Group as GroupIcon, Psychology as KnowledgeIcon, Extension as PluginIcon, Memory as MemoryIcon, BarChart as AnalyticsIcon, Hub as GraphIcon } from '@mui/icons-material';
+import { Chat as ChatIcon, CalendarMonth as CalendarIcon, CheckBox as TaskIcon, Description as DocIcon, Email as EmailIcon, Edit as WriteIcon, Settings as SettingsIcon, Group as GroupIcon, Psychology as KnowledgeIcon, Extension as PluginIcon, Memory as MemoryIcon, BarChart as AnalyticsIcon, Hub as GraphIcon, ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
 import { PluginService } from '../../services/plugin/PluginService';
 import { useTranslation } from 'react-i18next';
@@ -24,9 +24,10 @@ const NAV_ITEMS = [
 interface SidebarProps {
   collapsed?: boolean;
   onNavigate?: () => void;
+  onToggle?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onNavigate }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onNavigate, onToggle }) => {
   const { t } = useTranslation();
   const activePanel = useStore((s) => s.activePanel);
   const setActivePanel = useStore((s) => s.setActivePanel);
@@ -80,6 +81,33 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onNavigate 
           <Typography variant="caption" sx={{ fontSize: 14 }}>🛡️</Typography>
         </Box>
       )}
+
+      {/* Toggle button */}
+      <Box sx={{ px: 1, pb: 0.5, display: 'flex', justifyContent: collapsed ? 'center' : 'flex-end' }}>
+        <Box
+          component="button"
+          onClick={onToggle}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 28,
+            height: 28,
+            borderRadius: 1,
+            border: 'none',
+            cursor: 'pointer',
+            bgcolor: 'rgba(255,255,255,0.06)',
+            color: 'rgba(255,255,255,0.6)',
+            transition: 'all 0.15s ease',
+            '&:hover': {
+              bgcolor: 'rgba(255,255,255,0.12)',
+              color: 'rgba(255,255,255,0.9)',
+            },
+          }}
+        >
+          {collapsed ? <ChevronRightIcon sx={{ fontSize: 16 }} /> : <ChevronLeftIcon sx={{ fontSize: 16 }} />}
+        </Box>
+      </Box>
 
       <Divider sx={{ opacity: 0.15, mx: 1, mb: 1 }} />
 

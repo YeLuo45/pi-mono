@@ -39,6 +39,8 @@ export const MainPage: React.FC = () => {
   const activePanel = useStore((s) => s.activePanel);
   const activePluginId = useStore((s) => s.activePluginId);
   const setActivePluginId = useStore((s) => s.setActivePluginId);
+  const sidebarCollapsed = useStore((s) => s.sidebarCollapsed);
+  const toggleSidebar = useStore((s) => s.toggleSidebar);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [relationGraphOpen, setRelationGraphOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -87,7 +89,7 @@ export const MainPage: React.FC = () => {
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'rgba(10, 5, 20, 1)' }}>
       {/* Desktop sidebar */}
-      {!isMobile && <Sidebar />}
+      {!isMobile && <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />}
 
       {/* Mobile drawer */}
       {isMobile && (
@@ -136,12 +138,8 @@ export const MainPage: React.FC = () => {
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            maxWidth: isMobile ? '100%' : 480,
-            mx: 'auto',
             width: '100%',
             bgcolor: 'rgba(15, 10, 30, 0.92)',
-            borderLeft: isMobile ? 'none' : '1px solid rgba(255,255,255,0.06)',
-            borderRight: isMobile ? 'none' : '1px solid rgba(255,255,255,0.06)',
             backgroundImage: 'linear-gradient(180deg, rgba(20,10,40,0.3) 0%, rgba(15,10,30,0.95) 100%)',
           }}
         >
