@@ -40,11 +40,11 @@ interface PersonaSelectorProps {
   collapsed?: boolean;
 }
 
-const VOICE_LABELS = {
-  warm: '温暖',
-  rational: '理性',
-  humorous: '幽默',
-  serious: '严肃',
+const VOICE_LABELS: Record<string, string> = {
+  warm: 'warm',
+  rational: 'rational',
+  humorous: 'humorous',
+  serious: 'serious',
 };
 
 export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) => {
@@ -216,7 +216,7 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
         }}
       >
         <Typography variant="body2" sx={{ fontSize: 12, fontWeight: 600 }}>
-          {activePersona?.name || '选择人格'}
+          {activePersona?.name || t('persona.selectPersona', '选择人格')}
         </Typography>
       </Button>
       <Box sx={{ px: 1.5, pb: 1 }}>
@@ -246,7 +246,7 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
       >
         <Box sx={{ px: 2, py: 1 }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            人格
+            {t('persona.persona', '人格')}
           </Typography>
         </Box>
         {personas.map((p) => {
@@ -354,17 +354,17 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
         <Divider />
         <MenuItem onClick={() => { setCreateOpen(true); setAnchorEl(null); }} sx={{ gap: 1 }}>
           <AddIcon sx={{ fontSize: 16 }} />
-          <Typography variant="body2" sx={{ fontSize: 13 }}>创建新人格</Typography>
+          <Typography variant="body2" sx={{ fontSize: 13 }}>{t('persona.createNew', '创建新人格')}</Typography>
         </MenuItem>
       </Menu>
 
       {/* Create dialog */}
       <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>创建新人格</DialogTitle>
+        <DialogTitle>{t('persona.createTitle', '创建新人格')}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '16px !important' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <TextField
-              label="头像"
+              label={t('persona.avatar', '头像')}
               value={newAvatar}
               onChange={(e) => setNewAvatar(e.target.value.slice(0, 2))}
               size="small"
@@ -372,7 +372,7 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
               placeholder="😊"
             />
             <TextField
-              label="名称"
+              label={t('persona.name', '名称')}
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               size="small"
@@ -381,7 +381,7 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
             />
           </Box>
           <TextField
-            label="简介"
+            label={t('persona.bio', '简介')}
             value={newBio}
             onChange={(e) => setNewBio(e.target.value)}
             size="small"
@@ -390,23 +390,23 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
             rows={2}
           />
           <Box>
-            <Typography variant="caption" sx={{ mb: 0.5, display: 'block', color: 'text.secondary' }}>语气</Typography>
+            <Typography variant="caption" sx={{ mb: 0.5, display: 'block', color: 'text.secondary' }}>{t('persona.voice', '语气')}</Typography>
             <Select
               value={newVoice}
               onChange={(e) => setNewVoice(e.target.value as typeof newVoice)}
               size="small"
               fullWidth
             >
-              <MenuItem value="warm">温暖</MenuItem>
-              <MenuItem value="rational">理性</MenuItem>
-              <MenuItem value="humorous">幽默</MenuItem>
-              <MenuItem value="serious">严肃</MenuItem>
+              <MenuItem value="warm">{t('persona.voice.warm', '温暖')}</MenuItem>
+              <MenuItem value="rational">{t('persona.voice.rational', '理性')}</MenuItem>
+              <MenuItem value="humorous">{t('persona.voice.humorous', '幽默')}</MenuItem>
+              <MenuItem value="serious">{t('persona.voice.serious', '严肃')}</MenuItem>
             </Select>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCreateOpen(false)}>取消</Button>
-          <Button onClick={handleCreate} variant="contained" disabled={!newName.trim()}>创建</Button>
+          <Button onClick={() => setCreateOpen(false)}>{t('common.cancel', '取消')}</Button>
+          <Button onClick={handleCreate} variant="contained" disabled={!newName.trim()}>{t('common.add', '创建')}</Button>
         </DialogActions>
       </Dialog>
 

@@ -3,12 +3,14 @@ import { Box, IconButton, Chip, Typography, useMediaQuery, Drawer } from '@mui/m
 import { Bolt as BoltIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useSceneStore } from '../../stores/sceneStore';
 import { executeScene } from '../../utils/sceneScheduler';
+import { useTranslation } from 'react-i18next';
 
 interface QuickSceneBarProps {
   onClose?: () => void;
 }
 
 export const QuickSceneBar: React.FC<QuickSceneBarProps> = ({ onClose }) => {
+  const { t } = useTranslation();
   const scenes = useSceneStore((s) => s.scenes);
   const quickScenes = scenes.filter((s) => s.enabled && s.isQuick);
   const isMobile = useMediaQuery('(max-width: 600px)');
@@ -57,7 +59,7 @@ export const QuickSceneBar: React.FC<QuickSceneBarProps> = ({ onClose }) => {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, pb: 1 }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-              快捷场景
+              {t('scene.quickScenes', '快捷场景')}
             </Typography>
             <IconButton size="small" onClick={() => setDrawerOpen(false)}>
               <CloseIcon />

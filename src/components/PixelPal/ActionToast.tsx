@@ -7,6 +7,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Paper, Typography, IconButton, Button, Fade } from '@mui/material';
 import { Close as CloseIcon, CheckCircle as CheckIcon } from '@mui/icons-material';
 import { ACTION_COLORS, ACTION_ICONS } from '../../services/actions/ActionTypes';
@@ -26,6 +27,7 @@ export const ActionToast: React.FC<ActionToastProps> = ({
   onActionTake,
   position = 'bottom-right',
 }) => {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(true);
   const colors = ACTION_COLORS[action.type];
   const icon = ACTION_ICONS[action.type];
@@ -59,16 +61,16 @@ export const ActionToast: React.FC<ActionToastProps> = ({
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Typography sx={{ fontSize: 10, color: colors.color, opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                ⏰ 提醒
+                ⏰ {t('action.reminder', '提醒')}
               </Typography>
               {action.urgency === 'overdue' && (
                 <Box sx={{ px: 0.5, py: 0.1, borderRadius: 0.5, bgcolor: 'rgba(244,67,54,0.2)', fontSize: 9, color: '#F44336', fontWeight: 700 }}>
-                  已过期
+                  {t('action.overdue', '已过期')}
                 </Box>
               )}
               {action.urgency === 'soon' && (
                 <Box sx={{ px: 0.5, py: 0.1, borderRadius: 0.5, bgcolor: 'rgba(255,152,0,0.2)', fontSize: 9, color: '#FF9800', fontWeight: 700 }}>
-                  即将到期
+                  {t('action.soon', '即将到期')}
                 </Box>
               )}
             </Box>
@@ -85,7 +87,7 @@ export const ActionToast: React.FC<ActionToastProps> = ({
                   onClick={() => { onActionTake(action); handleDismiss(); }}
                   sx={{ fontSize: 10, py: 0.25, px: 1, minWidth: 0 }}
                 >
-                  马上做
+                  {t('action.doNow', '马上做')}
                 </Button>
                 <Button
                   size="small"
@@ -93,7 +95,7 @@ export const ActionToast: React.FC<ActionToastProps> = ({
                   onClick={handleDismiss}
                   sx={{ fontSize: 10, py: 0.25, px: 1, color: 'text.secondary', minWidth: 0 }}
                 >
-                  稍后
+                  {t('action.later', '稍后')}
                 </Button>
               </Box>
             )}
@@ -105,7 +107,7 @@ export const ActionToast: React.FC<ActionToastProps> = ({
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Typography sx={{ fontSize: 10, color: colors.color, opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                💡 建议
+                💡 {t('action.suggest', '建议')}
               </Typography>
             </Box>
             <Typography sx={{ fontSize: 13, color: 'white' }}>
@@ -124,7 +126,7 @@ export const ActionToast: React.FC<ActionToastProps> = ({
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Typography sx={{ fontSize: 10, color: colors.color, opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                🧠 记忆
+                🧠 {t('action.memory', '记忆')}
               </Typography>
             </Box>
             <Typography sx={{ fontSize: 13, color: 'white' }}>

@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogTitle,
@@ -75,16 +76,16 @@ const VOICE_OPTIONS: Array<{ value: Persona['voice']; label: string }> = [
   { value: 'serious', label: '严肃' },
 ];
 
-function formatRelativeTime(timestamp: number): string {
+function formatRelativeTime(timestamp: number, t: (key: string, opts?: object) => string): string {
   const diff = Date.now() - timestamp;
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  if (days > 0) return `${days}天前`;
-  if (hours > 0) return `${hours}小时前`;
-  if (minutes > 0) return `${minutes}分钟前`;
-  return '刚刚';
+  if (days > 0) return t('time.daysAgo', { count: days });
+  if (hours > 0) return t('time.hoursAgo', { count: hours });
+  if (minutes > 0) return t('time.minutesAgo', { count: minutes });
+  return t('time.justNow');
 }
 
 export const PersonaDetail: React.FC<PersonaDetailProps> = ({
@@ -93,6 +94,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
   persona,
   onPersonaUpdated,
 }) => {
+  const { t } = useTranslation();
   const [bio, setBio] = useState(persona.bio);
   const [voice, setVoice] = useState<Persona['voice']>(persona.voice);
   const [avatar, setAvatar] = useState(persona.avatar);
@@ -186,9 +188,9 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
       const dateStr = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
       const filename = `pixelpal_${persona.name}_${dateStr}.json`;
       downloadJSON(data, filename);
-      setExportSnackbar(`已导出: ${filename}`);
+      setExportSnackbar(t('persona.detail.exported', { defaultValue: `已导出: ${filename}`, filename }));
     } catch (err) {
-      setExportSnackbar(`导出失败: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setExportSnackbar(t('persona.detail.exportFailed', { defaultValue: `导出失败: ${err instanceof Error ? err.message : 'Unknown error'}`, error: err instanceof Error ? err.message : 'Unknown error' }));
     }
   };
 
@@ -196,15 +198,15 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
     const code = encodeTemplate(persona);
     const success = await copyToClipboard(code);
     if (success) {
-      setShareSnackbar('分享码已复制！');
+      setShareSnackbar(t('persona.detail.shareCodeCopied', '分享码已复制！'));
     } else {
-      setShareSnackbar('复制失败，请手动复制');
+      setShareSnackbar(t('persona.detail.copyFailed', '复制失败，请手动复制'));
     }
   };
 
   const handleSaveAsTemplate = () => {
     saveAsTemplate(persona);
-    setShareSnackbar('已保存到模板库！');
+    setShareSnackbar(t('persona.detail.savedToTemplate', '已保存到模板库！'));
   };
 
   const handleClose = () => {
@@ -296,37 +298,37 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
         <Tab
           icon={<StatsIcon sx={{ fontSize: 14 }} />}
           iconPosition="start"
-          label="统计"
+          label={t('persona.detail.tab.stats', '统计')}
           sx={{ minHeight: 36, fontSize: 12, gap: 0.5 }}
         />
         <Tab
           icon={<EditIcon sx={{ fontSize: 14 }} />}
           iconPosition="start"
-          label="编辑"
+          label={t('persona.detail.tab.edit', '编辑')}
           sx={{ minHeight: 36, fontSize: 12, gap: 0.5 }}
         />
         <Tab
           icon={<TimeIcon sx={{ fontSize: 14 }} />}
           iconPosition="start"
-          label="预览"
+          label={t('persona.detail.tab.preview', '预览')}
           sx={{ minHeight: 36, fontSize: 12, gap: 0.5 }}
         />
         <Tab
           icon={<SettingsIcon sx={{ fontSize: 14 }} />}
           iconPosition="start"
-          label="设置"
+          label={t('persona.detail.tab.settings', '设置')}
           sx={{ minHeight: 36, fontSize: 12, gap: 0.5 }}
         />
         <Tab
           icon={<VolumeUpIcon sx={{ fontSize: 14 }} />}
           iconPosition="start"
-          label="声音"
+          label={t('persona.detail.tab.voice', '声音')}
           sx={{ minHeight: 36, fontSize: 12, gap: 0.5 }}
         />
         <Tab
           icon={<FaceIcon sx={{ fontSize: 14 }} />}
           iconPosition="start"
-          label="外貌"
+          label={t('persona.detail.tab.appearance', '外貌')}
           sx={{ minHeight: 36, fontSize: 12, gap: 0.5 }}
         />
       </Tabs>
@@ -338,22 +340,22 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
               <StatCard
                 icon={<MessageIcon sx={{ fontSize: 16 }} />}
-                label="消息数"
+                label={t('persona.detail.stats.messages', '消息数')}
                 value={String(messageCount)}
               />
               <StatCard
                 icon={<MemoryIcon sx={{ fontSize: 16 }} />}
-                label="记忆数"
+                label={t('persona.detail.stats.memories', '记忆数')}
                 value={String(memoryCount)}
               />
               <StatCard
                 icon={<TimeIcon sx={{ fontSize: 16 }} />}
-                label="最后活跃"
-                value={lastActiveTimestamp ? formatRelativeTime(lastActiveTimestamp) : '无记录'}
+                label={t('persona.detail.stats.lastActive', '最后活跃')}
+                value={lastActiveTimestamp ? formatRelativeTime(lastActiveTimestamp, t) : t('persona.detail.noRecord', '无记录')}
               />
               <StatCard
                 icon={<StatsIcon sx={{ fontSize: 16 }} />}
-                label="切换次数"
+                label={t('persona.detail.stats.switchCount', '切换次数')}
                 value={String(usageCount)}
               />
             </Box>
@@ -362,7 +364,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             <Box sx={{ mt: 1 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
-                  亲密度
+                  {t('persona.detail.intimacy', '亲密度')}
                 </Typography>
                 <Typography variant="caption" sx={{ fontSize: 11, fontWeight: 600 }}>
                   {(() => {
@@ -392,11 +394,11 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             <Divider />
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
-                人格 ID: {persona.id}
+                {t('persona.detail.personaId', '人格 ID')}: {persona.id}
               </Typography>
               <br />
               <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
-                类型: {persona.isDefault ? '预设人格' : '自定义人格'}
+                {t('persona.detail.type', '类型')}: {persona.isDefault ? t('persona.detail.presetPersona', '预设人格') : t('persona.detail.customPersona', '自定义人格')}
               </Typography>
             </Box>
           </Box>
@@ -408,7 +410,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             {/* Avatar picker */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                头像
+                {t('persona.detail.avatar', '头像')}
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, maxHeight: 120, overflowY: 'auto' }}>
                 {Object.entries(EMOJI_CATEGORIES).map(([category, emojis]) =>
@@ -438,20 +440,20 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
 
             {/* Bio */}
             <TextField
-              label="简介"
+              label={t('persona.detail.bio', '简介')}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               size="small"
               fullWidth
               multiline
               rows={2}
-              placeholder="描述这个人格的特点..."
+              placeholder={t('persona.detail.bioPlaceholder', '描述这个人格的特点...')}
             />
 
             {/* Voice */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                语气
+                {t('persona.detail.voice', '语气')}
               </Typography>
               <Select
                 value={voice}
@@ -470,7 +472,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             {/* Modified indicator */}
             {isModified && (
               <Chip
-                label="已修改（未保存）"
+                label={t('persona.detail.modifiedUnsaved', '已修改（未保存）')}
                 size="small"
                 color="warning"
                 variant="outlined"
@@ -483,7 +485,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
           /* Preview tab */
           <Box>
             <Typography variant="caption" sx={{ color: 'text.secondary', mb: 1, display: 'block' }}>
-              系统提示词预览
+              {t('persona.detail.systemPromptPreview', '系统提示词预览')}
             </Typography>
             <Box
               sx={{
@@ -526,7 +528,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                主题设置
+                {t('persona.detail.themeSettings', '主题设置')}
               </Typography>
               <FormControlLabel
                 control={
@@ -537,7 +539,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                     color="primary"
                   />
                 }
-                label="跟随人格切换主题"
+                label={t('persona.detail.followThemeOnSwitch', '跟随人格切换主题')}
                 sx={{
                   bgcolor: 'rgba(255,255,255,0.04)',
                   borderRadius: 1.5,
@@ -548,43 +550,35 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                 }}
               />
               <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.5, display: 'block', fontSize: 10 }}>
-                开启后，切换人格将自动应用该人格的主题配色
+                {t('persona.detail.followThemeHint', '开启后，切换人格将自动应用该人格的主题配色')}
               </Typography>
             </Box>
             {persona.theme && (
               <Box>
                 <Typography variant="caption" sx={{ color: 'text.secondary', mb: 1, display: 'block' }}>
-                  当前主题色
+                  {t('persona.detail.currentThemeColor', '当前主题色')}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {[
-                    { label: '主色', color: persona.theme.primaryColor },
-                    { label: '副色', color: persona.theme.secondaryColor },
-                    { label: '强调', color: persona.theme.accentColor },
-                    { label: '背景', color: persona.theme.backgroundColor },
-                    { label: '文字', color: persona.theme.textColor },
-                  ].map((swatch) => (
-                    <Box
-                      key={swatch.label}
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 0.5,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: 1,
-                          bgcolor: swatch.color,
-                          border: '1px solid rgba(255,255,255,0.1)',
-                        }}
-                      />
-                      <Typography sx={{ fontSize: 9, color: 'text.secondary' }}>{swatch.label}</Typography>
-                    </Box>
-                  ))}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+                    <Box sx={{ width: 28, height: 28, borderRadius: 1, bgcolor: persona.theme.primaryColor, border: '1px solid rgba(255,255,255,0.1)' }} />
+                    <Typography sx={{ fontSize: 9, color: 'text.secondary' }}>{t('persona.detail.primaryColor', '主色')}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+                    <Box sx={{ width: 28, height: 28, borderRadius: 1, bgcolor: persona.theme.secondaryColor, border: '1px solid rgba(255,255,255,0.1)' }} />
+                    <Typography sx={{ fontSize: 9, color: 'text.secondary' }}>{t('persona.detail.secondaryColor', '副色')}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+                    <Box sx={{ width: 28, height: 28, borderRadius: 1, bgcolor: persona.theme.accentColor, border: '1px solid rgba(255,255,255,0.1)' }} />
+                    <Typography sx={{ fontSize: 9, color: 'text.secondary' }}>{t('persona.detail.accentColor', '强调')}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+                    <Box sx={{ width: 28, height: 28, borderRadius: 1, bgcolor: persona.theme.backgroundColor, border: '1px solid rgba(255,255,255,0.1)' }} />
+                    <Typography sx={{ fontSize: 9, color: 'text.secondary' }}>{t('persona.detail.backgroundColor', '背景')}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+                    <Box sx={{ width: 28, height: 28, borderRadius: 1, bgcolor: persona.theme.textColor, border: '1px solid rgba(255,255,255,0.1)' }} />
+                    <Typography sx={{ fontSize: 9, color: 'text.secondary' }}>{t('persona.detail.textColor', '文字')}</Typography>
+                  </Box>
                 </Box>
               </Box>
             )}
@@ -592,7 +586,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             {/* Export Data */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                数据备份
+                {t('persona.detail.dataBackup', '数据备份')}
               </Typography>
               <Button
                 size="small"
@@ -601,17 +595,17 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                 onClick={handleExport}
                 sx={{ fontSize: 11 }}
               >
-                导出数据
+                {t('persona.detail.exportData', '导出数据')}
               </Button>
               <Typography variant="caption" sx={{ color: 'text.disabled', mt: 0.5, display: 'block', fontSize: 10 }}>
-                导出该人格的聊天记录和记忆
+                {t('persona.detail.exportHint', '导出该人格的聊天记录和记忆')}
               </Typography>
             </Box>
 
             {/* Share & Save Template */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                分享与模板
+                {t('persona.detail.shareAndTemplate', '分享与模板')}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
@@ -621,7 +615,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                   onClick={handleShare}
                   sx={{ fontSize: 10 }}
                 >
-                  分享
+                  {t('persona.detail.share', '分享')}
                 </Button>
                 <Button
                   size="small"
@@ -630,7 +624,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                   onClick={handleSaveAsTemplate}
                   sx={{ fontSize: 10 }}
                 >
-                  保存到模板库
+                  {t('persona.detail.saveToTemplate', '保存到模板库')}
                 </Button>
               </Box>
             </Box>
@@ -638,7 +632,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             {/* Growth Diary */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                成长档案
+                {t('persona.detail.growthDiary', '成长档案')}
               </Typography>
               <Button
                 size="small"
@@ -647,14 +641,14 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                 onClick={() => setProfileOpen(true)}
                 sx={{ fontSize: 10 }}
               >
-                查看成长档案
+                {t('persona.detail.viewGrowthDiary', '查看成长档案')}
               </Button>
             </Box>
 
             {/* V39: Interactive Games */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                互动游戏
+                {t('persona.detail.interactiveGames', '互动游戏')}
               </Typography>
               <Button
                 size="small"
@@ -663,14 +657,14 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                 onClick={() => setGameDialogOpen(true)}
                 sx={{ fontSize: 10 }}
               >
-                互动游戏
+                {t('persona.detail.interactiveGames', '互动游戏')}
               </Button>
             </Box>
 
             {/* V36: Send Memo */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                便条
+                {t('persona.detail.memo', '便条')}
               </Typography>
               <Button
                 size="small"
@@ -679,7 +673,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                 onClick={() => setMemoOpen(true)}
                 sx={{ fontSize: 10 }}
               >
-                写便条
+                {t('persona.detail.writeMemo', '写便条')}
               </Button>
             </Box>
           </Box>
@@ -704,7 +698,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             {/* Avatar presets */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                头像
+                {t('persona.detail.avatar', '头像')}
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                 {AVATAR_PRESETS.map((emoji) => (
@@ -733,7 +727,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             {/* Expression */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                表情
+                {t('persona.detail.expression', '表情')}
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                 {['😊', '😐', '😢', '🤔', '😠', '😄', '😎', '🤯', '😌'].map((e) => (
@@ -758,7 +752,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             {/* Accessory */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                配饰
+                {t('persona.detail.accessory', '配饰')}
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                 {['👓', '🎧', '🎀', '💎', '🤍', '👒', '🎩', '🧣'].map((a) => (
@@ -783,7 +777,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             {/* Outfit */}
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                服装
+                {t('persona.detail.outfit', '服装')}
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                 {['👕', '👔', '🎽', '👗', '👟', '🩱', '🧥'].map((o) => (
@@ -813,7 +807,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                   {appearance.expression} {appearance.accessory} {appearance.outfit}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10 }}>
-                  表情:{appearance.expression} | 配饰:{appearance.accessory} | 服装:{appearance.outfit}
+                  {t('persona.detail.expression', '表情')}:{appearance.expression} | {t('persona.detail.accessory', '配饰')}:{appearance.accessory} | {t('persona.detail.outfit', '服装')}:{appearance.outfit}
                 </Typography>
               </Box>
             </Box>
@@ -823,7 +817,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
 
       <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
         <Button onClick={handleClose} size="small">
-          取消
+          {t('common.cancel', '取消')}
         </Button>
         <Button
           onClick={handleSave}
@@ -831,7 +825,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
           size="small"
           disabled={!isModified || saving}
         >
-          {saving ? '保存中...' : '保存'}
+          {saving ? t('persona.detail.saving', '保存中...') : t('common.save', '保存')}
         </Button>
       </DialogActions>
 
@@ -873,12 +867,12 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
       >
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <MailIcon sx={{ fontSize: 18 }} />
-          写便条
+          {t('persona.detail.writeMemo', '写便条')}
         </DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '16px !important' }}>
           <Box>
             <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-              发送给
+              {t('persona.detail.sendTo', '发送给')}
             </Typography>
             <Select
               value={memoTargetId}
@@ -888,7 +882,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
               displayEmpty
             >
               <MenuItem value="" disabled>
-                选择人格...
+                {t('persona.detail.selectPersona', '选择人格...')}
               </MenuItem>
               {(() => {
                 const allP = getAllPersonas();
@@ -908,14 +902,14 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             </Select>
           </Box>
           <TextField
-            label="便条内容"
+            label={t('persona.detail.memoContent', '便条内容')}
             value={memoContent}
             onChange={(e) => setMemoContent(e.target.value.slice(0, 100))}
             size="small"
             fullWidth
             multiline
             rows={3}
-            placeholder="写下你想说的话..."
+            placeholder={t('persona.detail.memoPlaceholder', '写下你想说的话...')}
             helperText={`${memoContent.length}/100`}
           />
         </DialogContent>
@@ -928,13 +922,13 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             }}
             size="small"
           >
-            取消
+            {t('common.cancel', '取消')}
           </Button>
           <Button
             onClick={() => {
               if (!memoTargetId || !memoContent.trim()) return;
               sendMemo(memoTargetId, memoContent.trim());
-              setMemoSnackbar('便条已发送！');
+              setMemoSnackbar(t('persona.detail.memoSent', '便条已发送！'));
               setMemoOpen(false);
               setMemoTargetId('');
               setMemoContent('');
@@ -943,7 +937,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             size="small"
             disabled={!memoTargetId || !memoContent.trim()}
           >
-            发送
+            {t('common.send', '发送')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -964,6 +958,7 @@ const VoiceTab: React.FC<{
   persona: Persona;
   onSave: (voice: Persona['voice']) => void;
 }> = ({ persona, onSave }) => {
+  const { t } = useTranslation();
   const [rate, setRate] = useState(persona.voice.rate);
   const [pitch, setPitch] = useState(persona.voice.pitch);
   const [volume, setVolume] = useState(persona.voice.volume);
@@ -993,7 +988,7 @@ const VoiceTab: React.FC<{
 
   const handleSave = () => {
     onSave({ rate, pitch, volume, voiceName: voiceName || undefined });
-    setSnackbar('声音设置已保存！');
+    setSnackbar(t('persona.detail.voiceSettingsSaved', '声音设置已保存！'));
   };
 
   const isModified =
@@ -1007,10 +1002,10 @@ const VoiceTab: React.FC<{
       {/* Rate */}
       <Box>
         <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-          语速: {rate.toFixed(1)}
+          {t('persona.detail.speechRate', '语速')}: {rate.toFixed(1)}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>慢</Typography>
+          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>{t('persona.detail.slow', '慢')}</Typography>
           <Slider
             value={rate}
             min={0.5}
@@ -1019,17 +1014,17 @@ const VoiceTab: React.FC<{
             onChange={(_, v) => setRate(v as number)}
             sx={{ flex: 1 }}
           />
-          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>快</Typography>
+          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>{t('persona.detail.fast', '快')}</Typography>
         </Box>
       </Box>
 
       {/* Pitch */}
       <Box>
         <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-          音调: {pitch.toFixed(1)}
+          {t('persona.detail.pitch', '音调')}: {pitch.toFixed(1)}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>低</Typography>
+          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>{t('persona.detail.low', '低')}</Typography>
           <Slider
             value={pitch}
             min={0.5}
@@ -1038,17 +1033,17 @@ const VoiceTab: React.FC<{
             onChange={(_, v) => setPitch(v as number)}
             sx={{ flex: 1 }}
           />
-          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>高</Typography>
+          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>{t('persona.detail.high', '高')}</Typography>
         </Box>
       </Box>
 
       {/* Volume */}
       <Box>
         <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-          音量: {Math.round(volume * 100)}%
+          {t('persona.detail.volume', '音量')}: {Math.round(volume * 100)}%
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>静音</Typography>
+          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>{t('persona.detail.mute', '静音')}</Typography>
           <Slider
             value={volume}
             min={0}
@@ -1057,14 +1052,14 @@ const VoiceTab: React.FC<{
             onChange={(_, v) => setVolume(v as number)}
             sx={{ flex: 1 }}
           />
-          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>最大</Typography>
+          <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10 }}>{t('persona.detail.max', '最大')}</Typography>
         </Box>
       </Box>
 
       {/* Voice selector */}
       <Box>
         <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
-          语音（可选）
+          {t('persona.detail.voiceOptional', '语音（可选）')}
         </Typography>
         <Select
           value={voiceName}
@@ -1073,7 +1068,7 @@ const VoiceTab: React.FC<{
           fullWidth
           displayEmpty
         >
-          <MenuItem value="">默认语音</MenuItem>
+          <MenuItem value="">{t('persona.detail.defaultVoice', '默认语音')}</MenuItem>
           {availableVoices.map((v) => (
             <MenuItem key={v.name} value={v.name}>
               {v.name} ({v.lang})
@@ -1082,7 +1077,7 @@ const VoiceTab: React.FC<{
         </Select>
         {availableVoices.length === 0 && (
           <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 10, display: 'block', mt: 0.5 }}>
-            加载中...
+            {t('common.loading', '加载中...')}
           </Typography>
         )}
       </Box>
@@ -1095,7 +1090,7 @@ const VoiceTab: React.FC<{
         startIcon={<VolumeUpIcon sx={{ fontSize: 14 }} />}
         sx={{ fontSize: 11 }}
       >
-        测试声音
+        {t('persona.detail.testVoice', '测试声音')}
       </Button>
 
       {/* Save button */}
@@ -1107,12 +1102,12 @@ const VoiceTab: React.FC<{
         startIcon={<SaveIcon sx={{ fontSize: 14 }} />}
         sx={{ fontSize: 11 }}
       >
-        保存
+        {t('common.save', '保存')}
       </Button>
 
       {isModified && (
         <Chip
-          label="已修改（未保存）"
+          label={t('persona.detail.modifiedUnsaved', '已修改（未保存）')}
           size="small"
           color="warning"
           variant="outlined"

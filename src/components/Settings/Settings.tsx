@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box, Typography, TextField, Button, Paper,
   FormControl, InputLabel, Select, MenuItem,
@@ -41,6 +42,7 @@ const PROVIDER_LABELS: Record<string, string> = {
 };
 
 export const Settings: React.FC = () => {
+  const { t } = useTranslation();
   const aiConfig = useStore((s) => s.aiConfig);
   const setAIConfig = useStore((s) => s.setAIConfig);
   const models = useStore((s) => s.models);
@@ -174,12 +176,12 @@ export const Settings: React.FC = () => {
     setInstallError('');
     setInstallPreview(null);
     if (!installCode.trim()) {
-      setInstallError('请输入分享码');
+      setInstallError(t('settings.invalidShareCode'));
       return;
     }
     const payload = decodeTemplate(installCode.trim());
     if (!payload) {
-      setInstallError('无效的分享码');
+      setInstallError(t('settings.invalidShareCode'));
       return;
     }
     setInstallPreview(templateToPersonaData(payload));
@@ -190,12 +192,12 @@ export const Settings: React.FC = () => {
     try {
       const newPersona = createPersona(installPreview);
       setActivePersonaId(newPersona.id);
-      setInstallSuccess(`已创建人格: ${newPersona.name}`);
+      setInstallSuccess(t('settings.personaCreated', { name: newPersona.name }));
       setInstallCode('');
       setInstallPreview(null);
       setTimeout(() => setInstallSuccess(''), 3000);
     } catch (err) {
-      setInstallError(`安装失败: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setInstallError(t('settings.installFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
     }
   };
 
@@ -210,10 +212,10 @@ export const Settings: React.FC = () => {
       };
       const newPersona = createPersona(personaData);
       setActivePersonaId(newPersona.id);
-      setInstallSuccess(`已创建人格: ${newPersona.name}`);
+      setInstallSuccess(t('settings.personaCreated', { name: newPersona.name }));
       setTimeout(() => setInstallSuccess(''), 3000);
     } catch (err) {
-      setInstallError(`安装失败: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setInstallError(t('settings.installFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
     }
   };
 
@@ -222,10 +224,10 @@ export const Settings: React.FC = () => {
       const { id, createdAt, updatedAt, isDefault, ...templateData } = template;
       const newPersona = createPersona(templateData);
       setActivePersonaId(newPersona.id);
-      setInstallSuccess(`已创建人格: ${newPersona.name}`);
+      setInstallSuccess(t('settings.personaCreated', { name: newPersona.name }));
       setTimeout(() => setInstallSuccess(''), 3000);
     } catch (err) {
-      setInstallError(`创建失败: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setInstallError(t('settings.createFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
     }
   };
 
@@ -485,18 +487,18 @@ export const Settings: React.FC = () => {
         {/* V33: App Theme Settings */}
         <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
-            🎨 主题设置
+            {t('settings.themeSettings')}
           </Typography>
 
           {/* Theme Mode Toggle */}
           <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" sx={{ fontSize: 12, mb: 1, color: 'text.secondary' }}>
-              主题模式
-            </Typography>
+<Typography variant="body2" sx={{ fontSize: 12, mb: 1, color: 'text.secondary' }}>
+                {t('settings.themeMode')}
+              </Typography>
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               {(['light', 'dark', 'system'] as const).map((mode) => {
                 const isActive = appThemeMode === mode;
-                const labels = { light: '明亮', dark: '暗黑', system: '跟随系统' };
+                const labels = { light: t('settings.light'), dark: t('settings.dark'), system: t('settings.followSystem') };
                 return (
                   <Box
                     key={mode}
@@ -543,7 +545,7 @@ export const Settings: React.FC = () => {
           {/* Theme Preset Selector */}
           <Box sx={{ mb: 2 }}>
             <Typography variant="body2" sx={{ fontSize: 12, mb: 1, color: 'text.secondary' }}>
-              主题风格
+              {t('settings.themeStyle')}
             </Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1 }}>
               {APP_THEME_PRESETS.map((preset) => {
@@ -601,7 +603,7 @@ export const Settings: React.FC = () => {
                     <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: customTheme?.variables['--accent-color'] || '#a78bfa' }} />
                   </Box>
                   <Typography sx={{ fontSize: 9, color: 'var(--accent-color)', fontWeight: 600, lineHeight: 1.2 }}>
-                    自定义
+                    {t('settings.custom')}
                   </Typography>
                 </Box>
               )}
@@ -622,7 +624,7 @@ export const Settings: React.FC = () => {
               }}
             >
               <Typography variant="body2" sx={{ fontSize: 12 }}>
-                自定义主题
+                {t('settings.customTheme')}
               </Typography>
               {customExpanded ? <CollapseIcon sx={{ fontSize: 18 }} /> : <ExpandIcon sx={{ fontSize: 18 }} />}
             </Box>
@@ -631,7 +633,7 @@ export const Settings: React.FC = () => {
                 {/* Color pickers */}
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
                   <Box>
-                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>背景色</Typography>
+                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>{t('settings.backgroundColor')}</Typography>
                     <input
                       type="color"
                       value={customColors.background}
@@ -640,7 +642,7 @@ export const Settings: React.FC = () => {
                     />
                   </Box>
                   <Box>
-                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>文字色</Typography>
+                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>{t('settings.textColor')}</Typography>
                     <input
                       type="color"
                       value={customColors.text}
@@ -649,7 +651,7 @@ export const Settings: React.FC = () => {
                     />
                   </Box>
                   <Box>
-                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>强调色</Typography>
+                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>{t('settings.accentColor')}</Typography>
                     <input
                       type="color"
                       value={customColors.accent}
@@ -658,7 +660,7 @@ export const Settings: React.FC = () => {
                     />
                   </Box>
                   <Box>
-                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>边框色</Typography>
+                    <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>{t('settings.borderColor')}</Typography>
                     <input
                       type="color"
                       value={customColors.border}
@@ -678,14 +680,14 @@ export const Settings: React.FC = () => {
                   }}
                 >
                   <Typography sx={{ fontSize: 11, color: customColors.text, fontWeight: 600, mb: 0.5 }}>
-                    预览效果
+                    {t('settings.preview')}
                   </Typography>
                   <Typography sx={{ fontSize: 10, color: customColors.text, opacity: 0.7 }}>
-                    这是一个示例文本
+                    {t('settings.sampleText')}
                   </Typography>
                   <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
                     <Box sx={{ px: 1, py: 0.5, borderRadius: 0.5, bgcolor: customColors.accent, color: '#fff', fontSize: 9 }}>
-                      按钮
+                      {t('common.button')}
                     </Box>
                   </Box>
                 </Box>
@@ -696,7 +698,7 @@ export const Settings: React.FC = () => {
                   onClick={handleSaveCustomTheme}
                   sx={{ fontSize: 12 }}
                 >
-                  保存我的主题
+                  {t('settings.saveMyTheme')}
                 </Button>
               </Box>
             </Collapse>
@@ -785,7 +787,7 @@ export const Settings: React.FC = () => {
                 value={customNameInput}
                 onChange={(e) => setCustomNameInput(e.target.value)}
                 onBlur={() => setCustomName(customNameInput)}
-                placeholder={PERSONAS[companion.personaId]?.name ?? '小墨'}
+                placeholder={PERSONAS[companion.personaId]?.name ?? t('settings.defaultCompanionName')}
                 sx={{ flex: 1, '& input': { fontSize: 12 } }}
               />
             </Box>
@@ -855,7 +857,7 @@ export const Settings: React.FC = () => {
         {/* Data Backup & Restore */}
         <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
-            💾 数据备份
+            💾 {t('settings.dataBackup')}
           </Typography>
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
@@ -873,12 +875,12 @@ export const Settings: React.FC = () => {
                     downloadJSON(data, `pixelpal_backup_${dateStr}.json`);
                     setError('');
                   } catch (err) {
-                    setError(`导出失败: ${err instanceof Error ? err.message : 'Unknown error'}`);
+                    setError(t('settings.exportFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
                   }
                 }}
                 sx={{ fontSize: 10 }}
               >
-                导出全部数据
+                {t('settings.exportAllData')}
               </Button>
               <Button
                 size="small"
@@ -887,7 +889,7 @@ export const Settings: React.FC = () => {
                 startIcon={<UploadIcon sx={{ fontSize: 14 }} />}
                 sx={{ fontSize: 10 }}
               >
-                导入数据
+                {t('settings.importData')}
                 <input
                   type="file"
                   accept=".json"
@@ -908,7 +910,7 @@ export const Settings: React.FC = () => {
                         setError(result.message);
                       }
                     } catch (err) {
-                      setError(`导入失败: ${err instanceof Error ? err.message : 'Unknown error'}`);
+                      setError(t('settings.importFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
                     }
                     // Reset file input
                     e.target.value = '';
@@ -917,7 +919,7 @@ export const Settings: React.FC = () => {
               </Button>
             </Box>
             <Typography variant="caption" sx={{ fontSize: 10, color: 'text.disabled' }}>
-              导出包含所有人格、聊天记录和记忆；导入会自动重命名冲突的人格
+              {t('settings.exportHint')}
             </Typography>
             {error && <Alert severity="error" sx={{ fontSize: 11 }}>{error}</Alert>}
           </Box>
@@ -928,15 +930,15 @@ export const Settings: React.FC = () => {
         {/* Template Management — V31 */}
         <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
-            🎭 人格模板管理
+            🎭 {t('settings.personaTemplateManagement')}
           </Typography>
 
           {/* Template tab buttons */}
           <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
             {([
-              { key: 'local', label: '我的模板' },
-              { key: 'online', label: '在线模板库' },
-              { key: 'install', label: '安装模板' },
+              { key: 'local', label: t('settings.myTemplates') },
+              { key: 'online', label: t('settings.onlineTemplateLibrary') },
+              { key: 'install', label: t('settings.installTemplate') },
             ] as const).map(tab => (
               <Button
                 key={tab.key}
@@ -955,7 +957,7 @@ export const Settings: React.FC = () => {
             <Box>
               {localTemplates.length === 0 ? (
                 <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: 11 }}>
-                  暂无本地模板。在人格详情中点击"保存到模板库"可添加模板。
+                  {t('settings.noLocalTemplates')}
                 </Typography>
               ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -986,7 +988,7 @@ export const Settings: React.FC = () => {
                         onClick={() => handleCreateFromLocalTemplate(template)}
                         sx={{ fontSize: 9, minWidth: 'auto', p: 0.5 }}
                       >
-                        创建人格
+                        {t('settings.createPersona')}
                       </Button>
                       <IconButton
                         size="small"
@@ -1044,7 +1046,7 @@ export const Settings: React.FC = () => {
                     onClick={() => handleInstallOnlineTemplate(template)}
                     sx={{ fontSize: 9, minWidth: 'auto', p: 0.5 }}
                   >
-                    安装
+                    {t('settings.install')}
                   </Button>
                 </Box>
               ))}
@@ -1057,7 +1059,7 @@ export const Settings: React.FC = () => {
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <TextField
                   size="small"
-                  placeholder="粘贴分享码"
+                  placeholder={t('settings.pasteShareCode')}
                   value={installCode}
                   onChange={(e) => {
                     setInstallCode(e.target.value);
@@ -1073,7 +1075,7 @@ export const Settings: React.FC = () => {
                   onClick={handleDecodeInstallCode}
                   sx={{ fontSize: 10, minWidth: 'auto', whiteSpace: 'nowrap' }}
                 >
-                  解析
+                  {t('settings.parse')}
                 </Button>
               </Box>
 
@@ -1094,7 +1096,7 @@ export const Settings: React.FC = () => {
                         {installPreview.name}
                       </Typography>
                       <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10 }}>
-                        {installPreview.voice === 'warm' ? '温暖' : installPreview.voice === 'rational' ? '理性' : installPreview.voice === 'humorous' ? '幽默' : '严肃'}
+                        {installPreview.voice === 'warm' ? t('persona.warm') : installPreview.voice === 'rational' ? t('persona.rational') : installPreview.voice === 'humorous' ? t('persona.humorous') : t('persona.serious')}
                       </Typography>
                     </Box>
                   </Box>
@@ -1107,7 +1109,7 @@ export const Settings: React.FC = () => {
                     onClick={handleInstallTemplate}
                     sx={{ mt: 1, fontSize: 10 }}
                   >
-                    安装此模板
+                    {t('settings.installThisTemplate')}
                   </Button>
                 </Box>
               )}
@@ -1250,14 +1252,14 @@ export const Settings: React.FC = () => {
         {/* Language Settings */}
         <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
-            🌐 Language / 语言
+            {t('settings.languageLabel')}
           </Typography>
 
           <FormControl size="small" fullWidth>
-            <InputLabel>Select language / 选择语言</InputLabel>
+            <InputLabel>{t('settings.selectLanguage')}</InputLabel>
             <Select
               value={useStore((s) => s.language)}
-              label="Select language / 选择语言"
+              label={t('settings.selectLanguage')}
               onChange={(e) => {
                 const lang = e.target.value as 'zh' | 'en';
                 useStore.getState().setLanguage(lang);
@@ -1267,8 +1269,8 @@ export const Settings: React.FC = () => {
                 });
               }}
             >
-              <MenuItem value="zh">中文</MenuItem>
-              <MenuItem value="en">English</MenuItem>
+              <MenuItem value="zh">{t('settings.chinese')}</MenuItem>
+              <MenuItem value="en">{t('settings.english')}</MenuItem>
             </Select>
           </FormControl>
         </Paper>

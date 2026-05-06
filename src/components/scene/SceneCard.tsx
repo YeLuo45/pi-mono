@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Card, CardContent, Typography, Switch, IconButton, Chip } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Bolt as BoltIcon } from '@mui/icons-material';
 import type { Scene } from '../../types/scene';
+import { useTranslation } from 'react-i18next';
 
 interface SceneCardProps {
   scene: Scene;
@@ -12,14 +13,15 @@ interface SceneCardProps {
 }
 
 export const SceneCard: React.FC<SceneCardProps> = ({ scene, onEdit, onDelete, onToggle, onQuickTrigger }) => {
-  const triggerLabels = scene.triggers.map((t) => {
-    switch (t.type) {
+  const { t: tt } = useTranslation();
+  const triggerLabels = scene.triggers.map((trigger) => {
+    switch (trigger.type) {
       case 'time':
-        return `⏰ ${(t as any).time}`;
+        return `⏰ ${(trigger as any).time}`;
       case 'click':
-        return '🖱️ 点击';
+        return tt('scene.click', '🖱️ 点击');
       case 'keyword':
-        return `🔑 ${(t as any).pattern}`;
+        return `🔑 ${(trigger as any).pattern}`;
       default:
         return '?';
     }

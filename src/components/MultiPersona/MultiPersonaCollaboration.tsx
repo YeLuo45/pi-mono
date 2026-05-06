@@ -361,7 +361,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
     return (
       <Box sx={{ mb: 1, px: 0.5 }}>
         <Typography variant="caption" sx={{ fontSize: 9, color: 'text.secondary', display: 'block', mb: 0.25 }}>
-          情绪趋势
+          {t('multiPersona.emotionTrend', '情绪趋势')}
         </Typography>
         <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} style={{ display: 'block' }}>
           {/* Grid lines */}
@@ -409,7 +409,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
     return (
       <Card sx={{ m: 1, p: 1.5, bgcolor: 'rgba(0,0,0,0.3)', borderRadius: 1.5 }}>
         <Typography variant="subtitle2" sx={{ fontSize: 11, mb: 1, color: 'primary.light' }}>
-          情绪摘要
+          {t('multiPersona.emotionSummary', '情绪摘要')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           {personaIds.map(pid => {
@@ -982,7 +982,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
                       {getPersonaInfo(typingPersona)?.name || typingPersona}
                     </Typography>
                     <Typography sx={{ fontSize: 10, color: 'text.secondary', fontStyle: 'italic' }}>
-                      正在思考...
+                      {t('team.thinking', '正在思考...')}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, ml: 3 }}>
@@ -1018,7 +1018,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
                 <TextField
                   fullWidth
                   size="small"
-                  placeholder="输入你的观点，开启讨论..."
+                  placeholder={t('team.debateInputPlaceholder', '输入你的观点，开启讨论...')}
                   value={debateInput}
                   onChange={(e) => setDebateInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleDebateSubmit()}
@@ -1035,7 +1035,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
                   onClick={handleDebateSubmit}
                   disabled={!debateInput.trim() || !!typingPersona}
                 >
-                  发言
+                  {t('team.speak', '发言')}
                 </Button>
               </Box>
             )}
@@ -1189,7 +1189,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
             fullWidth
             size="small"
             label={t('team.topic') || '话题'}
-            placeholder="例如：AI对教育的影响"
+            placeholder={t('team.debateTopicPlaceholder', '例如：AI对教育的影响')}
             value={debateTopic}
             onChange={(e) => setDebateTopic(e.target.value)}
             sx={{ mt: 1, '& .MuiInputBase-input': { fontSize: 12 } }}
@@ -1197,7 +1197,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
 
           {/* Persona Selection */}
           <Typography variant="caption" sx={{ fontSize: 11, display: 'block', mt: 2, mb: 1 }}>
-            {t('team.selectPersonas') || '选择参与讨论的角色（至少2个）'}
+            {t('team.selectPersonasDebate', '选择参与讨论的角色（至少2个）')}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             {(() => {
@@ -1249,7 +1249,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
 
           {debateSelectedPersonas.length > 0 && (
             <Typography sx={{ fontSize: 10, color: 'text.secondary', mt: 1 }}>
-              已选择 {debateSelectedPersonas.length} 个角色
+              {t('team.selectedCount', '{{count}} 个角色已选择', { count: debateSelectedPersonas.length })}
             </Typography>
           )}
         </DialogContent>

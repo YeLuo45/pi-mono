@@ -3,6 +3,7 @@ import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Chip, Typogr
 import type { SelectChangeEvent } from '@mui/material';
 import type { Trigger, TimeTrigger, KeywordTrigger } from '../../types/scene';
 import { createTrigger } from '../../types/scene';
+import { useTranslation } from 'react-i18next';
 
 interface TriggerConfigProps {
   triggers: Trigger[];
@@ -10,6 +11,7 @@ interface TriggerConfigProps {
 }
 
 export const TriggerConfig: React.FC<TriggerConfigProps> = ({ triggers, onChange }) => {
+  const { t } = useTranslation();
   const timeTrigger = triggers.find((t) => t.type === 'time') as TimeTrigger | undefined;
   const keywordTrigger = triggers.find((t) => t.type === 'keyword') as KeywordTrigger | undefined;
   const hasClickTrigger = triggers.some((t) => t.type === 'click');
@@ -32,15 +34,15 @@ export const TriggerConfig: React.FC<TriggerConfigProps> = ({ triggers, onChange
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Typography variant="subtitle2" sx={{ fontWeight: 600, fontSize: 12, color: 'text.secondary' }}>
-        触发条件
+        {t('scene.triggers', '触发条件')}
       </Typography>
 
       {/* Time trigger */}
       {timeTrigger ? (
         <Box sx={{ p: 1.5, bgcolor: 'rgba(255,255,255,0.04)', borderRadius: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-            <Chip label="⏰ 定时触发" size="small" />
-            <Chip label="已添加" size="small" color="primary" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
+            <Chip label={t('scene.timeTrigger', '⏰ 定时触发')} size="small" />
+            <Chip label={t('scene.added', '已添加')} size="small" color="primary" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
           </Box>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1 }}>
             <TextField
@@ -51,10 +53,10 @@ export const TriggerConfig: React.FC<TriggerConfigProps> = ({ triggers, onChange
               sx={{ flex: 1, minWidth: 0 }}
             />
             <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 100 }, flex: { xs: 0, sm: 1 } }}>
-              <InputLabel>重复</InputLabel>
+              <InputLabel>{t('scene.repeat', '重复')}</InputLabel>
               <Select
                 value={typeof timeTrigger.repeat === 'string' ? timeTrigger.repeat : JSON.stringify(timeTrigger.repeat)}
-                label="重复"
+                label={t('scene.repeat', '重复')}
                 onChange={(e: SelectChangeEvent<string>) => {
                   const val = e.target.value;
                   if (val.startsWith('[')) {
@@ -64,18 +66,18 @@ export const TriggerConfig: React.FC<TriggerConfigProps> = ({ triggers, onChange
                   }
                 }}
               >
-                <MenuItem value="daily">每天</MenuItem>
-                <MenuItem value="weekdays">工作日</MenuItem>
-                <MenuItem value="weekends">周末</MenuItem>
-                <MenuItem value="[1,2,3,4,5]">周一至周五</MenuItem>
-                <MenuItem value="[0,6]">周六日</MenuItem>
+                <MenuItem value="daily">{t('scene.daily', '每天')}</MenuItem>
+                <MenuItem value="weekdays">{t('scene.weekdays', '工作日')}</MenuItem>
+                <MenuItem value="weekends">{t('scene.weekends', '周末')}</MenuItem>
+                <MenuItem value="[1,2,3,4,5]">{t('scene.monFri', '周一至周五')}</MenuItem>
+                <MenuItem value="[0,6]">{t('scene.weekend', '周六日')}</MenuItem>
               </Select>
             </FormControl>
           </Box>
         </Box>
       ) : (
         <Chip
-          label="+ 添加定时触发"
+          label={t('scene.addTimeTrigger', '+ 添加定时触发')}
           size="small"
           onClick={() => addTrigger('time')}
           sx={{ alignSelf: 'flex-start', cursor: 'pointer', minHeight: 32, px: 1 }}
@@ -86,21 +88,21 @@ export const TriggerConfig: React.FC<TriggerConfigProps> = ({ triggers, onChange
       {keywordTrigger ? (
         <Box sx={{ p: 1.5, bgcolor: 'rgba(255,255,255,0.04)', borderRadius: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-            <Chip label="🔑 关键词触发" size="small" />
-            <Chip label="已添加" size="small" color="primary" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
+            <Chip label={t('scene.keywordTrigger', '🔑 关键词触发')} size="small" />
+            <Chip label={t('scene.added', '已添加')} size="small" color="primary" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
           </Box>
           <TextField
             fullWidth
             size="small"
-            placeholder="输入关键词，如：*你好* 或 晚安"
+            placeholder={t('scene.keywordPlaceholder', '输入关键词，如：*你好* 或 晚安')}
             value={keywordTrigger.pattern}
             onChange={(e) => updateKeywordTrigger(e.target.value)}
-            helperText="* 匹配任意字符，如 *晚安* 匹配「晚安，明天见」"
+            helperText={t('scene.keywordHint', '* 匹配任意字符，如 *晚安* 匹配「晚安，明天见」')}
           />
         </Box>
       ) : (
         <Chip
-          label="+ 添加关键词触发"
+          label={t('scene.addKeywordTrigger', '+ 添加关键词触发')}
           size="small"
           onClick={() => addTrigger('keyword')}
           sx={{ alignSelf: 'flex-start', cursor: 'pointer', minHeight: 32, px: 1 }}
@@ -110,11 +112,11 @@ export const TriggerConfig: React.FC<TriggerConfigProps> = ({ triggers, onChange
       {/* Click trigger */}
       {hasClickTrigger ? (
         <Box sx={{ p: 1.5, bgcolor: 'rgba(255,255,255,0.04)', borderRadius: 1 }}>
-          <Chip label="🖱️ 点击触发（显示在快捷栏）" size="small" color="primary" />
+          <Chip label={t('scene.clickTrigger', '🖱️ 点击触发（显示在快捷栏）')} size="small" color="primary" />
         </Box>
       ) : (
         <Chip
-          label="+ 添加点击触发"
+          label={t('scene.addClickTrigger', '+ 添加点击触发')}
           size="small"
           onClick={() => addTrigger('click')}
           sx={{ alignSelf: 'flex-start', cursor: 'pointer', minHeight: 32, px: 1 }}

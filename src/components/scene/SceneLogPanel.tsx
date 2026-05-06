@@ -11,12 +11,14 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { useSceneStore, type SceneLog } from '../../stores/sceneStore';
+import { useTranslation } from 'react-i18next';
 
 interface SceneLogPanelProps {
   onClose?: () => void;
 }
 
 export const SceneLogPanel: React.FC<SceneLogPanelProps> = ({ onClose }) => {
+  const { t } = useTranslation();
   const logs = useSceneStore((s) => s.sceneLogs);
   const clearLogs = useSceneStore((s) => s.clearLogs);
   const [showAll, setShowAll] = useState(false);
@@ -36,7 +38,7 @@ export const SceneLogPanel: React.FC<SceneLogPanelProps> = ({ onClose }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <HistoryIcon fontSize="small" />
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            执行日志
+            {t('scene.executionLog', '执行日志')}
           </Typography>
           {logs.length > 0 && (
             <Chip label={logs.length} size="small" color="primary" sx={{ height: 20, fontSize: 11 }} />
@@ -45,7 +47,7 @@ export const SceneLogPanel: React.FC<SceneLogPanelProps> = ({ onClose }) => {
         <Box sx={{ display: 'flex', gap: 0.5 }}>
           {logs.length > 0 && (
             <Button size="small" startIcon={<DeleteIcon />} onClick={clearLogs} color="error" variant="text">
-              清空
+              {t('scene.clear', '清空')}
             </Button>
           )}
           {onClose && (
@@ -59,7 +61,7 @@ export const SceneLogPanel: React.FC<SceneLogPanelProps> = ({ onClose }) => {
       {logs.length === 0 ? (
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            暂无执行日志
+            {t('scene.noLogs', '暂无执行日志')}
           </Typography>
         </Box>
       ) : (
@@ -71,7 +73,7 @@ export const SceneLogPanel: React.FC<SceneLogPanelProps> = ({ onClose }) => {
           </List>
           {!showAll && logs.length > 20 && (
             <Button size="small" onClick={() => setShowAll(true)} sx={{ mt: 1 }}>
-              查看全部 {logs.length} 条
+              {t('scene.viewAll', '查看全部')} {logs.length} {t('scene.logs', '条')}
             </Button>
           )}
         </Box>

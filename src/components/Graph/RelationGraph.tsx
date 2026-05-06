@@ -9,6 +9,7 @@
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogTitle,
@@ -77,6 +78,7 @@ function getEdgeColor(intimacy: number): string {
 }
 
 export const RelationGraph: React.FC<RelationGraphProps> = ({ open, onClose }) => {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number>(0);
@@ -363,13 +365,13 @@ export const RelationGraph: React.FC<RelationGraphProps> = ({ open, onClose }) =
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
               <Typography variant="caption" color="text.secondary">
-                消息数: <strong>{nearestNode.node.messageCount}</strong>
+                {t('graph.messageCount', '消息数:')} <strong>{nearestNode.node.messageCount}</strong>
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                亲密度: <strong>{nearestNode.node.intimacy} ({getIntimacyLevel(nearestNode.node.intimacy)})</strong>
+                {t('graph.intimacy', '亲密度:')} <strong>{nearestNode.node.intimacy} ({getIntimacyLevel(nearestNode.node.intimacy)})</strong>
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                最后活跃: <strong>{nearestNode.node.messageCount > 0 ? `${Math.max(1, nearestNode.node.messageCount)}天前` : '从未'}</strong>
+                {t('graph.lastActive', '最后活跃:')} <strong>{nearestNode.node.messageCount > 0 ? `${Math.max(1, nearestNode.node.messageCount)}${t('graph.daysAgo', '天前')}` : t('graph.never', '从未')}</strong>
               </Typography>
             </Box>
           </Paper>
@@ -392,11 +394,11 @@ export const RelationGraph: React.FC<RelationGraphProps> = ({ open, onClose }) =
               {sourceNode.avatar} ↔ {targetNode.avatar}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              潜在互动热度: <strong>{Math.round(nearestEdge.weight)}</strong>
+              {t('graph.potentialHeat', '潜在互动热度:')} <strong>{Math.round(nearestEdge.weight)}</strong>
             </Typography>
             <br />
             <Typography variant="caption" color="text.secondary">
-              平均亲密度: <strong>{Math.round(nearestEdge.intimacy)}</strong>
+              {t('graph.avgIntimacy', '平均亲密度:')} <strong>{Math.round(nearestEdge.intimacy)}</strong>
             </Typography>
           </Paper>
         ),
@@ -456,9 +458,9 @@ export const RelationGraph: React.FC<RelationGraphProps> = ({ open, onClose }) =
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="h6" sx={{ fontSize: 16, fontWeight: 600 }}>
-            🔗 关系图谱
+            🔗 {t('graph.title', '关系图谱')}
           </Typography>
-          <Chip label={`${graphData.current.nodes.length} 个人格`} size="small" sx={{ fontSize: 11 }} />
+          <Chip label={`${graphData.current.nodes.length} ${t('graph.personaCount', '个人格')}`} size="small" sx={{ fontSize: 11 }} />
         </Box>
         <IconButton onClick={onClose} size="small">
           <CloseIcon />
@@ -469,15 +471,15 @@ export const RelationGraph: React.FC<RelationGraphProps> = ({ open, onClose }) =
         <Box sx={{ position: 'absolute', top: 12, left: 16, zIndex: 10, display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#6b7280' }} />
-            <Typography variant="caption" sx={{ fontSize: 10 }}>低亲密度</Typography>
+            <Typography variant="caption" sx={{ fontSize: 10 }}>{t('graph.lowIntimacy', '低亲密度')}</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#eab308' }} />
-            <Typography variant="caption" sx={{ fontSize: 10 }}>中亲密度</Typography>
+            <Typography variant="caption" sx={{ fontSize: 10 }}>{t('graph.mediumIntimacy', '中亲密度')}</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#a855f7' }} />
-            <Typography variant="caption" sx={{ fontSize: 10 }}>高亲密度</Typography>
+            <Typography variant="caption" sx={{ fontSize: 10 }}>{t('graph.highIntimacy', '高亲密度')}</Typography>
           </Box>
         </Box>
 
@@ -519,7 +521,7 @@ export const RelationGraph: React.FC<RelationGraphProps> = ({ open, onClose }) =
               justifyContent: 'center',
               bgcolor: 'rgba(0,0,0,0.4)',
             }}>
-              <Typography color="text.secondary">布局计算中...</Typography>
+              <Typography color="text.secondary">{t('graph.calculating', '布局计算中...')}</Typography>
             </Box>
           )}
         </Box>

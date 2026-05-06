@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box, Typography, IconButton, Chip, Divider,
   TextField, Button, Select, MenuItem, FormControl, InputLabel,
@@ -18,6 +19,7 @@ import { taskQueue } from '../../services/agent/taskQueue';
 import type { Task, TaskPriority } from '../../services/agent/types';
 
 export const AgentPanel: React.FC = () => {
+  const { t } = useTranslation();
   const [showCreate, setShowCreate] = useState(false);
   const [newGoal, setNewGoal] = useState('');
   const [newPriority, setNewPriority] = useState<TaskPriority>('normal');
@@ -67,13 +69,13 @@ export const AgentPanel: React.FC = () => {
       >
         <FlashIcon sx={{ fontSize: 16, color: 'primary.main' }} />
         <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 700, flex: 1 }}>
-          任务中心
+          {t('agent.taskCenter', '任务中心')}
         </Typography>
 
         {/* Quick status */}
         {isRunning ? (
           <Chip
-            label="运行中"
+            label={t('agent.running', '运行中')}
             size="small"
             sx={{
               fontSize: 10,
@@ -89,7 +91,7 @@ export const AgentPanel: React.FC = () => {
           />
         ) : (
           <Chip
-            label="空闲"
+            label={t('agent.idle', '空闲')}
             size="small"
             sx={{ fontSize: 10, height: 20, bgcolor: 'rgba(158,158,158,0.15)', color: '#9E9E9E' }}
           />
@@ -103,7 +105,7 @@ export const AgentPanel: React.FC = () => {
             onClick={handleStartNext}
             sx={{ fontSize: 10, py: 0.3, px: 1, minWidth: 0 }}
           >
-            执行下一个
+            {t('agent.executeNext', '执行下一个')}
           </Button>
         )}
 
@@ -129,7 +131,7 @@ export const AgentPanel: React.FC = () => {
         >
           <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
             <TextField
-              placeholder="输入任务目标..."
+              placeholder={t('agent.taskGoalPlaceholder', '输入任务目标...')}
               value={newGoal}
               onChange={(e) => setNewGoal(e.target.value)}
               size="small"
@@ -149,16 +151,16 @@ export const AgentPanel: React.FC = () => {
                 onChange={(e) => setNewPriority(e.target.value as TaskPriority)}
                 sx={{ fontSize: 12 }}
               >
-                <MenuItem value="low">低</MenuItem>
-                <MenuItem value="normal">普通</MenuItem>
-                <MenuItem value="high">高</MenuItem>
-                <MenuItem value="urgent">紧急</MenuItem>
+                <MenuItem value="low">{t('agent.priorityLow', '低')}</MenuItem>
+                <MenuItem value="normal">{t('agent.priorityNormal', '普通')}</MenuItem>
+                <MenuItem value="high">{t('agent.priorityHigh', '高')}</MenuItem>
+                <MenuItem value="urgent">{t('agent.priorityUrgent', '紧急')}</MenuItem>
               </Select>
             </FormControl>
           </Box>
           <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
             <Button size="small" onClick={() => setShowCreate(false)} sx={{ fontSize: 11 }}>
-              取消
+              {t('common.cancel', '取消')}
             </Button>
             <Button
               size="small"
@@ -167,7 +169,7 @@ export const AgentPanel: React.FC = () => {
               disabled={!newGoal.trim()}
               sx={{ fontSize: 11 }}
             >
-              创建任务
+              {t('agent.createTask', '创建任务')}
             </Button>
           </Box>
         </Box>
@@ -184,12 +186,12 @@ export const AgentPanel: React.FC = () => {
         }}
       >
         {[
-          { label: '队列', value: stats.total, color: '#9E9E9E' },
-          { label: '等待', value: stats.pending, color: '#FF9800' },
-          { label: '运行', value: stats.running, color: '#2196F3' },
-          { label: '暂停', value: stats.paused, color: '#9E9E9E' },
-          { label: '完成', value: stats.completed, color: '#4CAF50' },
-          { label: '失败', value: stats.failed, color: '#F44336' },
+          { label: t('agent.queue', '队列'), value: stats.total, color: '#9E9E9E' },
+          { label: t('agent.waiting', '等待'), value: stats.pending, color: '#FF9800' },
+          { label: t('agent.running', '运行'), value: stats.running, color: '#2196F3' },
+          { label: t('agent.paused', '暂停'), value: stats.paused, color: '#9E9E9E' },
+          { label: t('agent.completed', '完成'), value: stats.completed, color: '#4CAF50' },
+          { label: t('agent.failed', '失败'), value: stats.failed, color: '#F44336' },
         ].map(({ label, value, color }) => (
           <Box key={label} sx={{ textAlign: 'center' }}>
             <Typography

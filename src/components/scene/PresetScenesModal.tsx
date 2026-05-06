@@ -4,6 +4,7 @@ import {
   Box, Typography, Grid, useMediaQuery,
 } from '@mui/material';
 import { PRESET_SCENES, type PresetScene } from '../../data/presetScenes';
+import { useTranslation } from 'react-i18next';
 
 interface PresetScenesModalProps {
   open: boolean;
@@ -12,6 +13,7 @@ interface PresetScenesModalProps {
 }
 
 export const PresetScenesModal: React.FC<PresetScenesModalProps> = ({ open, onClose, onAddPreset }) => {
+  const { t } = useTranslation();
   const isMobile = useMediaQuery('(max-width: 600px)');
 
   return (
@@ -24,11 +26,11 @@ export const PresetScenesModal: React.FC<PresetScenesModalProps> = ({ open, onCl
       PaperProps={{ sx: { borderRadius: isMobile ? 0 : 2 } }}
     >
       <DialogTitle sx={{ pb: 1 }}>
-        选择预设场景
+        {t('scene.selectPreset', '选择预设场景')}
       </DialogTitle>
       <DialogContent sx={{ overflowY: isMobile ? 'auto' : undefined }}>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
-          一键添加常用场景，后续可自行编辑
+          {t('scene.presetHint', '一键添加常用场景，后续可自行编辑')}
         </Typography>
         <Grid container spacing={2}>
           {PRESET_SCENES.map((preset) => (
@@ -66,7 +68,7 @@ export const PresetScenesModal: React.FC<PresetScenesModalProps> = ({ open, onCl
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose} variant="outlined" fullWidth={isMobile}>
-          关闭
+          {t('common.close', '关闭')}
         </Button>
       </DialogActions>
     </Dialog>

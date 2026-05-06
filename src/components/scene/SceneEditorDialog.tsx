@@ -6,6 +6,7 @@ import {
 import type { Scene, Trigger, Action } from '../../types/scene';
 import { TriggerConfig } from './TriggerConfig';
 import { ActionConfig } from './ActionConfig';
+import { useTranslation } from 'react-i18next';
 
 interface SceneEditorDialogProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface SceneEditorDialogProps {
 }
 
 export const SceneEditorDialog: React.FC<SceneEditorDialogProps> = ({ open, onClose, onSave, editingScene }) => {
+  const { t } = useTranslation();
   const isMobile = useMediaQuery('(max-width: 600px)');
   const [name, setName] = useState('');
   const [isQuick, setIsQuick] = useState(false);
@@ -22,6 +24,8 @@ export const SceneEditorDialog: React.FC<SceneEditorDialogProps> = ({ open, onCl
   const [actions, setActions] = useState<Action[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+
+  const isValid = name.trim().length > 0 && triggers.length > 0 && actions.length > 0;
 
   useEffect(() => {
     if (editingScene) {
@@ -85,22 +89,22 @@ export const SceneEditorDialog: React.FC<SceneEditorDialogProps> = ({ open, onCl
       }}
     >
       <DialogTitle sx={{ pb: 1, fontSize: isMobile ? 18 : undefined }}>
-        {editingScene ? '编辑场景' : '新建场景'}
+        {editingScene ? t('scene.editScene', '编辑场景') : t('scene.newScene', '新建场景')}
       </DialogTitle>
       <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, overflowY: isMobile ? 'auto' : undefined }}>
         <TextField
-          label="场景名称"
+          label={t('scene.sceneName', '场景名称')}
           value={name}
           onChange={(e) => setName(e.target.value)}
           fullWidth
           size="small"
           inputProps={{ maxLength: 20 }}
-          helperText={`${name.length}/20 字符`}
+          helperText={`${name.length}/20 ${t('scene.chars', '字符')}`}
         />
 
         <FormControlLabel
           control={<Switch checked={isQuick} onChange={(e) => setIsQuick(e.target.checked)} />}
-          label="显示在快捷栏"
+          label={t('scene.showInQuickBar', '显示在快捷栏')}
         />
 
         {/* Tags */}
@@ -108,7 +112,7 @@ export const SceneEditorDialog: React.FC<SceneEditorDialogProps> = ({ open, onCl
           <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
             <TextField
               size="small"
-              placeholder="输入标签，回车添加"
+              placeholder={t('scene.tagPlaceholder', '输入标签，回车添加')}
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={(e) => {
@@ -120,7 +124,7 @@ export const SceneEditorDialog: React.FC<SceneEditorDialogProps> = ({ open, onCl
               sx={{ flex: 1 }}
             />
             <Button size="small" variant="outlined" onClick={addTag} disabled={!tagInput.trim()}>
-              添加
+              {t('scene.add', '添加')}
             </Button>
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -145,10 +149,10 @@ export const SceneEditorDialog: React.FC<SceneEditorDialogProps> = ({ open, onCl
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2, flexDirection: { xs: 'column-reverse', sm: 'row' }, gap: 1 }}>
         <Button onClick={onClose} fullWidth={isMobile} variant="outlined">
-          取消
+          {t('common.cancel', '取消')}
         </Button>
         <Button variant="contained" onClick={handleSave} disabled={!isValid} fullWidth={isMobile}>
-          保存
+          {t('common.save', '保存')}
         </Button>
       </DialogActions>
     </Dialog>

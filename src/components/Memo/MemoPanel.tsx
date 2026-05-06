@@ -4,6 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogTitle,
@@ -30,19 +31,20 @@ interface MemoPanelProps {
   onClose: () => void;
 }
 
-function formatTimeAgo(timestamp: number): string {
+function formatTimeAgo(timestamp: number, t: (key: string, fallback: string) => string): string {
   const diff = Date.now() - timestamp;
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  if (days > 0) return `${days}天前`;
-  if (hours > 0) return `${hours}小时前`;
-  if (minutes > 0) return `${minutes}分钟前`;
-  return '刚刚';
+  if (days > 0) return t('time.daysAgo', '{{count}}天前').replace('{{count}}', String(days));
+  if (hours > 0) return t('time.hoursAgo', '{{count}}小时前').replace('{{count}}', String(hours));
+  if (minutes > 0) return t('time.minutesAgo', '{{count}}分钟前').replace('{{count}}', String(minutes));
+  return t('time.justNow', '刚刚');
 }
 
 export const MemoPanel: React.FC<MemoPanelProps> = ({ personaId, open, onClose }) => {
+  const { t } = useTranslation();
   const memos = useStore((s) => s.memos);
   const markMemoRead = useStore((s) => s.markMemoRead);
   const markAllMemosReadForPersona = useStore((s) => s.markAllMemosReadForPersona);
@@ -99,7 +101,7 @@ export const MemoPanel: React.FC<MemoPanelProps> = ({ personaId, open, onClose }
         }}
       >
         <Typography variant="h6" sx={{ fontSize: 16 }}>
-          📬 收到的便条
+          📬 {t('memo.receivedMemos', '收到的便条')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           {receivedMemos.some((m: Memo) => !m.read) && (
@@ -109,7 +111,7 @@ export const MemoPanel: React.FC<MemoPanelProps> = ({ personaId, open, onClose }
               onClick={handleMarkAllRead}
               sx={{ fontSize: 11 }}
             >
-              全部标为已读
+              {t('memo.markAllRead', '全部标为已读')}
             </Button>
           )}
           <IconButton size="small" onClick={onClose}>
@@ -135,7 +137,7 @@ export const MemoPanel: React.FC<MemoPanelProps> = ({ personaId, open, onClose }
               📭
             </Typography>
             <Typography variant="body2" sx={{ opacity: 0.5, fontSize: 13 }}>
-              还没有便条
+              {t('memo.noMemos', '还没有便条')}
             </Typography>
           </Box>
         ) : (
@@ -185,7 +187,7 @@ export const MemoPanel: React.FC<MemoPanelProps> = ({ personaId, open, onClose }
                   </Typography>
                   {!memo.read && (
                     <Chip
-                      label="新"
+                      label={t('memo.new', '新')}
                       size="small"
                       sx={{
                         height: 16,
@@ -197,7 +199,7 @@ export const MemoPanel: React.FC<MemoPanelProps> = ({ personaId, open, onClose }
                     />
                   )}
                   <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary' }}>
-                    {formatTimeAgo(memo.createdAt)}
+                    {formatTimeAgo(memo.createdAt, t)}
                   </Typography>
                 </Box>
 
@@ -226,7 +228,7 @@ export const MemoPanel: React.FC<MemoPanelProps> = ({ personaId, open, onClose }
                     '&:hover': { color: 'primary.main' },
                   }}
                 >
-                  回复
+                  {t('memo.reply', '回复')}
                 </Button>
               </Box>
             );
