@@ -15,6 +15,7 @@ import {
   IconButton,
   Tooltip,
   Badge,
+  LinearProgress,
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -33,7 +34,7 @@ import {
 } from '../../services/persona';
 import { useStore } from '../../store';
 import { PersonaDetail } from './PersonaDetail';
-import { getIntimacyLevel } from '../../store';
+import { getIntimacyLevel, getIntimacyColor } from '../../store';
 
 interface PersonaSelectorProps {
   collapsed?: boolean;
@@ -120,9 +121,32 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
     }
   };
 
+  const activeIntimacy = personaIntimacy[activePersona?.id || ''] || 0;
+  const activeLevel = getIntimacyLevel(activeIntimacy);
+  const activeColor = getIntimacyColor(activeIntimacy);
+
   if (collapsed) {
     return (
-      <Tooltip title={activePersona ? `${activePersona.avatar} ${activePersona.name}` : '选择人格'} placement="right">
+      <Tooltip
+        title={
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, minWidth: 120 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography sx={{ fontSize: 14 }}>{activePersona?.avatar}</Typography>
+              <Typography sx={{ fontSize: 12 }}>{activePersona?.name}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography sx={{ fontSize: 10, color: activeColor }}>{activeLevel}</Typography>
+              <LinearProgress
+                variant="determinate"
+                value={activeIntimacy}
+                sx={{ flex: 1, height: 4, borderRadius: 2, bgcolor: 'rgba(255,255,255,0.2)' }}
+              />
+              <Typography sx={{ fontSize: 10 }}>{activeIntimacy}</Typography>
+            </Box>
+          </Box>
+        }
+        placement="right"
+      >
         <IconButton
           onClick={(e) => setAnchorEl(e.currentTarget)}
           size="small"
@@ -195,6 +219,23 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
           {activePersona?.name || '选择人格'}
         </Typography>
       </Button>
+      <Box sx={{ px: 1.5, pb: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+          <Typography sx={{ fontSize: 9, color: activeColor }}>{activeLevel}</Typography>
+          <LinearProgress
+            variant="determinate"
+            value={activeIntimacy}
+            sx={{
+              flex: 1,
+              height: 3,
+              borderRadius: 1.5,
+              bgcolor: 'rgba(255,255,255,0.1)',
+              '& .MuiLinearProgress-bar': { bgcolor: activeColor },
+            }}
+          />
+          <Typography sx={{ fontSize: 9, color: 'text.secondary' }}>{activeIntimacy}</Typography>
+        </Box>
+      </Box>
 
       {/* Dropdown menu */}
       <Menu
@@ -208,91 +249,108 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
             人格
           </Typography>
         </Box>
-        {personas.map((p) => (
-          <MenuItem
-            key={p.id}
-            selected={p.id === activePersona?.id}
-            onClick={() => handleSelect(p)}
-            sx={{ gap: 1.5, py: 1 }}
-          >
-            <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-              <Typography
-                sx={{
-                  fontSize: 18,
-                  lineHeight: 1,
-                  ...((personaIntimacy[p.id] || 0) >= 61
-                    ? {
-                        filter: 'drop-shadow(0 0 6px #FFD700)',
-                        borderRadius: '50%',
-                        boxShadow: '0 0 8px 2px rgba(255, 215, 0, 0.6)',
-                        p: 0.5,
-                      }
-                    : {}),
-                }}
-              >
-                {p.avatar}
-              </Typography>
-              {p.appearance && (
-                <Box
+        {personas.map((p) => {
+          const intimacy = personaIntimacy[p.id] || 0;
+          const level = getIntimacyLevel(intimacy);
+          const color = getIntimacyColor(intimacy);
+          return (
+            <MenuItem
+              key={p.id}
+              selected={p.id === activePersona?.id}
+              onClick={() => handleSelect(p)}
+              sx={{ gap: 1, py: 1 }}
+            >
+              <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                <Typography
                   sx={{
-                    position: 'absolute',
-                    bottom: -2,
-                    right: -4,
-                    fontSize: 7,
+                    fontSize: 18,
                     lineHeight: 1,
-                    bgcolor: 'background.paper',
-                    borderRadius: '50%',
-                    p: 0.25,
+                    ...((personaIntimacy[p.id] || 0) >= 61
+                      ? {
+                          filter: 'drop-shadow(0 0 6px #FFD700)',
+                          borderRadius: '50%',
+                          boxShadow: '0 0 8px 2px rgba(255, 215, 0, 0.6)',
+                          p: 0.5,
+                        }
+                      : {}),
                   }}
                 >
-                  {p.appearance.expression}
+                  {p.avatar}
+                </Typography>
+                {p.appearance && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: -2,
+                      right: -4,
+                      fontSize: 7,
+                      lineHeight: 1,
+                      bgcolor: 'background.paper',
+                      borderRadius: '50%',
+                      p: 0.25,
+                    }}
+                  >
+                    {p.appearance.expression}
+                  </Box>
+                )}
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body2" sx={{ fontSize: 13, fontWeight: p.id === activePersona?.id ? 600 : 400 }}>
+                  {p.name}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
+                  <Typography variant="caption" sx={{ fontSize: 9, color }}>{level}</Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={intimacy}
+                    sx={{
+                      flex: 1,
+                      height: 2,
+                      borderRadius: 1,
+                      bgcolor: 'rgba(255,255,255,0.1)',
+                      '& .MuiLinearProgress-bar': { bgcolor: color },
+                    }}
+                  />
+                  <Typography variant="caption" sx={{ fontSize: 9, color: 'text.secondary' }}>{intimacy}</Typography>
+                </Box>
+              </Box>
+              {getUnreadMemosCount(p.id) > 0 && (
+                <Box
+                  sx={{
+                    minWidth: 18,
+                    height: 18,
+                    borderRadius: '9px',
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    fontSize: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    px: 0.5,
+                  }}
+                >
+                  {getUnreadMemosCount(p.id)}
                 </Box>
               )}
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="body2" sx={{ fontSize: 13, fontWeight: p.id === activePersona?.id ? 600 : 400 }}>
-                {p.name}
-              </Typography>
-              <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary' }}>
-                {p.bio?.slice(0, 20) || VOICE_LABELS[p.voice]}
-              </Typography>
-            </Box>
-            {getUnreadMemosCount(p.id) > 0 && (
-              <Box
-                sx={{
-                  minWidth: 18,
-                  height: 18,
-                  borderRadius: '9px',
-                  bgcolor: 'primary.main',
-                  color: 'white',
-                  fontSize: 10,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  px: 0.5,
-                }}
-              >
-                {getUnreadMemosCount(p.id)}
-              </Box>
-            )}
-            {!p.isDefault && (
+              {!p.isDefault && (
+                <IconButton
+                  size="small"
+                  onClick={(e) => handleDelete(e, p)}
+                  sx={{ p: 0.5 }}
+                >
+                  <DeleteIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              )}
               <IconButton
                 size="small"
-                onClick={(e) => handleDelete(e, p)}
+                onClick={(e) => handleOpenDetail(e, p)}
                 sx={{ p: 0.5 }}
               >
-                <DeleteIcon sx={{ fontSize: 14 }} />
+                <SettingsIcon sx={{ fontSize: 14 }} />
               </IconButton>
-            )}
-            <IconButton
-              size="small"
-              onClick={(e) => handleOpenDetail(e, p)}
-              sx={{ p: 0.5 }}
-            >
-              <SettingsIcon sx={{ fontSize: 14 }} />
-            </IconButton>
-          </MenuItem>
-        ))}
+            </MenuItem>
+          );
+        })}
         <Divider />
         <MenuItem onClick={() => { setCreateOpen(true); setAnchorEl(null); }} sx={{ gap: 1 }}>
           <AddIcon sx={{ fontSize: 16 }} />
