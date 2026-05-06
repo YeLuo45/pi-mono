@@ -9,7 +9,7 @@
  * - Export/Import memories
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 import WordCloud from 'wordcloud';
@@ -37,12 +37,17 @@ import {
   Divider,
   Collapse,
   Slider,
+  Popper,
+  ClickAwayListener,
+  List as MuiList,
+  ListItem as MuiListItem,
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Memory as MemoryIcon,
   Timeline as TimelineIcon,
   Star as StarIcon,
+  StarBorder as StarBorderIcon,
   Delete as DeleteIcon,
   PushPin as PinIcon,
   PushPin as UnpinIcon,
@@ -55,6 +60,7 @@ import {
   Upload as UploadIcon,
   CalendarMonth as CalendarIcon,
   EmojiEmotions as EmotionIcon,
+  LocalOffer as TagIcon,
 } from '@mui/icons-material';
 import {
   getMemoryStats,
@@ -198,6 +204,85 @@ export const MemoryPanel: React.FC = () => {
   const [keywordFilter, setKeywordFilter] = useState('');
   const [dateRange, setDateRange] = useState<[number | null, number | null]>([null, null]);
   const [importanceRange, setImportanceRange] = useState<[number, number]>([0, 100]);
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
+  const [tagSearchQuery, setTagSearchQuery] = useState('');
+  const [tagSearchAnchor, setTagSearchAnchor] = useState<HTMLElement | null>(null);
+  const [showStarredOnly, setShowStarredOnly] = useState(false);
+
+  // Collect all unique tags from memories for autocomplete
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    for (const m of memories) {
+      for (const t of m.tags) {
+        tagSet.add(t);
+      }
+    }
+    return Array.from(tagSet).sort();
+  }, [memories]);
+
+  // Filtered tag suggestions based on tagSearchQuery
+  const tagSuggestions = useMemo(() => {
+    if (!tagSearchQuery.trim()) return [];
+    const q = tagSearchQuery.toLowerCase();
+    return allTags.filter(t => t.toLowerCase().includes(q) && !tagFilter.includes(t)).slice(0, 8);
+  }, [tagSearchQuery, allTags, tagFilter]);
+
+  // Tag filter stats (count per tag among filtered memories)
+  const tagCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const m of memories) {
+      for (const t of m.tags) {
+        counts[t] = (counts[t] || 0) + 1;
+      }
+    }
+    return counts;
+  }, [memories]);
+
+  // Add tag to filter
+  const addTagFilter = (tag: string) => {
+    if (!tagFilter.includes(tag)) {
+      setTagFilter(prev => [...prev, tag]);
+    }
+    setTagSearchQuery('');
+    setTagSearchAnchor(null);
+  };
+
+  // Remove tag from filter
+  const removeTagFilter = (tag: string) => {
+    setTagFilter(prev => prev.filter(t => t !== tag));
+  };
+
+  // Stats card data
+  const statsCard = useMemo(() => {
+    if (!stats) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const weekAgo = new Date(today);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const todayMs = today.getTime();
+    const yesterdayMs = yesterday.getTime();
+    const weekAgoMs = weekAgo.getTime();
+
+    const todayCount = memories.filter(m => m.createdAt >= todayMs).length;
+    const yesterdayCount = memories.filter(m => m.createdAt >= yesterdayMs && m.createdAt < todayMs).length;
+    const weekCount = memories.filter(m => m.createdAt >= weekAgoMs).length;
+    const highImportanceCount = memories.filter(m => m.importance >= 70).length;
+    const avgAccessCount = memories.length > 0 ? Math.round(memories.reduce((sum, m) => sum + m.accessCount, 0) / memories.length) : 0;
+
+    return {
+      total: stats.totalEntries,
+      avgImportance: stats.averageImportance.toFixed(1),
+      todayCount,
+      yesterdayCount,
+      weekCount,
+      highImportanceCount,
+      avgAccessCount,
+      oldestMonths: stats.oldestEntry ? Math.floor((Date.now() - stats.oldestEntry) / (86400000 * 30)) : 0,
+    };
+  }, [stats, memories]);
 
   // Selected memory for detail view
   const [selectedMemory, setSelectedMemory] = useState<MemoryEntry | null>(null);
@@ -293,11 +378,13 @@ export const MemoryPanel: React.FC = () => {
     }
   });
 
-  // Filter memories by keyword, date range, and importance
+  // Filter memories by keyword, date range, importance, tags, and starred
   const filteredMemories = sortedMemories.filter((m) => {
     if (keywordFilter.trim()) {
       const kw = keywordFilter.toLowerCase();
-      if (!m.content.toLowerCase().includes(kw) && !m.tags.some((t) => t.toLowerCase().includes(kw))) {
+      // Support #tag syntax in keyword filter
+      const tagMatch = kw.startsWith('#') ? m.tags.some((t) => t.toLowerCase().includes(kw.slice(1))) : false;
+      if (!m.content.toLowerCase().includes(kw) && !m.tags.some((t) => t.toLowerCase().includes(kw)) && !tagMatch) {
         return false;
       }
     }
@@ -308,6 +395,12 @@ export const MemoryPanel: React.FC = () => {
       return false;
     }
     if (dateRange[1] !== null && m.createdAt > dateRange[1]) {
+      return false;
+    }
+    if (tagFilter.length > 0 && !tagFilter.some((t) => m.tags.includes(t))) {
+      return false;
+    }
+    if (showStarredOnly && m.importance < 70) {
       return false;
     }
     return true;
@@ -516,6 +609,18 @@ export const MemoryPanel: React.FC = () => {
             onDateRangeChange={setDateRange}
             importanceRange={importanceRange}
             onImportanceRangeChange={setImportanceRange}
+            tagFilter={tagFilter}
+            tagCounts={tagCounts}
+            onAddTag={addTagFilter}
+            onRemoveTag={removeTagFilter}
+            tagSuggestions={tagSuggestions}
+            onTagSearchQueryChange={setTagSearchQuery}
+            tagSearchAnchor={tagSearchAnchor}
+            onTagSearchAnchorChange={setTagSearchAnchor}
+            showStarredOnly={showStarredOnly}
+            onShowStarredOnlyChange={setShowStarredOnly}
+            statsCard={statsCard}
+            allTags={allTags}
           />
         )}
 
@@ -727,6 +832,27 @@ interface AllMemoriesTabProps {
   onDateRangeChange: (v: [number | null, number | null]) => void;
   importanceRange: [number, number];
   onImportanceRangeChange: (v: [number, number]) => void;
+  tagFilter: string[];
+  tagCounts: Record<string, number>;
+  onAddTag: (tag: string) => void;
+  onRemoveTag: (tag: string) => void;
+  tagSuggestions: string[];
+  onTagSearchQueryChange: (v: string) => void;
+  tagSearchAnchor: HTMLElement | null;
+  onTagSearchAnchorChange: (el: HTMLElement | null) => void;
+  showStarredOnly: boolean;
+  onShowStarredOnlyChange: (v: boolean) => void;
+  statsCard: {
+    total: number;
+    avgImportance: string;
+    todayCount: number;
+    yesterdayCount: number;
+    weekCount: number;
+    highImportanceCount: number;
+    avgAccessCount: number;
+    oldestMonths: number;
+  } | null;
+  allTags: string[];
 }
 
 function AllMemoriesTab({
@@ -748,9 +874,24 @@ function AllMemoriesTab({
   onDateRangeChange,
   importanceRange,
   onImportanceRangeChange,
+  tagFilter,
+  tagCounts,
+  onAddTag,
+  onRemoveTag,
+  tagSuggestions,
+  onTagSearchQueryChange,
+  tagSearchAnchor,
+  onTagSearchAnchorChange,
+  showStarredOnly,
+  onShowStarredOnlyChange,
+  statsCard,
+  allTags,
 }: AllMemoriesTabProps) {
   const { t } = useTranslation();
   const [showFilters, setShowFilters] = useState(false);
+
+  // Timeline grouping state: 'today' | 'yesterday' | 'thisWeek' | 'older'
+  const [timelineGroup, setTimelineGroup] = useState<'all' | 'today' | 'yesterday' | 'thisWeek' | 'older'>('all');
 
   // Helper to get persona avatar by id
   const getPersonaAvatar = (personaId?: string): string => {
@@ -759,38 +900,112 @@ function AllMemoriesTab({
     return persona?.avatar || '🧠';
   };
 
+  // Group memories into timeline buckets
+  const timelineGroups = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const weekStart = new Date(today);
+    weekStart.setDate(weekStart.getDate() - 7);
+
+    const todayMs = today.getTime();
+    const yesterdayMs = yesterday.getTime();
+    const weekMs = weekStart.getTime();
+
+    return {
+      today: memories.filter(m => m.createdAt >= todayMs),
+      yesterday: memories.filter(m => m.createdAt >= yesterdayMs && m.createdAt < todayMs),
+      thisWeek: memories.filter(m => m.createdAt >= weekMs && m.createdAt < yesterdayMs),
+      older: memories.filter(m => m.createdAt < weekMs),
+    };
+  }, [memories]);
+
+  // Get memories to display based on timeline group
+  const displayMemories = useMemo(() => {
+    if (timelineGroup === 'all') return memories;
+    return timelineGroups[timelineGroup] || [];
+  }, [timelineGroup, timelineGroups, memories]);
+
+  // Render importance stars
+  const renderStars = (importance: number) => {
+    const stars = Math.ceil(importance / 25); // 0-4 stars based on importance
+    return (
+      <Stack direction="row" spacing={0.25}>
+        {[1, 2, 3, 4].map(level => (
+          <IconButton
+            key={level}
+            size="small"
+            sx={{ p: 0.1 }}
+          >
+            {importance >= level * 25 ? (
+              <StarIcon sx={{ fontSize: 12, color: 'warning.main' }} />
+            ) : (
+              <StarBorderIcon sx={{ fontSize: 12, color: 'text.disabled' }} />
+            )}
+          </IconButton>
+        ))}
+      </Stack>
+    );
+  };
+
   return (
     <Stack spacing={2}>
-      {/* Stats summary */}
-      {stats && (
+      {/* Stats Card */}
+      {statsCard && (
         <Paper sx={{ p: 1.5, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 1 }}>
-          <Stack direction="row" spacing={2} flexWrap="wrap" gap={1}>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h6" sx={{ fontSize: 18, fontWeight: 700 }}>
-                {stats.totalEntries}
+          <Stack direction="row" spacing={2} flexWrap="wrap" gap={1} alignItems="center">
+            <Box sx={{ textAlign: 'center', minWidth: 56 }}>
+              <Typography variant="h6" sx={{ fontSize: 20, fontWeight: 700 }}>
+                {statsCard.total}
               </Typography>
-              <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary' }}>
+              <Typography variant="caption" sx={{ fontSize: 9, color: 'text.secondary' }}>
                 {t('memoryPanel.totalMemories')}
               </Typography>
             </Box>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h6" sx={{ fontSize: 18, fontWeight: 700 }}>
-                {stats.averageImportance.toFixed(1)}
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+            <Box sx={{ textAlign: 'center', minWidth: 56 }}>
+              <Typography variant="h6" sx={{ fontSize: 20, fontWeight: 700 }}>
+                {statsCard.avgImportance}
               </Typography>
-              <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary' }}>
+              <Typography variant="caption" sx={{ fontSize: 9, color: 'text.secondary' }}>
                 {t('memoryPanel.avgImportance')}
               </Typography>
             </Box>
-            {stats.oldestEntry && (
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="h6" sx={{ fontSize: 18, fontWeight: 700 }}>
-                  {Math.floor((Date.now() - stats.oldestEntry) / (86400000 * 30))}m
-                </Typography>
-                <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary' }}>
-                  {t('memoryPanel.oldestMemory')}
-                </Typography>
-              </Box>
-            )}
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+            <Box sx={{ textAlign: 'center', minWidth: 44 }}>
+              <Typography variant="h6" sx={{ fontSize: 18, fontWeight: 700, color: 'success.main' }}>
+                {statsCard.todayCount}
+              </Typography>
+              <Typography variant="caption" sx={{ fontSize: 9, color: 'text.secondary' }}>
+                {t('memoryPanel.today')}
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'center', minWidth: 44 }}>
+              <Typography variant="h6" sx={{ fontSize: 18, fontWeight: 700 }}>
+                {statsCard.yesterdayCount}
+              </Typography>
+              <Typography variant="caption" sx={{ fontSize: 9, color: 'text.secondary' }}>
+                {t('memoryPanel.yesterday')}
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'center', minWidth: 44 }}>
+              <Typography variant="h6" sx={{ fontSize: 18, fontWeight: 700 }}>
+                {statsCard.weekCount}
+              </Typography>
+              <Typography variant="caption" sx={{ fontSize: 9, color: 'text.secondary' }}>
+                {t('memoryPanel.thisWeek')}
+              </Typography>
+            </Box>
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+            <Box sx={{ textAlign: 'center', minWidth: 44 }}>
+              <Typography variant="h6" sx={{ fontSize: 18, fontWeight: 700, color: 'warning.main' }}>
+                {statsCard.highImportanceCount}
+              </Typography>
+              <Typography variant="caption" sx={{ fontSize: 9, color: 'text.secondary' }}>
+                ⭐ {t('memoryPanel.important')}
+              </Typography>
+            </Box>
           </Stack>
         </Paper>
       )}
@@ -799,7 +1014,7 @@ function AllMemoriesTab({
       <Stack direction="row" spacing={1} alignItems="center">
         <TextField
           size="small"
-          placeholder={t('memoryPanel.filterKeyword')}
+          placeholder={t('memoryPanel.filterKeyword') + ' (try #tag)'}
           value={keywordFilter}
           onChange={(e) => onKeywordFilterChange(e.target.value)}
           sx={{ flex: 1, fontSize: 12 }}
@@ -821,6 +1036,122 @@ function AllMemoriesTab({
         <Button size="small" variant="outlined" onClick={() => setShowFilters(!showFilters)} sx={{ fontSize: 10 }}>
           <CalendarIcon sx={{ fontSize: 14, mr: 0.5 }} /> {t('memoryPanel.filters')}
         </Button>
+        <Button
+          size="small"
+          variant={showStarredOnly ? 'contained' : 'outlined'}
+          onClick={() => onShowStarredOnlyChange(!showStarredOnly)}
+          sx={{ fontSize: 10 }}
+          startIcon={<StarIcon sx={{ fontSize: 12 }} />}
+        >
+          ⭐
+        </Button>
+      </Stack>
+
+      {/* Tag Filter Row */}
+      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" gap={0.5}>
+        <TagIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+        {tagFilter.map(tag => (
+          <Chip
+            key={tag}
+            label={`#${tag}`}
+            size="small"
+            onDelete={() => onRemoveTag(tag)}
+            sx={{ fontSize: 10, height: 20, bgcolor: 'primary.main', color: 'white' }}
+          />
+        ))}
+        <TextField
+          size="small"
+          placeholder={t('memoryPanel.addTag') || 'Add tag...'}
+          value={tagSearchQuery}
+          onChange={(e) => {
+            onTagSearchQueryChange(e.target.value);
+            if (!tagSearchAnchor) {
+              onTagSearchAnchorChange(document.activeElement);
+            }
+          }}
+          onFocus={(e) => onTagSearchAnchorChange(e.currentTarget)}
+          sx={{ fontSize: 11, width: 100 }}
+        />
+        {tagSuggestions.length > 0 && (
+          <Popper
+            open={!!tagSearchAnchor && tagSuggestions.length > 0}
+            anchorEl={tagSearchAnchor}
+            placement="bottom-start"
+          >
+            <Paper sx={{ p: 0.5, minWidth: 120 }}>
+              <MuiList dense disablePadding>
+                {tagSuggestions.map(tag => (
+                  <MuiListItem
+                    key={tag}
+                    button
+                    dense
+                    onClick={() => onAddTag(tag)}
+                    sx={{ fontSize: 11, py: 0.25 }}
+                  >
+                    <Typography variant="caption" sx={{ fontSize: 11 }}>#{tag}</Typography>
+                    {tagCounts[tag] && (
+                      <Typography variant="caption" sx={{ fontSize: 9, color: 'text.disabled', ml: 'auto' }}>
+                        {tagCounts[tag]}
+                      </Typography>
+                    )}
+                  </MuiListItem>
+                ))}
+              </MuiList>
+            </Paper>
+          </Popper>
+        )}
+        <ClickAwayListener onClickAway={() => { onTagSearchAnchorChange(null); onTagSearchQueryChange(''); }}>
+          <Box />
+        </ClickAwayListener>
+      </Stack>
+
+      {/* Popular Tags */}
+      {allTags.length > 0 && tagFilter.length === 0 && (
+        <Stack direction="row" spacing={0.5} flexWrap="wrap" gap={0.5} alignItems="center">
+          <Typography variant="caption" sx={{ fontSize: 9, color: 'text.disabled', mr: 0.5 }}>
+            {t('memoryPanel.popularTags')}:
+          </Typography>
+          {allTags.slice(0, 10).map(tag => (
+            <Chip
+              key={tag}
+              label={`#${tag}`}
+              size="small"
+              onClick={() => onAddTag(tag)}
+              sx={{
+                fontSize: 9,
+                height: 16,
+                bgcolor: 'rgba(255,255,255,0.05)',
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
+              }}
+            />
+          ))}
+        </Stack>
+      )}
+
+      {/* Timeline Grouping */}
+      <Stack direction="row" spacing={0.5} flexWrap="wrap" gap={0.5}>
+        {([
+          { key: 'all', label: t('memoryPanel.all') },
+          { key: 'today', label: t('memoryPanel.today') },
+          { key: 'yesterday', label: t('memoryPanel.yesterday') },
+          { key: 'thisWeek', label: t('memoryPanel.thisWeek') },
+          { key: 'older', label: t('memoryPanel.older') },
+        ] as const).map(({ key, label }) => {
+          const count = key === 'all' ? undefined : (timelineGroups[key]?.length || 0);
+          return (
+            <Chip
+              key={key}
+              label={count !== undefined ? `${label} (${count})` : label}
+              size="small"
+              onClick={() => setTimelineGroup(key)}
+              sx={{
+                fontSize: 10,
+                height: 22,
+                bgcolor: timelineGroup === key ? 'primary.main' : 'rgba(255,255,255,0.08)',
+              }}
+            />
+          );
+        })}
       </Stack>
 
       {/* Advanced filters */}
@@ -925,7 +1256,7 @@ function AllMemoriesTab({
       {/* Memory list */}
       {loading ? (
         <LinearProgress />
-      ) : memories.length === 0 ? (
+      ) : displayMemories.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <MemoryIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -937,7 +1268,7 @@ function AllMemoriesTab({
         </Box>
       ) : (
         <List dense sx={{ p: 0 }}>
-          {memories.map(memory => (
+          {displayMemories.map(memory => (
             <ListItem
               key={memory.id}
               sx={{
@@ -968,10 +1299,8 @@ function AllMemoriesTab({
                       color: MEMORY_TYPE_COLORS[memory.type],
                     }}
                   />
-                  <Typography variant="caption" sx={{ fontSize: 10, color: 'primary.main', fontWeight: 600 }}>
-                    {memory.importance}
-                  </Typography>
-                  {memory.importance >= 70 && <StarIcon sx={{ fontSize: 12, color: 'warning.main' }} />}
+                  {/* Importance Stars */}
+                  {renderStars(memory.importance)}
                   <Typography variant="caption" sx={{ fontSize: 9, color: 'text.disabled', ml: 'auto' }}>
                     {formatRelativeTime(memory.createdAt)}
                   </Typography>
