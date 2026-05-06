@@ -289,7 +289,6 @@ export async function importPersonaData(jsonStr: string): Promise<ImportResult> 
           updatedAt: Date.now(),
         };
         existingPersonas.push(importedPersona);
-        importedPersona = importedPersona;
       }
       
       // Save all personas

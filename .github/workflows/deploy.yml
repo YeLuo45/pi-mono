@@ -33,7 +33,7 @@ jobs:
       - name: Build
         env:
           GITHUB_PAGES: 'true'
-        run: npm run build
+        run: npx tsc --noEmit --skipLibCheck && vite build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

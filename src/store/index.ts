@@ -735,16 +735,17 @@ export const useStore = create<AppState>()(
           );
           // Apply initial persona theme after rehydration
           if (state.personaFollowTheme) {
-            const persona = getAllPersonas().find((p) => p.id === state.activePersonaId);
-            if (persona?.theme) {
-              applyPersonaTheme(persona.theme);
+            const currentPersona = getAllPersonas().find((p) => p.id === state.activePersonaId);
+            if (currentPersona?.theme) {
+              applyPersonaTheme(currentPersona.theme);
             }
           } else {
             resetPersonaTheme();
           }
           // V37: Apply initial persona voice after rehydration
-          if (persona?.voice) {
-            setVoiceServiceConfig(persona.voice);
+          const activePersona = getAllPersonas().find((p) => p.id === state.activePersonaId);
+          if (activePersona?.voice) {
+            setVoiceServiceConfig(activePersona.voice);
           }
         }
       },
