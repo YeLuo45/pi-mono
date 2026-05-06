@@ -476,7 +476,6 @@ export const ChatPanel: React.FC = () => {
     adjustMoodForInteraction('chat');
 
     // --- Persona Command Interception ---
-    const parsed = parsePersonaCommand(userMsg);
     if (parsed) {
       if (parsed.type === 'help') {
         const helpText = `可用命令：
