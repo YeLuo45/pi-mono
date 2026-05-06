@@ -19,7 +19,8 @@
     "menu": "菜单",
     "close": "关闭",
     "analytics": "数据分析",
-    "scenes": "场景"
+    "scenes": "场景",
+    "graph": "关系图谱"
   },
   "chat": {
     "title": "AI 聊天",

@@ -19,7 +19,8 @@
     "menu": "Menu",
     "close": "Close",
     "analytics": "Analytics",
-    "scenes": "Scenes"
+    "scenes": "Scenes",
+    "graph": "Relation Graph"
   },
   "chat": {
     "title": "AI Chat",

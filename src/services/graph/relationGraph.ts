@@ -71,21 +71,27 @@ export function computeRelationGraph(): RelationGraph {
   // Sort nodes by messageCount descending
   nodes.sort((a, b) => b.messageCount - a.messageCount);
 
-  // Build edges — all pairs of personas
+  // Build edges — only pairs with meaningful intimacy (> 0)
+  // Edge weight = average intimacy of the two personas
+  // (no cross-persona message history is stored, so intimacy is the relationship signal)
   const edges: GraphEdge[] = [];
   for (let i = 0; i < personas.length; i++) {
     for (let j = i + 1; j < personas.length; j++) {
       const pA = personas[i];
       const pB = personas[j];
-      const nodeA = nodes.find(n => n.id === pA.id)!;
-      const nodeB = nodes.find(n => n.id === pB.id)!;
+      const intimacyA = personaIntimacy[pA.id] || 0;
+      const intimacyB = personaIntimacy[pB.id] || 0;
 
-      edges.push({
-        source: pA.id,
-        target: pB.id,
-        weight: (nodeA.messageCount + nodeB.messageCount) / 2,
-        intimacy: (nodeA.intimacy + nodeB.intimacy) / 2,
-      });
+      // Only create edge if at least one persona has non-zero intimacy
+      if (intimacyA > 0 || intimacyB > 0) {
+        const avgIntimacy = (intimacyA + intimacyB) / 2;
+        edges.push({
+          source: pA.id,
+          target: pB.id,
+          weight: avgIntimacy,
+          intimacy: avgIntimacy,
+        });
+      }
     }
   }
 

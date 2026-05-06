@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Drawer, useMediaQuery, IconButton } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { Sidebar } from '../components/Layout/Sidebar';
@@ -17,7 +17,7 @@ import { MemoryPanel } from '../components/Memory/MemoryPanel';
 import { AnalyticsPanel } from '../components/Analytics/AnalyticsPanel';
 import { registerBuiltinPlugins, registerOptionalPlugins } from '../plugins';
 import { useStore } from '../store';
-import { useEffect } from 'react';
+import { RelationGraph } from '../components/Graph/RelationGraph';
 
 const PANEL_COMPONENTS = {
   chat: ChatPanel,
@@ -32,6 +32,7 @@ const PANEL_COMPONENTS = {
   plugin: PluginPanel,
   memory: MemoryPanel,
   analytics: AnalyticsPanel,
+  graph: () => null, // RelationGraph is rendered as a dialog at root level
 } as const;
 
 export const MainPage: React.FC = () => {
@@ -39,7 +40,15 @@ export const MainPage: React.FC = () => {
   const activePluginId = useStore((s) => s.activePluginId);
   const setActivePluginId = useStore((s) => s.setActivePluginId);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [relationGraphOpen, setRelationGraphOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
+
+  // Listen for relation graph open event from Sidebar
+  useEffect(() => {
+    const handleOpenRelationGraph = () => setRelationGraphOpen(true);
+    window.addEventListener('pixelpal:openRelationGraph', handleOpenRelationGraph);
+    return () => window.removeEventListener('pixelpal:openRelationGraph', handleOpenRelationGraph);
+  }, []);
 
   // Register built-in and optional plugins once on mount
   useEffect(() => {
@@ -141,6 +150,9 @@ export const MainPage: React.FC = () => {
           <ActivePanelComponent />
         </Box>
       </Box>
+
+      {/* Relation Graph Dialog — rendered at root level */}
+      <RelationGraph open={relationGraphOpen} onClose={() => setRelationGraphOpen(false)} />
     </Box>
   );
 };
