@@ -13,12 +13,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:electron": "tsc -b && vite build",
+    "build:electron": "npx vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "prepackage": "node -e \"const fs=require('fs');['node_modules/canvas','node_modules/@nut.tree'].forEach(p=>{try{fs.rmSync(p,{recursive:true,force:true});console.log('Removed',p)}catch(e){}})\"",
-    "package": "npm run prepackage && npm run build && electron-builder --win --x64",
-    "package:dir": "npm run prepackage && npm run build && electron-builder --win --x64 --dir"
+    "package": "npm run prepackage && npm run build:electron && electron-builder --win --x64",
+    "package:dir": "npm run prepackage && npm run build:electron && electron-builder --win --x64 --dir"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

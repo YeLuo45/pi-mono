@@ -2,9 +2,7 @@ name: Build Electron (Windows)
 
 on:
   push:
-    branches: [v16-scenes, main]
-  pull_request:
-    branches: [v16-scenes, main]
+    branches: [master]
 
 jobs:
   build:
@@ -29,7 +27,7 @@ jobs:
           Remove-Item -Recurse -Force node_modules/@nut.tree -ErrorAction SilentlyContinue
 
       - name: Build renderer and electron
-        run: npm run build
+        run: npm run build:electron
 
       - name: Build Windows exe
         run: npm run package
