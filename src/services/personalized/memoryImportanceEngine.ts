@@ -5,7 +5,7 @@
  * L1-L4 importance levels + scoring + decay
  */
 
-import { useStore } from '../../store';
+
 
 // ===== Type Definitions =====
 
@@ -485,9 +485,5 @@ export function createMemoryFromChat(
 
 export { 
   LEVEL_THRESHOLDS, 
-  DEFAULT_DECAY_RATES,
-  type MemoryItem,
-  type MemoryScoringInput,
-  type MemoryImportanceConfig,
-  type MemoryStats
+  DEFAULT_DECAY_RATES
 };

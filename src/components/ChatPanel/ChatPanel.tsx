@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useSceneStore } from '../../stores/sceneStore';
 import { checkKeywordTrigger, executeScene, initSceneScheduler } from '../../utils/sceneScheduler';
 import { parsePersonaCommand, fuzzyMatchPersona, fuzzyMatchPersonas } from '../../utils/personaCommands';
-import { getAllPersonas, getPersonaSystemPrompt } from '../../services/persona/personaStorage';
+import { getAllPersonas, getPersonaSystemPrompt } from '../../services/persona';
 import { getIntimacyLevel } from '../../store';
 import { checkAndTagImportantMessage } from '../../services/summary/dailySummary';
 import { checkAndCreateMilestones } from '../../services/milestone/milestoneTracker';
