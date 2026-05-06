@@ -163,6 +163,8 @@
     "noEmails": "No emails loaded"
   },
   "team": {
+    "title": "Team Collaboration",
+    "members": "members",
     "activeCollaborators": "Active Collaborators",
     "setAsTeamLead": "Set as Team Lead",
     "setAsObserver": "Set as observer",
@@ -170,9 +172,10 @@
     "removeFromTeam": "Remove from team",
     "addTeamMember": "Add Team Member",
     "allowDebate": "Allow debate between personas",
+    "allowCrossTalk": "Allow cross-talk between personas",
     "maxActiveMembers": "Max Active Members",
     "teamDiscussion": "Team Discussion",
-    "concludeDiscussion": "Conclude discussion",
+    "concludeDiscussion": "Conclude & Synthesize",
     "clear": "Clear",
     "start": "Start",
     "topic": "Topic",
@@ -182,7 +185,23 @@
     "startNewDiscussion": "Start New Discussion",
     "selectPersona": "Select Persona",
     "personaName": "Persona Name",
-    "personaTraits": "Persona Traits"
+    "personaTraits": "Persona Traits",
+    "noMembers": "No team members yet",
+    "discussionPlaceholder": "Start a team discussion...",
+    "setupBalanced": "Setup Balanced Team",
+    "contribution": "Contribution Distribution",
+    "analysis": "Discussion Analysis",
+    "addPersona": "Add Persona",
+    "selectPersonaToAdd": "Select persona to add"
+  },
+  "persona": {
+    "title": "AI Persona",
+    "allPersonas": "All Personas",
+    "selectPersona": "Select Persona",
+    "traits": "Personality Traits",
+    "teamView": "Team View",
+    "addToTeam": "Add to Team",
+    "addToTeamHint": "Build a multi-persona team"
   },
   "settings": {
     "title": "Settings",

@@ -1,8 +1,12 @@
 /**
- * Multi-Persona Collaboration Panel
+ * Multi-Persona Collaboration Panel V21
  *
- * UI for team management and collaborative discussion.
- * Shows team members, allows switching personas, and displays team chat.
+ * Enhanced UI for team management and collaborative discussion with:
+ * - Role-based team organization
+ * - Real-time contribution tracking
+ * - Cross-persona discussion threads
+ * - Team response synthesis
+ * - Emotion-aware interactions
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -34,6 +38,13 @@ import {
   ListItemAvatar,
   ListItemText,
   ListItemSecondaryAction,
+  Badge,
+  LinearProgress,
+  Tab,
+  Tabs,
+  Card,
+  CardContent,
+  CardHeader,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -47,12 +58,22 @@ import {
   Chat as ChatIcon,
   Clear as ClearIcon,
   Summarize as SummarizeIcon,
+  Psychology as SpecialistIcon,
+  Analytics as AnalystIcon,
+  Balance as MediatorIcon,
+  PlayArrow as PlayIcon,
+  Pause as PauseIcon,
+  TrendingUp as TrendingUpIcon,
+  Psychology as PsychologyIcon,
+  EmojiEmotions as EmojiIcon,
+  Insights as InsightsIcon,
 } from '@mui/icons-material';
 import { useStore } from '../../store';
 import {
   type PersonaMember,
   type TeamDiscussion,
   type CollaborationMessage,
+  type PersonaRole,
   getAvailablePersonasForTeam,
   getTeamConfig,
   setTeamConfig,
@@ -69,9 +90,30 @@ import {
   getCurrentDiscussion,
   concludeDiscussion,
   clearDiscussion,
+  analyzeDiscussion,
+  synthesizeTeamResponse,
+  getRoleDescription,
+  setPersonaRole,
+  getPersonaMessages,
 } from '../../services/companion/multiPersonaService';
 import type { PersonaId } from '../../services/companion/personalityTypes';
 import { getPersona } from '../../services/companion/personalityTypes';
+
+const roleIcons: Record<PersonaRole, React.ReactNode> = {
+  primary: <StarIcon sx={{ fontSize: 14, color: 'gold' }} />,
+  specialist: <SpecialistIcon sx={{ fontSize: 14, color: '#FF9800' }} />,
+  analyst: <AnalystIcon sx={{ fontSize: 14, color: '#2196F3' }} />,
+  mediator: <MediatorIcon sx={{ fontSize: 14, color: '#E91E63' }} />,
+  observer: <VisibilityIcon sx={{ fontSize: 14, opacity: 0.6 }} />,
+};
+
+const roleColors: Record<PersonaRole, string> = {
+  primary: '#FFD700',
+  specialist: '#FF9800',
+  analyst: '#2196F3',
+  mediator: '#E91E63',
+  observer: '#9E9E9E',
+};
 
 export const MultiPersonaCollaboration: React.FC = () => {
   const { t } = useTranslation();
@@ -81,8 +123,10 @@ export const MultiPersonaCollaboration: React.FC = () => {
   const [chatExpanded, setChatExpanded] = useState(false);
   const [localDiscussion, setLocalDiscussion] = useState<TeamDiscussion | null>(null);
   const [teamInput, setTeamInput] = useState('');
+  const [activeTab, setActiveTab] = useState(0);
+  const [contributions, setContributions] = useState<{ [key: string]: number }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   const companion = useStore((s) => s.companion);
   const setPersona = useStore((s) => s.setPersona);
 
@@ -91,6 +135,14 @@ export const MultiPersonaCollaboration: React.FC = () => {
     const discussion = getCurrentDiscussion();
     if (discussion) {
       setLocalDiscussion({ ...discussion });
+      // Update contribution tracking
+      const contribs: { [key: string]: number } = {};
+      for (const msg of discussion.messages) {
+        if (msg.type === 'contribution') {
+          contribs[msg.personaId] = (contribs[msg.personaId] || 0) + 1;
+        }
+      }
+      setContributions(contribs);
     }
   }, [localDiscussion?.messages.length]);
 
@@ -108,7 +160,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
 
   const handleAddPersona = () => {
     if (selectedNewPersona) {
-      const success = addPersonaToTeam(selectedNewPersona, 'contributor');
+      const success = addPersonaToTeam(selectedNewPersona, 'specialist');
       if (success) {
         setSelectedNewPersona('');
         setAddPersonaOpen(false);
@@ -126,8 +178,11 @@ export const MultiPersonaCollaboration: React.FC = () => {
 
   const handleSetPrimary = (personaId: PersonaId) => {
     setPrimaryPersona(personaId);
-    // Also update the main companion
     setPersona(personaId);
+  };
+
+  const handleRoleChange = (personaId: PersonaId, role: PersonaRole) => {
+    setPersonaRole(personaId, role);
   };
 
   const handleSetupBalanced = () => {
@@ -145,6 +200,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
 
   const handleConcludeDiscussion = () => {
     if (localDiscussion) {
+      const synthesis = synthesizeTeamResponse();
       const summary = `Team discussed: ${localDiscussion.topic}. ${localDiscussion.messages.length} messages exchanged.`;
       concludeDiscussion(summary);
       setLocalDiscussion(prev => prev ? { ...prev, status: 'summarized', summary } : null);
@@ -154,14 +210,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
   const handleClearTeamChat = () => {
     clearDiscussion();
     setLocalDiscussion(null);
-  };
-
-  const getRoleIcon = (role: PersonaMember['role']) => {
-    switch (role) {
-      case 'primary': return <StarIcon sx={{ fontSize: 14, color: 'gold' }} />;
-      case 'contributor': return <PersonIcon sx={{ fontSize: 14 }} />;
-      case 'observer': return <VisibilityIcon sx={{ fontSize: 14, opacity: 0.6 }} />;
-    }
+    setContributions({});
   };
 
   const getStatusColor = (isActive: boolean) => isActive ? 'success' : 'default';
@@ -174,6 +223,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
       case 'agreement': return '#81C784';
       case 'disagreement': return '#FF8A65';
       case 'summary': return '#FFD54F';
+      case 'synthesis': return '#CE93D8';
       default: return '#9B7FD4';
     }
   };
@@ -186,6 +236,12 @@ export const MultiPersonaCollaboration: React.FC = () => {
     witty: '#4CAF50',
   };
 
+  const getContributionPercentage = (personaId: PersonaId): number => {
+    if (!localDiscussion || localDiscussion.messages.length === 0) return 0;
+    const count = contributions[personaId] || 0;
+    return Math.round((count / localDiscussion.messages.filter(m => m.type === 'contribution').length) * 100);
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Team Management Section */}
@@ -195,18 +251,18 @@ export const MultiPersonaCollaboration: React.FC = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GroupIcon sx={{ fontSize: 18, color: 'primary.main' }} />
             <Typography variant="subtitle1" sx={{ fontSize: 14, fontWeight: 600 }}>
-              {t('team.title')}
+              {t('team.title') || 'Team Collaboration'}
             </Typography>
             <Chip
               size="small"
-              label={`${teamMembers.length} ${teamMembers.length !== 1 ? t('team.members') : t('team.members')}`}
+              label={`${teamMembers.length} ${teamMembers.length !== 1 ? 'members' : 'member'}`}
               sx={{ height: 20, fontSize: 10 }}
             />
           </Box>
           <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <Tooltip title={t('team.setupBalanced')}>
+            <Tooltip title={t('team.setupBalanced') || 'Setup Balanced Team'}>
               <Button size="small" onClick={handleSetupBalanced} sx={{ minWidth: 0, p: 0.5 }}>
-                <SummarizeIcon sx={{ fontSize: 16 }} />
+                <PsychologyIcon sx={{ fontSize: 16 }} />
               </Button>
             </Tooltip>
             <IconButton size="small" onClick={() => setTeamExpanded(!teamExpanded)}>
@@ -223,11 +279,39 @@ export const MultiPersonaCollaboration: React.FC = () => {
             {getTeamDescription()}
           </Typography>
 
+          {/* Contribution Overview (when discussion active) */}
+          {localDiscussion && localDiscussion.status === 'active' && activeMembers.length > 0 && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', mb: 0.5, display: 'block' }}>
+                {t('team.contribution') || 'Contribution Distribution'}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                {activeMembers.map(member => (
+                  <Tooltip key={member.personaId} title={`${getContributionPercentage(member.personaId)}% of contributions`}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: member.color,
+                        }}
+                      />
+                      <Typography sx={{ fontSize: 10 }}>
+                        {member.name}: {contributions[member.personaId] || 0}
+                      </Typography>
+                    </Box>
+                  </Tooltip>
+                ))}
+              </Box>
+            </Box>
+          )}
+
           {/* Active Members Quick View */}
           {activeMembers.length > 0 && (
             <Box sx={{ mb: 2 }}>
               <Typography variant="caption" sx={{ fontSize: 11, color: 'text.secondary', mb: 0.5, display: 'block' }}>
-                {t('team.activeCollaborators')}
+                {t('team.activeCollaborators') || 'Active Collaborators'}
               </Typography>
               <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
                 {activeMembers.map(member => (
@@ -240,9 +324,9 @@ export const MultiPersonaCollaboration: React.FC = () => {
                       </Avatar>
                     }
                     label={member.name}
-                    icon={getRoleIcon(member.role)}
-                    sx={{ 
-                      height: 24, 
+                    icon={roleIcons[member.role] as any}
+                    sx={{
+                      height: 24,
                       fontSize: 11,
                       border: member.role === 'primary' ? `1px solid ${member.color}` : 'none',
                     }}
@@ -256,6 +340,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
           {teamMembers.length > 0 ? (
             <List dense disablePadding>
               {teamMembers.map(member => {
+                const persona = getPersona(member.personaId);
                 return (
                   <ListItem
                     key={member.personaId}
@@ -267,18 +352,34 @@ export const MultiPersonaCollaboration: React.FC = () => {
                       bgcolor: member.role === 'primary' ? 'rgba(155, 127, 212, 0.1)' : 'transparent',
                     }}
                   >
-                    <ListItemAvatar sx={{ minWidth: 32 }}>
-                      <Avatar 
-                        sx={{ 
-                          bgcolor: member.color, 
-                          width: 24, 
-                          height: 24, 
-                          fontSize: 11,
-                          opacity: member.isActive ? 1 : 0.5,
-                        }}
+                    <ListItemAvatar sx={{ minWidth: 36 }}>
+                      <Badge
+                        overlap="circular"
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        badgeContent={
+                          <Box
+                            sx={{
+                              width: 10,
+                              height: 10,
+                              borderRadius: '50%',
+                              bgcolor: member.isActive ? 'success.main' : 'grey.500',
+                              border: '1px solid rgba(30,20,55,0.95)',
+                            }}
+                          />
+                        }
                       >
-                        {member.name[0]}
-                      </Avatar>
+                        <Avatar
+                          sx={{
+                            bgcolor: member.color,
+                            width: 28,
+                            height: 28,
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {member.name[0]}
+                        </Avatar>
+                      </Badge>
                     </ListItemAvatar>
                     <ListItemText
                       primary={
@@ -286,13 +387,10 @@ export const MultiPersonaCollaboration: React.FC = () => {
                           <Typography sx={{ fontSize: 12, fontWeight: member.role === 'primary' ? 600 : 400 }}>
                             {member.name}
                           </Typography>
-                          {getRoleIcon(member.role)}
-                          <Chip
-                            size="small"
-                            label={getStatusLabel(member.isActive)}
-                            color={getStatusColor(member.isActive)}
-                            sx={{ height: 16, fontSize: 9 }}
-                          />
+                          {roleIcons[member.role]}
+                          <Typography sx={{ fontSize: 10, color: roleColors[member.role] }}>
+                            {member.role}
+                          </Typography>
                         </Box>
                       }
                       secondary={
@@ -302,9 +400,28 @@ export const MultiPersonaCollaboration: React.FC = () => {
                       }
                     />
                     <ListItemSecondaryAction sx={{ right: 0 }}>
-                      <Box sx={{ display: 'flex', gap: 0.25 }}>
+                      <Box sx={{ display: 'flex', gap: 0.25, alignItems: 'center' }}>
+                        {/* Role Selector */}
+                        <Select
+                          size="small"
+                          value={member.role}
+                          onChange={(e) => handleRoleChange(member.personaId, e.target.value as PersonaRole)}
+                          sx={{
+                            fontSize: 10,
+                            height: 24,
+                            '& .MuiSelect-select': { py: 0.5 },
+                            minWidth: 80,
+                          }}
+                        >
+                          <MenuItem value="primary" sx={{ fontSize: 10 }}>Lead</MenuItem>
+                          <MenuItem value="specialist" sx={{ fontSize: 10 }}>Specialist</MenuItem>
+                          <MenuItem value="analyst" sx={{ fontSize: 10 }}>Analyst</MenuItem>
+                          <MenuItem value="mediator" sx={{ fontSize: 10 }}>Mediator</MenuItem>
+                          <MenuItem value="observer" sx={{ fontSize: 10 }}>Observer</MenuItem>
+                        </Select>
+
                         {member.role !== 'primary' && (
-                          <Tooltip title={t('team.setAsTeamLead')}>
+                          <Tooltip title={t('team.setAsTeamLead') || 'Set as Team Lead'}>
                             <IconButton
                               size="small"
                               onClick={() => handleSetPrimary(member.personaId)}
@@ -314,15 +431,15 @@ export const MultiPersonaCollaboration: React.FC = () => {
                             </IconButton>
                           </Tooltip>
                         )}
-                        <Tooltip title={member.isActive ? t('team.setAsObserver') : t('team.setAsActive')}>
+                        <Tooltip title={member.isActive ? t('team.setAsObserver') || 'Set as Observer' : t('team.setAsActive') || 'Set as Active'}>
                           <Switch
                             size="small"
                             checked={member.isActive}
                             onChange={() => handleToggleActive(member.personaId, member.isActive)}
-                            sx={{ '& .MuiSwitch-thumb': { width: 12, height: 12 } }}
+                            sx={{ '& .MuiSwitch-thumb': { width: 10, height: 10 } }}
                           />
                         </Tooltip>
-                        <Tooltip title={t('team.removeFromTeam')}>
+                        <Tooltip title={t('team.removeFromTeam') || 'Remove from Team'}>
                           <IconButton
                             size="small"
                             onClick={() => handleRemovePersona(member.personaId)}
@@ -340,7 +457,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
           ) : (
             <Box sx={{ textAlign: 'center', py: 2, opacity: 0.6 }}>
               <Typography variant="body2" sx={{ fontSize: 12 }}>
-                {t('team.noMembers')}
+                {t('team.noMembers') || 'No team members yet'}
               </Typography>
             </Box>
           )}
@@ -353,7 +470,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
             onClick={() => setAddPersonaOpen(true)}
             sx={{ mt: 1.5 }}
           >
-            {t('team.addTeamMember')}
+            {t('team.addTeamMember') || 'Add Team Member'}
           </Button>
 
           {/* Team Settings */}
@@ -368,20 +485,35 @@ export const MultiPersonaCollaboration: React.FC = () => {
               }
               label={
                 <Typography sx={{ fontSize: 11 }}>
-                  {t('team.allowDebate')}
+                  {t('team.allowDebate') || 'Allow Debate'}
+                </Typography>
+              }
+              sx={{ mb: 0.5 }}
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={teamConfig.allowCrossTalk}
+                  onChange={(_, checked) => setTeamConfig({ allowCrossTalk: checked })}
+                />
+              }
+              label={
+                <Typography sx={{ fontSize: 11 }}>
+                  {t('team.allowCrossTalk') || 'Allow Cross-Talk'}
                 </Typography>
               }
               sx={{ mb: 0.5 }}
             />
             <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-              <InputLabel sx={{ fontSize: 12 }}>{t('team.maxActiveMembers')}</InputLabel>
+              <InputLabel sx={{ fontSize: 12 }}>{t('team.maxActiveMembers') || 'Max Active'}</InputLabel>
               <Select
                 value={teamConfig.maxActiveMembers}
-                label={t('team.maxActiveMembers')}
+                label={t('team.maxActiveMembers') || 'Max Active'}
                 onChange={(e) => setTeamConfig({ maxActiveMembers: Number(e.target.value) })}
                 sx={{ fontSize: 12 }}
               >
-                {[1, 2, 3, 4].map(n => (
+                {[1, 2, 3, 4, 5].map(n => (
                   <MenuItem key={n} value={n} sx={{ fontSize: 12 }}>{n}</MenuItem>
                 ))}
               </Select>
@@ -397,11 +529,11 @@ export const MultiPersonaCollaboration: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <ChatIcon sx={{ fontSize: 18, color: 'primary.main' }} />
               <Typography variant="subtitle1" sx={{ fontSize: 14, fontWeight: 600 }}>
-                {t('team.teamDiscussion')}
+                {t('team.teamDiscussion') || 'Team Discussion'}
               </Typography>
               {localDiscussion && (
-                <Chip 
-                  size="small" 
+                <Chip
+                  size="small"
                   label={localDiscussion.status}
                   color={localDiscussion.status === 'active' ? 'primary' : 'default'}
                   sx={{ height: 18, fontSize: 9, textTransform: 'capitalize' }}
@@ -410,14 +542,14 @@ export const MultiPersonaCollaboration: React.FC = () => {
             </Box>
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               {localDiscussion && localDiscussion.status === 'active' && (
-                <Tooltip title={t('team.concludeDiscussion')}>
+                <Tooltip title={t('team.concludeDiscussion') || 'Conclude & Synthesize'}>
                   <IconButton size="small" onClick={handleConcludeDiscussion}>
                     <SummarizeIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
               )}
               {localDiscussion && (
-                <Tooltip title={t('team.clear')}>
+                <Tooltip title={t('team.clear') || 'Clear'}>
                   <IconButton size="small" onClick={handleClearTeamChat}>
                     <ClearIcon sx={{ fontSize: 16 }} />
                   </IconButton>
@@ -432,13 +564,27 @@ export const MultiPersonaCollaboration: React.FC = () => {
           <Collapse in={chatExpanded}>
             <Divider sx={{ my: 1.5 }} />
 
+            {/* Tabs for different views */}
+            <Tabs
+              value={activeTab}
+              onChange={(_, v) => setActiveTab(v)}
+              sx={{
+                mb: 1.5,
+                minHeight: 32,
+                '& .MuiTab-root': { minHeight: 32, py: 0.5, fontSize: 11 },
+              }}
+            >
+              <Tab icon={<ChatIcon sx={{ fontSize: 14 }} />} iconPosition="start" label="Chat" />
+              <Tab icon={<InsightsIcon sx={{ fontSize: 14 }} />} iconPosition="start" label="Analysis" />
+            </Tabs>
+
             {/* Discussion Topic Input */}
             {!localDiscussion && (
               <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                 <TextField
                   fullWidth
                   size="small"
-                  placeholder={t('team.discussionPlaceholder')}
+                  placeholder={t('team.discussionPlaceholder') || 'Start a team discussion...'}
                   value={teamInput}
                   onChange={(e) => setTeamInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleStartDiscussion()}
@@ -451,8 +597,9 @@ export const MultiPersonaCollaboration: React.FC = () => {
                   size="small"
                   onClick={handleStartDiscussion}
                   disabled={!teamInput.trim()}
+                  startIcon={<PlayIcon />}
                 >
-                  {t('team.start')}
+                  {t('team.start') || 'Start'}
                 </Button>
               </Box>
             )}
@@ -461,32 +608,36 @@ export const MultiPersonaCollaboration: React.FC = () => {
             {localDiscussion && (
               <Box sx={{ mb: 1.5, p: 1, bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1 }}>
                 <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary' }}>
-                  {t('team.topic')}
+                  {t('team.topic') || 'Topic'}
                 </Typography>
                 <Typography variant="body2" sx={{ fontSize: 12, fontWeight: 500 }}>
                   {localDiscussion.topic}
                 </Typography>
+                <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary' }}>
+                  {localDiscussion.messages.length} messages · {activeMembers.length} active
+                </Typography>
               </Box>
             )}
 
-            {/* Messages */}
-            <Box sx={{ 
-              maxHeight: 300, 
-              overflowY: 'auto', 
-              display: 'flex', 
-              flexDirection: 'column', 
+            {/* Chat Messages */}
+            <Box sx={{
+              maxHeight: 300,
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
               gap: 1,
               mb: 1.5,
             }}>
               {localDiscussion?.messages.map(msg => {
                 const personaColor = personaColors[msg.personaId] || '#9B7FD4';
+                const isUser = msg.personaId === companion.personaId;
                 return (
                   <Box
                     key={msg.id}
                     sx={{
                       display: 'flex',
                       flexDirection: 'column',
-                      alignItems: msg.personaId === companion.personaId ? 'flex-end' : 'flex-start',
+                      alignItems: isUser ? 'flex-end' : 'flex-start',
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.25 }}>
@@ -498,157 +649,140 @@ export const MultiPersonaCollaboration: React.FC = () => {
                           bgcolor: personaColor,
                         }}
                       />
-                      <Typography sx={{ fontSize: 10, color: 'text.secondary', fontWeight: 500 }}>
+                      <Typography sx={{ fontSize: 10, fontWeight: 600, color: personaColor }}>
                         {msg.personaName}
                       </Typography>
                       <Chip
-                        size="small"
                         label={msg.type}
+                        size="small"
                         sx={{
                           height: 14,
                           fontSize: 8,
                           bgcolor: getMessageTypeColor(msg.type),
-                          color: 'black',
-                          textTransform: 'capitalize',
+                          '& .MuiChip-label': { px: 0.5 },
                         }}
                       />
                     </Box>
                     <Paper
                       sx={{
                         p: 1,
-                        bgcolor: 'rgba(0,0,0,0.3)',
+                        bgcolor: 'rgba(0,0,0,0.2)',
+                        maxWidth: '85%',
                         borderRadius: 1,
                         borderLeft: `2px solid ${personaColor}`,
-                        maxWidth: '90%',
                       }}
                     >
-                      <Typography sx={{ fontSize: 12, whiteSpace: 'pre-wrap', lineHeight: 1.4 }}>
+                      <Typography sx={{ fontSize: 12, whiteSpace: 'pre-wrap' }}>
                         {msg.content}
                       </Typography>
                     </Paper>
                   </Box>
                 );
               })}
-              {(!localDiscussion || localDiscussion.messages.length === 0) && (
-                <Box sx={{ textAlign: 'center', py: 2, opacity: 0.5 }}>
-                  <Typography variant="body2" sx={{ fontSize: 12 }}>
-                    {t('team.noMessagesYet')}
-                  </Typography>
-                </Box>
-              )}
               <div ref={messagesEndRef} />
             </Box>
 
-            {/* Summary if concluded */}
-            {localDiscussion?.summary && (
-              <Box sx={{ p: 1.5, bgcolor: 'rgba(255, 213, 79, 0.1)', borderRadius: 1, mb: 1.5 }}>
-                <Typography variant="caption" sx={{ fontSize: 10, color: '#FFD54F', fontWeight: 600 }}>
-                  {t('team.summary')}
+            {/* Analysis Tab Content */}
+            {activeTab === 1 && localDiscussion && (
+              <Box sx={{ mb: 1.5 }}>
+                <Typography variant="caption" sx={{ fontSize: 11, fontWeight: 600 }}>
+                  {t('team.analysis') || 'Discussion Analysis'}
                 </Typography>
-                <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>
-                  {localDiscussion.summary}
-                </Typography>
+                {(() => {
+                  const analysis = analyzeDiscussion();
+                  return (
+                    <Box sx={{ mt: 1 }}>
+                      {analysis.map(a => (
+                        <Card key={a.personaId} sx={{ mb: 1, bgcolor: 'rgba(0,0,0,0.2)' }}>
+                          <CardContent sx={{ py: 1, '&:last-child': { pb: 1 } }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                              <Box sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                bgcolor: personaColors[a.personaId],
+                              }} />
+                              <Typography sx={{ fontSize: 11, fontWeight: 600 }}>
+                                {a.perspective}
+                              </Typography>
+                              <Chip
+                                label={a.emotion}
+                                size="small"
+                                sx={{ height: 14, fontSize: 8 }}
+                              />
+                            </Box>
+                            <Typography sx={{ fontSize: 10, color: 'text.secondary' }}>
+                              Confidence: {Math.round(a.confidence * 100)}%
+                            </Typography>
+                            {a.keyPoints.length > 0 && (
+                              <Box sx={{ mt: 0.5 }}>
+                                {a.keyPoints.map((p, i) => (
+                                  <Typography key={i} sx={{ fontSize: 10 }}>
+                                    • {p.slice(0, 80)}{p.length > 80 ? '...' : ''}
+                                  </Typography>
+                                ))}
+                              </Box>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </Box>
+                  );
+                })()}
               </Box>
-            )}
-
-            {/* Continue Discussion Input */}
-            {localDiscussion && localDiscussion.status === 'active' && (
-              <TextField
-                fullWidth
-                size="small"
-                placeholder={t('team.addToDiscussion')}
-                value={teamInput}
-                onChange={(e) => setTeamInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && teamInput.trim()) {
-                    addDiscussionMessage(
-                      companion.personaId,
-                      teamInput.trim(),
-                      'contribution'
-                    );
-                    setTeamInput('');
-                  }
-                }}
-                sx={{ '& .MuiInputBase-input': { fontSize: 12 } }}
-              />
-            )}
-
-            {/* New Discussion Button */}
-            {localDiscussion && localDiscussion.status !== 'active' && (
-              <Button
-                variant="outlined"
-                size="small"
-                fullWidth
-                onClick={() => {
-                  setLocalDiscussion(null);
-                  setTeamInput('');
-                }}
-                sx={{ fontSize: 11 }}
-              >
-                {t('team.startNewDiscussion')}
-              </Button>
             )}
           </Collapse>
         </Paper>
       )}
 
       {/* Add Persona Dialog */}
-      <Dialog open={addPersonaOpen} onClose={() => setAddPersonaOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ fontSize: 14 }}>{t('team.addTeamMember')}</DialogTitle>
+      <Dialog
+        open={addPersonaOpen}
+        onClose={() => setAddPersonaOpen(false)}
+        PaperProps={{
+          sx: { bgcolor: 'rgba(30, 20, 55, 0.98)', minWidth: 320 },
+        }}
+      >
+        <DialogTitle sx={{ fontSize: 14 }}>
+          {t('team.addPersona') || 'Add Team Member'}
+        </DialogTitle>
         <DialogContent>
           <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-            <InputLabel sx={{ fontSize: 12 }}>{t('team.selectPersona')}</InputLabel>
+            <InputLabel sx={{ fontSize: 12 }}>
+              {t('team.selectPersona') || 'Select Persona'}
+            </InputLabel>
             <Select
               value={selectedNewPersona}
-              label={t('team.selectPersona')}
+              label={t('team.selectPersona') || 'Select Persona'}
               onChange={(e) => setSelectedNewPersona(e.target.value as PersonaId)}
               sx={{ fontSize: 12 }}
             >
               {availablePersonas
                 .filter(p => !teamMembers.some(m => m.personaId === p.id))
-                .map(persona => (
-                  <MenuItem key={persona.id} value={persona.id} sx={{ fontSize: 12 }}>
+                .map(p => (
+                  <MenuItem key={p.id} value={p.id} sx={{ fontSize: 12 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: persona.color }} />
-                      {persona.name} - {persona.description}
+                      <Avatar sx={{ width: 24, height: 24, bgcolor: p.color, fontSize: 10 }}>
+                        {p.name[0]}
+                      </Avatar>
+                      {p.name}
                     </Box>
                   </MenuItem>
                 ))}
             </Select>
           </FormControl>
-          {selectedNewPersona && (
-            <Box sx={{ mt: 2, p: 1.5, bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1 }}>
-              <Typography variant="body2" sx={{ fontSize: 11, fontWeight: 600, mb: 0.5 }}>
-                {getPersona(selectedNewPersona).name}
-              </Typography>
-              <Typography variant="body2" sx={{ fontSize: 11, color: 'text.secondary' }}>
-                {getPersona(selectedNewPersona).description}
-              </Typography>
-              <Box sx={{ mt: 1, display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                {getPersona(selectedNewPersona).traits.map(trait => (
-                  <Chip
-                    key={trait.id}
-                    size="small"
-                    label={trait.id}
-                    sx={{ height: 18, fontSize: 9 }}
-                  />
-                ))}
-              </Box>
-            </Box>
-          )}
         </DialogContent>
         <DialogActions>
-          <Button size="small" onClick={() => setAddPersonaOpen(false)} sx={{ fontSize: 11 }}>
-            {t('common.cancel')}
+          <Button onClick={() => setAddPersonaOpen(false)} size="small">
+            {t('common.cancel') || 'Cancel'}
           </Button>
           <Button
-            size="small"
-            variant="contained"
             onClick={handleAddPersona}
+            variant="contained"
+            size="small"
             disabled={!selectedNewPersona}
-            sx={{ fontSize: 11 }}
           >
-            {t('common.add')}
+            {t('team.add') || 'Add'}
           </Button>
         </DialogActions>
       </Dialog>

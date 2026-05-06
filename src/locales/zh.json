@@ -163,6 +163,8 @@
     "noEmails": "暂无邮件"
   },
   "team": {
+    "title": "团队协作",
+    "members": "成员",
     "activeCollaborators": "活跃协作者",
     "setAsTeamLead": "设为主角色",
     "setAsObserver": "设为观察者",
@@ -170,9 +172,10 @@
     "removeFromTeam": "移出团队",
     "addTeamMember": "添加团队成员",
     "allowDebate": "允许角色之间辩论",
+    "allowCrossTalk": "允许角色互相回复",
     "maxActiveMembers": "最大活跃成员数",
     "teamDiscussion": "团队讨论",
-    "concludeDiscussion": "结束讨论",
+    "concludeDiscussion": "结束并综合",
     "clear": "清空",
     "start": "开始",
     "topic": "话题",
@@ -182,7 +185,23 @@
     "startNewDiscussion": "发起新讨论",
     "selectPersona": "选择角色",
     "personaName": "角色名称",
-    "personaTraits": "角色特征"
+    "personaTraits": "角色特征",
+    "noMembers": "暂无团队成员",
+    "discussionPlaceholder": "发起团队讨论...",
+    "setupBalanced": "平衡组队",
+    "contribution": "贡献分布",
+    "analysis": "讨论分析",
+    "addPersona": "添加角色",
+    "selectPersonaToAdd": "选择要添加的角色"
+  },
+  "persona": {
+    "title": "AI 角色",
+    "allPersonas": "所有角色",
+    "selectPersona": "选择角色",
+    "traits": "性格特征",
+    "teamView": "团队视图",
+    "addToTeam": "添加到团队",
+    "addToTeamHint": "构建多角色团队"
   },
   "settings": {
     "title": "设置",
