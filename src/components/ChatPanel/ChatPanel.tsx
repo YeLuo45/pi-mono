@@ -451,6 +451,7 @@ export const ChatPanel: React.FC = () => {
     const parsed = parsePersonaCommand(userMsg);
     if (parsed && (parsed.type === 'clear' || parsed.type === 'new')) {
       clearMessages();
+      endCollab(); // also clear collab state to prevent orphaned messages
       addMessage({ role: 'system', content: '已开启新对话', personaId: activePersonaId });
       return;
     }
