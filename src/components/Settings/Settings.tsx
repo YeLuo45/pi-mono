@@ -394,22 +394,6 @@ export const Settings: React.FC = () => {
     });
   };
 
-  const getAvailableModelsForProvider = (provider: string): string[] => {
-    const modelMap: Record<string, string[]> = {
-      openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo'],
-      anthropic: ['claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022'],
-      minimax: ['MiniMax-Text-01', 'MiniMax-Text-01-mini'],
-      'minimax-cn': ['MiniMax-Text-01'],
-      xiaomi: ['MiLM', 'mimo-v2-pro', 'mimo-v2-omni'],
-      zhipu: ['glm-4', 'glm-4-plus', 'glm-4-air', 'glm-4-flash'],
-      qwen: ['qwen-turbo', 'qwen-plus', 'qwen-max', 'qwen-vl-max'],
-      gemini: ['gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash'],
-      'azure-openai': ['gpt-4o', 'gpt-4o-mini'],
-      custom: [],
-    };
-    return modelMap[provider] || [];
-  };
-
   // Sort models by priority
   const sortedModels = [...models].sort((a, b) => a.priority - b.priority);
   const enabledCount = models.filter(m => m.isEnabled && m.apiKey && m.apiKey.trim()).length;
@@ -1679,29 +1663,14 @@ export const Settings: React.FC = () => {
               </Select>
             </FormControl>
 
-            {getAvailableModelsForProvider(dialogModel.provider || 'openai').length > 0 ? (
-              <FormControl size="small" fullWidth>
-                <InputLabel>Model</InputLabel>
-                <Select
-                  value={dialogModel.modelName || ''}
-                  label="Model"
-                  onChange={(e) => setDialogModel({ ...dialogModel, modelName: e.target.value })}
-                >
-                  {getAvailableModelsForProvider(dialogModel.provider || 'openai').map((model) => (
-                    <MenuItem key={model} value={model}>{model}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            ) : (
-              <TextField
-                label="Model Name"
-                value={dialogModel.modelName || ''}
-                onChange={(e) => setDialogModel({ ...dialogModel, modelName: e.target.value })}
-                size="small"
-                fullWidth
-                placeholder="e.g., gpt-4o-mini"
-              />
-            )}
+            <TextField
+              label="Model Name"
+              value={dialogModel.modelName || ''}
+              onChange={(e) => setDialogModel({ ...dialogModel, modelName: e.target.value })}
+              size="small"
+              fullWidth
+              placeholder="e.g., gpt-4o-mini, claude-3-5-sonnet"
+            />
 
             <TextField
               label="API Base URL"

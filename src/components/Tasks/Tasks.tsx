@@ -317,7 +317,7 @@ export const Tasks: React.FC = () => {
   const doneCount = tasks.filter((t) => t.status === 'done').length;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
       {/* Header */}
       <Box
         sx={{
