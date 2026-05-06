@@ -111,10 +111,6 @@ interface AppState {
   activePanel: 'chat' | 'calendar' | 'tasks' | 'document' | 'knowledge' | 'email' | 'writing' | 'settings' | 'team' | 'plugin' | 'memory' | 'analytics' | 'scenes' | 'mall';
   setActivePanel: (panel: AppState['activePanel']) => void;
 
-  // V27: Sidebar collapse state
-  sidebarCollapsed: boolean;
-  toggleSidebar: () => void;
-
   // Active plugin (used when activePanel === 'plugin')
   activePluginId: string | null;
   setActivePluginId: (id: string | null) => void;
@@ -396,10 +392,6 @@ export const useStore = create<AppState>()(
       // UI
       activePanel: 'chat',
       setActivePanel: (panel) => set({ activePanel: panel }),
-
-      // V27: Sidebar collapse state
-      sidebarCollapsed: false,
-      toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
 
       // Active plugin
       activePluginId: null,
