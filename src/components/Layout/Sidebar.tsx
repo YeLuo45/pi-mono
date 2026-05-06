@@ -4,6 +4,7 @@ import { Chat as ChatIcon, CalendarMonth as CalendarIcon, CheckBox as TaskIcon, 
 import { useStore } from '../../store';
 import { PluginService } from '../../services/plugin/PluginService';
 import { useTranslation } from 'react-i18next';
+import { PersonaSelector } from '../Persona/PersonaSelector';
 
 const NAV_ITEMS = [
   { id: 'chat', labelKey: 'nav.chat', icon: ChatIcon },
@@ -77,6 +78,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onNavigate 
       )}
 
       <Divider sx={{ opacity: 0.15, mx: 1, mb: 1 }} />
+
+      {/* Persona Selector */}
+      <Box sx={{ px: 1, pb: 1 }}>
+        <PersonaSelector collapsed={collapsed} />
+      </Box>
 
       {/* Navigation items */}
       <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 0.5, px: 1 }}>
