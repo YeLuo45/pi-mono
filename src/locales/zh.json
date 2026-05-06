@@ -388,7 +388,9 @@
     "importanceRange": "重要性",
     "entries": "条记录",
     "timelineView": "时间线视图",
-    "wordCloud": "词云"
+    "wordCloud": "词云",
+    "expand": "展开",
+    "collapse": "收起"
   },
   "analytics": {
     "title": "数据分析面板",

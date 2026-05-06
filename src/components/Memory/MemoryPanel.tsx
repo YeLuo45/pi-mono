@@ -1788,16 +1788,36 @@ interface EmotionTimelineTabProps {
 function EmotionTimelineTab({ logs, warning, onRefresh }: EmotionTimelineTabProps) {
   const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [emotionFilter, setEmotionFilter] = useState<Set<TextEmotion>>(new Set());
+  const [expandAll, setExpandAll] = useState(false);
 
-  // Group logs by date
-  const groupedByDate = groupEmotionLogsByDate(logs);
+  // All possible emotions
+  const allEmotions: TextEmotion[] = ['happy', 'calm', 'anxious', 'angry', 'sad', 'excited', 'exhausted', 'unknown'];
+
+  // Toggle emotion filter
+  const toggleEmotion = (emotion: TextEmotion) => {
+    setEmotionFilter(prev => {
+      const next = new Set(prev);
+      if (next.has(emotion)) next.delete(emotion);
+      else next.add(emotion);
+      return next;
+    });
+  };
+
+  // Filter logs by selected emotions
+  const filteredLogs = emotionFilter.size > 0
+    ? logs.filter(log => emotionFilter.has(log.emotion))
+    : logs;
+
+  // Group filtered logs by date
+  const groupedByDate = groupEmotionLogsByDate(filteredLogs);
   const dateKeys = Object.keys(groupedByDate).sort((a, b) => b.localeCompare(a));
 
-  // Get current (most recent) emotion
-  const latestLog = logs.length > 0 ? logs[logs.length - 1] : null;
+  // Get current (most recent) emotion from filtered logs
+  const latestLog = filteredLogs.length > 0 ? filteredLogs[filteredLogs.length - 1] : null;
 
-  // Calculate emotion distribution
-  const distribution = calculateEmotionDistribution(logs);
+  // Calculate emotion distribution from filtered logs
+  const distribution = calculateEmotionDistribution(filteredLogs);
 
   // Emotion colors
   const emotionColors: Record<TextEmotion, string> = {
@@ -1816,6 +1836,12 @@ function EmotionTimelineTab({ logs, warning, onRefresh }: EmotionTimelineTabProp
     alert(t('emotionPanel.exportSuccess'));
   };
 
+  // Decide if a log entry should be expanded
+  const isExpanded = (logId: string) => {
+    if (expandAll) return true;
+    return expandedId === logId;
+  };
+
   return (
     <Stack spacing={2}>
       {/* Header */}
@@ -1824,6 +1850,14 @@ function EmotionTimelineTab({ logs, warning, onRefresh }: EmotionTimelineTabProp
           {t('emotionPanel.emotionTrend')}
         </Typography>
         <Stack direction="row" spacing={1}>
+          <Button
+            size="small"
+            variant={expandAll ? 'contained' : 'outlined'}
+            onClick={() => setExpandAll(prev => !prev)}
+            sx={{ fontSize: 10, py: 0.25, px: 1 }}
+          >
+            {expandAll ? t('memoryPanel.collapse') : t('memoryPanel.expand')}
+          </Button>
           <Button
             size="small"
             variant="outlined"
@@ -1838,6 +1872,37 @@ function EmotionTimelineTab({ logs, warning, onRefresh }: EmotionTimelineTabProp
           </IconButton>
         </Stack>
       </Stack>
+
+      {/* Emotion Filter Chips */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+        {allEmotions.map(emotion => {
+          const isSelected = emotionFilter.has(emotion);
+          return (
+            <Chip
+              key={emotion}
+              label={`${getTextEmotionEmoji(emotion)} ${t('emotion.' + emotion)}`}
+              size="small"
+              onClick={() => toggleEmotion(emotion)}
+              sx={{
+                fontSize: 10,
+                height: 22,
+                bgcolor: isSelected ? emotionColors[emotion] + '33' : 'rgba(255,255,255,0.04)',
+                borderColor: isSelected ? emotionColors[emotion] : 'transparent',
+                color: isSelected ? emotionColors[emotion] : 'text.secondary',
+                border: '1px solid',
+              }}
+            />
+          );
+        })}
+        {emotionFilter.size > 0 && (
+          <Chip
+            label="✕ 清除"
+            size="small"
+            onClick={() => setEmotionFilter(new Set())}
+            sx={{ fontSize: 10, height: 22, bgcolor: 'rgba(255,255,255,0.08)', color: 'text.secondary' }}
+          />
+        )}
+      </Box>
 
       {/* Current Emotion Card */}
       {latestLog && (
@@ -1876,7 +1941,7 @@ function EmotionTimelineTab({ logs, warning, onRefresh }: EmotionTimelineTabProp
       )}
 
       {/* Emotion Distribution (Simple Bar Chart) */}
-      {logs.length > 0 && (
+      {filteredLogs.length > 0 && (
         <Paper sx={{ p: 1.5, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 1 }}>
           <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', mb: 1, display: 'block' }}>
             {t('emotionPanel.emotionDistribution')}
@@ -1886,7 +1951,7 @@ function EmotionTimelineTab({ logs, warning, onRefresh }: EmotionTimelineTabProp
               .filter(([_, count]) => count > 0)
               .sort(([, a], [, b]) => b - a)
               .map(([emotion, count]) => {
-                const percentage = logs.length > 0 ? Math.round((count / logs.length) * 100) : 0;
+                const percentage = filteredLogs.length > 0 ? Math.round((count / filteredLogs.length) * 100) : 0;
                 return (
                   <Box key={emotion} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Typography variant="caption" sx={{ fontSize: 10, width: 60 }}>
@@ -1963,7 +2028,7 @@ function EmotionTimelineTab({ logs, warning, onRefresh }: EmotionTimelineTabProp
                         cursor: 'pointer',
                         '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
                       }}
-                      onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
+                      onClick={() => expandAll ? setExpandAll(false) : setExpandedId(expandedId === log.id ? null : log.id)}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                         <Typography variant="body2" sx={{ fontSize: 16 }}>
@@ -1976,7 +2041,7 @@ function EmotionTimelineTab({ logs, warning, onRefresh }: EmotionTimelineTabProp
                           {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </Typography>
                       </Box>
-                      {expandedId === log.id && (
+                      {isExpanded(log.id) && (
                         <Box>
                           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
                             <Typography variant="caption" sx={{ fontSize: 9, color: 'text.secondary' }}>

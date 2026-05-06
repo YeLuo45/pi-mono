@@ -388,7 +388,9 @@
     "importanceRange": "Importance",
     "entries": "entries",
     "timelineView": "Timeline View",
-    "wordCloud": "Word Cloud"
+    "wordCloud": "Word Cloud",
+    "expand": "Expand",
+    "collapse": "Collapse"
   },
   "analytics": {
     "title": "Analytics Dashboard",
