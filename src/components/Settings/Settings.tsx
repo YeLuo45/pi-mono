@@ -4,18 +4,18 @@ import {
   Box, Typography, TextField, Button, Paper,
   FormControl, InputLabel, Select, MenuItem,
   Alert, Divider, Stack, IconButton,
-  Switch, Collapse, List, ListItem,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Chip, Tooltip, Slider,
+  Chip, Tooltip, Slider, Collapse, Switch, List, ListItem,
 } from '@mui/material';
 import {
   Visibility, VisibilityOff, Save as SaveIcon,
   Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon,
   DragIndicator as DragIcon, ExpandMore as ExpandIcon, ExpandLess as CollapseIcon,
   Download as DownloadIcon, Upload as UploadIcon,
-  Share as ShareIcon,
+  Share as ShareIcon, Keyboard as KeyboardIcon,
 } from '@mui/icons-material';
 import { useStore } from '../../store';
+import { HOTKEY_DEFINITIONS } from '../../hooks/useHotkeys';
 import { testModel } from '../../services/ai/model-registry-adapter';
 import { PERSONAS, MOODS } from '../../services/companion/personalityTypes';
 import { getMemoryStats, clearAllMemories, compactMemory } from '../../services/memory/memoryStorage';
@@ -120,6 +120,10 @@ export const Settings: React.FC = () => {
     accent: '#8b5cf6',
     border: '#333333',
   });
+
+  // V52: Hotkey settings state
+  const hotkeySettings = useStore((s) => s.hotkeySettings);
+  const toggleHotkey = useStore((s) => s.toggleHotkey);
 
   const handleSaveCustomTheme = () => {
     const theme = createCustomPreset(customColors);
@@ -1694,6 +1698,68 @@ export const Settings: React.FC = () => {
               Connect Gmail from the Email panel using OAuth.
             </Typography>
           )}
+        </Paper>
+
+        {/* V52: Keyboard Shortcuts */}
+        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <KeyboardIcon sx={{ fontSize: 16 }} />
+            <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600 }}>
+              ⌨️ 快捷键
+            </Typography>
+          </Box>
+          <Typography variant="caption" sx={{ fontSize: 11, color: 'text.secondary', mb: 2, display: 'block' }}>
+            使用快捷键快速操作。在输入框中不生效。
+          </Typography>
+          <List dense disablePadding>
+            {HOTKEY_DEFINITIONS.map((hotkey) => {
+              const enabled = hotkeySettings[hotkey.id] ?? true;
+              return (
+                <ListItem
+                  key={hotkey.id}
+                  sx={{
+                    px: 0,
+                    py: 0.5,
+                    bgcolor: 'rgba(0,0,0,0.15)',
+                    borderRadius: 1,
+                    mb: 0.5,
+                    flexDirection: 'column',
+                    alignItems: 'stretch',
+                  }}
+                  secondaryAction={
+                    <Switch
+                      size="small"
+                      checked={enabled}
+                      onChange={() => toggleHotkey(hotkey.id)}
+                      sx={{ mt: 0.5 }}
+                    />
+                  }
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 5 }}>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontSize: 12, fontWeight: 500 }}>
+                        {hotkey.label}
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary' }}>
+                        {hotkey.description}
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={hotkey.shortcut}
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: 10,
+                        fontFamily: 'monospace',
+                        bgcolor: enabled ? 'rgba(94,106,210,0.2)' : 'rgba(255,255,255,0.05)',
+                        color: enabled ? 'primary.main' : 'text.disabled',
+                      }}
+                    />
+                  </Box>
+                </ListItem>
+              );
+            })}
+          </List>
         </Paper>
 
         {/* Webhook Settings */}

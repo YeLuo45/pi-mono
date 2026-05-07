@@ -10,6 +10,7 @@ import { getAllPersonas } from './services/persona/personaStorage';
 import { generateYesterdaySummaryIfNeeded } from './services/summary/dailySummary';
 import { checkAndCreateMilestones } from './services/milestone/milestoneTracker';
 import { applyAppTheme, getPresetById, getSystemTheme, resetToDefault, applyCustomTheme } from './utils/appTheme';
+import { useHotkeys } from './hooks/useHotkeys';
 import './services/i18n';
 
 const linearDarkTheme = createTheme({
@@ -967,6 +968,9 @@ const minimaxLightTheme = createTheme({
 });
 
 function App() {
+  // V52: Register global keyboard shortcuts
+  useHotkeys();
+
   const companion = useStore((s) => s.companion);
   const personaFollowTheme = useStore((s) => s.personaFollowTheme);
   const activePersonaId = useStore((s) => s.activePersonaId);

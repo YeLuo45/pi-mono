@@ -220,6 +220,11 @@ interface AppState {
   addCollabHistoryEntry: (entry: Omit<CollabHistoryEntry, 'id'>) => void;
   deleteCollabHistoryEntry: (id: string) => void;
   clearCollabHistory: () => void;
+
+  // V52: Hotkey Settings
+  hotkeySettings: Record<string, boolean>; // hotkeyId -> enabled
+  setHotkeyEnabled: (hotkeyId: string, enabled: boolean) => void;
+  toggleHotkey: (hotkeyId: string) => void;
 }
 
 // V40: Collaboration progress tracking
@@ -787,6 +792,24 @@ export const useStore = create<AppState>()(
           localStorage.setItem('pixel_pal_collab_history', JSON.stringify(updated));
           return { collabHistory: updated };
         }),
+
+      // V52: Hotkey Settings
+      hotkeySettings: {
+        'new-conversation': true,
+        'open-settings': true,
+        'toggle-sidebar': true,
+        'search-memory': true,
+        'next-persona': true,
+        'prev-persona': true,
+      },
+      setHotkeyEnabled: (hotkeyId, enabled) =>
+        set((state) => ({
+          hotkeySettings: { ...state.hotkeySettings, [hotkeyId]: enabled },
+        })),
+      toggleHotkey: (hotkeyId) =>
+        set((state) => ({
+          hotkeySettings: { ...state.hotkeySettings, [hotkeyId]: !state.hotkeySettings[hotkeyId] },
+        })),
     }),
     {
       name: 'pixelpal-storage',
