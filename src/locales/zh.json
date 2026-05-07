@@ -744,5 +744,95 @@
     "scenesWillBeImported": "个场景：",
     "noValidSceneData": "未找到有效的场景数据",
     "invalidFileFormat": "文件格式无效"
+  },
+  "collab": {
+    "status": {
+      "completed": "已完成",
+      "failed": "失败",
+      "stopped": "已停止",
+      "processing": "处理中",
+      "analyzing": "协作分析中…",
+      "waiting": "等待协作",
+      "inputHint": "输入消息开始多智能体协作"
+    },
+    "time": {
+      "today": "今天",
+      "yesterday": "昨天",
+      "second": "秒",
+      "minute": "分",
+      "minutes": "分钟"
+    },
+    "history": {
+      "title": "协作历史",
+      "empty": "暂无协作历史",
+      "emptyHint": "完成的协作会话将显示在这里",
+      "noTask": "无描述任务",
+      "exportJSON": "导出 JSON",
+      "exportCSV": "导出 CSV",
+      "clearAll": "清除全部历史",
+      "duration": "耗时",
+      "startTime": "开始时间",
+      "messages": "对话记录",
+      "noMessages": "无对话记录",
+      "noConclusion": "无聚合结论",
+      "entries": "条",
+      "expand": "展开全文",
+      "collapse": "收起"
+    },
+    "controls": {
+      "decomposing": "正在分解任务…",
+      "aggregating": "正在汇总结果…",
+      "done": "协作完成",
+      "failed": "协作失败",
+      "paused": "已暂停",
+      "working": "工作中…",
+      "pause": "暂停",
+      "resume": "继续",
+      "stop": "终止"
+    },
+    "role": {
+      "memoryExpert": "记忆专家",
+      "emotionAnalyst": "情感分析师",
+      "advisor": "策略顾问",
+      "researcher": "研究员",
+      "coder": "程序员"
+    },
+    "result": {
+      "failed": "协作失败",
+      "completed": "协作完成",
+      "duration": "用时",
+      "task": "任务",
+      "conclusion": "综合结论",
+      "completed_count": "完成",
+      "failed_count": "失败",
+      "total_count": "共",
+      "roleDetails": "角色贡献详情",
+      "expand": "展开",
+      "collapse": "收起",
+      "copy": "复制结论",
+      "newCollab": "新建协作"
+    },
+    "task": {
+      "title": "协作任务",
+      "type": "任务类型",
+      "dependency": "依赖",
+      "error": "错误",
+      "start": "开始",
+      "complete": "完成",
+      "view": "分工视图",
+      "progress": "完成",
+      "depRelation": "依赖关系",
+      "empty": "暂无任务分解"
+    },
+    "chat": {
+      "thinking": "思考中...",
+      "processing": "正在思考...",
+      "title": "实时对话",
+      "roleThinking": "思考中...",
+      "waiting": "等待角色开始讨论..."
+    },
+    "summary": {
+      "title": "协作总结"
+    }
   }
 }

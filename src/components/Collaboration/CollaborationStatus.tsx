@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, Collapse, IconButton, CircularProgress } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
@@ -18,11 +19,11 @@ const ROLE_EMOJI: Record<string, string> = {
 };
 
 const ROLE_LABELS: Record<string, string> = {
-  MemoryExpert: '记忆专家',
-  EmotionAnalyst: '情感分析师',
-  Advisor: '策略顾问',
-  Researcher: '研究员',
-  Coder: '程序员',
+  MemoryExpert: 'memoryExpert',
+  EmotionAnalyst: 'emotionAnalyst',
+  Advisor: 'advisor',
+  Researcher: 'researcher',
+  Coder: 'coder',
 };
 
 const STATUS_ICONS: Record<CollaborationProgress['status'], React.ReactNode> = {
@@ -36,6 +37,7 @@ interface RoleCardProps {
 }
 
 const RoleCard: React.FC<RoleCardProps> = ({ progress }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const emoji = ROLE_EMOJI[progress.role] || '🤖';
   const label = ROLE_LABELS[progress.role] || progress.roleLabel;
@@ -110,7 +112,9 @@ interface CollaborationStatusProps {
   className?: string;
 }
 
-export const CollaborationStatus: React.FC<CollaborationStatusProps> = ({ className }) => {
+export const CollaborationStatus: React.FC<CollaborationStatusProps> = ({
+ className }) => {
+  const { t } = useTranslation();
   const collaborationMode = useStore((s) => s.collaborationMode);
   const collaborationProgress = useStore((s) => s.collaborationProgress);
 
@@ -137,14 +141,14 @@ export const CollaborationStatus: React.FC<CollaborationStatusProps> = ({ classN
           }}
         />
         <Typography sx={{ fontSize: 11, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          {hasRunningTasks ? '协作分析中…' : hasCompletedTasks ? '协作完成' : '等待协作'}
+          {hasRunningTasks ? t('collab.status.analyzing') : hasCompletedTasks ? t('collab.status.completed') : t('collab.status.waiting')}
         </Typography>
       </Box>
 
       {collaborationProgress.length === 0 && (
         <Box sx={{ py: 1 }}>
           <Typography sx={{ fontSize: 11, color: 'text.disabled', textAlign: 'center' }}>
-            输入消息开始多智能体协作
+            {t('collab.status.inputHint')}
           </Typography>
         </Box>
       )}

@@ -8,6 +8,7 @@
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, CircularProgress, Fade } from '@mui/material';
 import { useStore } from '../../store';
 import type { CollaborationMessage, PersonaRole, Subtask } from '../../services/collaboration/types';
@@ -25,11 +26,11 @@ const ROLE_EMOJI: Record<PersonaRole, string> = {
 };
 
 const ROLE_LABELS: Record<PersonaRole, string> = {
-  MemoryExpert: '记忆专家',
-  EmotionAnalyst: '情感分析师',
-  Advisor: '策略顾问',
-  Researcher: '研究员',
-  Coder: '程序员',
+  MemoryExpert: 'memoryExpert',
+  EmotionAnalyst: 'emotionAnalyst',
+  Advisor: 'advisor',
+  Researcher: 'researcher',
+  Coder: 'coder',
 };
 
 // ============================================================================
@@ -42,6 +43,7 @@ interface MessageCardProps {
 }
 
 const MessageCard: React.FC<MessageCardProps> = ({ message, isActive }) => {
+  const { t } = useTranslation();
   const emoji = ROLE_EMOJI[message.role] || '👤';
   const roleLabel = ROLE_LABELS[message.role] || message.role;
   
@@ -144,8 +146,9 @@ interface TypingIndicatorProps {
 }
 
 const TypingIndicator: React.FC<TypingIndicatorProps> = ({ role, message }) => {
+  const { t } = useTranslation();
   const emoji = ROLE_EMOJI[role] || '👤';
-  const roleLabel = ROLE_LABELS[role] || role;
+  const roleLabel = t('collab.role.' + ROLE_LABELS[role]) || role;
 
   return (
     <Fade in timeout={200}>
@@ -225,7 +228,7 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({ role, message }) => {
               color: 'text.disabled',
             }}
           >
-            思考中...
+            {t('collab.chat.thinking')}
           </Typography>
         </Box>
       </Box>
@@ -332,7 +335,9 @@ interface CollaborationChatProps {
   className?: string;
 }
 
-export const CollaborationChat: React.FC<CollaborationChatProps> = ({ className }) => {
+export const CollaborationChat: React.FC<CollaborationChatProps> = ({
+ className }) => {
+  const { t } = useTranslation();
   const collaborationMode = useStore((s) => s.collaborationMode);
   const collaborationProgress = useStore((s) => s.collaborationProgress);
   
@@ -391,7 +396,7 @@ export const CollaborationChat: React.FC<CollaborationChatProps> = ({ className 
     // Update active role for typing indicator
     if (runningProgress) {
       setActiveRole(runningProgress.role as PersonaRole);
-      setPendingMessage(runningProgress.output || '正在思考...');
+      setPendingMessage(runningProgress.output || t('collab.chat.processing'));
     } else {
       setActiveRole(null);
       setPendingMessage('');
@@ -456,7 +461,7 @@ export const CollaborationChat: React.FC<CollaborationChatProps> = ({ className 
             letterSpacing: '0.08em',
           }}
         >
-          实时对话
+          {t('collab.chat.title')}
         </Typography>
         {activeRole && (
           <Box
@@ -468,7 +473,7 @@ export const CollaborationChat: React.FC<CollaborationChatProps> = ({ className 
           >
             <CircularProgress size={6} thickness={6} sx={{ color: '#863bff' }} />
             <Typography sx={{ fontSize: 10, color: 'text.disabled' }}>
-              {ROLE_LABELS[activeRole]}思考中...
+              {t('collab.role.' + ROLE_LABELS[activeRole])}{t('collab.chat.roleThinking')}
             </Typography>
           </Box>
         )}
@@ -495,7 +500,7 @@ export const CollaborationChat: React.FC<CollaborationChatProps> = ({ className 
             }}
           >
             <Typography sx={{ fontSize: 12, color: 'text.disabled' }}>
-              等待角色开始讨论...
+              {t('collab.chat.waiting')}
             </Typography>
           </Box>
         ) : (

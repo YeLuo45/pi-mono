@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, Collapse, IconButton, Tooltip } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -37,6 +38,7 @@ interface TaskNodeProps {
 }
 
 const TaskNode: React.FC<TaskNodeProps> = ({ subtask, level, isLast, childLines }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const emoji = getRoleEmoji(subtask.responsible as PersonaRole);
   const label = getRoleDisplayName(subtask.responsible as PersonaRole);
@@ -133,13 +135,13 @@ const TaskNode: React.FC<TaskNodeProps> = ({ subtask, level, isLast, childLines 
         >
           {/* Task type */}
           <Typography sx={{ fontSize: 10, color: 'text.disabled', mb: 0.5 }}>
-            任务类型: {subtask.type}
+            {t('collab.task.type')}: {subtask.type}
           </Typography>
 
           {/* Dependencies */}
           {subtask.dependencies.length > 0 && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
-              <Typography sx={{ fontSize: 10, color: 'text.disabled' }}>依赖:</Typography>
+              <Typography sx={{ fontSize: 10, color: 'text.disabled' }}>{t('collab.task.dependency')}:</Typography>
               {subtask.dependencies.map((depId, i) => (
                 <Box
                   key={depId}
@@ -184,7 +186,7 @@ const TaskNode: React.FC<TaskNodeProps> = ({ subtask, level, isLast, childLines 
           {/* Error */}
           {subtask.error && (
             <Typography sx={{ fontSize: 10, color: '#f44336', mt: 0.5 }}>
-              错误: {subtask.error}
+              {t('collab.task.error')}: {subtask.error}
             </Typography>
           )}
 
@@ -192,12 +194,12 @@ const TaskNode: React.FC<TaskNodeProps> = ({ subtask, level, isLast, childLines 
           <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
             {subtask.startedAt && (
               <Typography sx={{ fontSize: 9, color: 'text.disabled' }}>
-                开始: {new Date(subtask.startedAt).toLocaleTimeString()}
+                {t('collab.task.start')}: {new Date(subtask.startedAt).toLocaleTimeString()}
               </Typography>
             )}
             {subtask.completedAt && (
               <Typography sx={{ fontSize: 9, color: 'text.disabled' }}>
-                完成: {new Date(subtask.completedAt).toLocaleTimeString()}
+                {t('collab.task.complete')}: {new Date(subtask.completedAt).toLocaleTimeString()}
               </Typography>
             )}
           </Box>
@@ -220,10 +222,14 @@ interface TaskBreakdownProps {
  * with dependency arrows showing execution order.
  */
 export const TaskBreakdown: React.FC<TaskBreakdownProps> = ({
-  taskTitle = '协作任务',
+
+  taskTitle,
   subtasks,
   className,
 }) => {
+  const { t } = useTranslation();
+  // Default for taskTitle if not provided
+  const displayTitle = taskTitle ?? t('collab.task.title');
   // Group subtasks by execution level based on dependencies
   const getExecutionLevel = (subtask: Subtask, allSubtasks: Subtask[]): number => {
     if (subtask.dependencies.length === 0) return 0;
@@ -265,11 +271,11 @@ export const TaskBreakdown: React.FC<TaskBreakdownProps> = ({
             letterSpacing: '0.08em',
           }}
         >
-          📋 分工视图
+          {t('collab.task.view')}
         </Typography>
         <Box sx={{ flex: 1 }} />
         <Typography sx={{ fontSize: 10, color: 'text.disabled' }}>
-          {completed}/{total} 完成
+          {completed}/{total} {t('collab.task.progress')}
         </Typography>
         <Typography sx={{ fontSize: 10, color: '#863bff' }}>{progress}%</Typography>
       </Box>
@@ -295,7 +301,7 @@ export const TaskBreakdown: React.FC<TaskBreakdownProps> = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, px: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <ArrowIcon sx={{ fontSize: 10, color: 'rgba(134, 59, 255, 0.4)' }} />
-            <Typography sx={{ fontSize: 9, color: 'text.disabled' }}>依赖关系</Typography>
+            <Typography sx={{ fontSize: 9, color: 'text.disabled' }}>{t('collab.task.depRelation')}</Typography>
           </Box>
         </Box>
       )}
@@ -304,7 +310,7 @@ export const TaskBreakdown: React.FC<TaskBreakdownProps> = ({
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
         {subtasks.length === 0 ? (
           <Typography sx={{ fontSize: 11, color: 'text.disabled', textAlign: 'center', py: 2 }}>
-            暂无任务分解
+            {t('collab.task.empty')}
           </Typography>
         ) : (
           levels.map((levelTasks, levelIndex) =>

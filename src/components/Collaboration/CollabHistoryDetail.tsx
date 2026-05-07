@@ -8,6 +8,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -41,11 +42,11 @@ const ROLE_EMOJI: Record<string, string> = {
 };
 
 const ROLE_LABELS: Record<string, string> = {
-  MemoryExpert: '记忆专家',
-  EmotionAnalyst: '情感分析师',
-  Advisor: '策略顾问',
-  Researcher: '研究员',
-  Coder: '程序员',
+  MemoryExpert: 'memoryExpert',
+  EmotionAnalyst: 'emotionAnalyst',
+  Advisor: 'advisor',
+  Researcher: 'researcher',
+  Coder: 'coder',
 };
 
 // ============================================================================
@@ -58,6 +59,7 @@ interface MessageCardProps {
 }
 
 const MessageCard: React.FC<MessageCardProps> = ({ message, index }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const emoji = ROLE_EMOJI[message.personaId] || ROLE_EMOJI[message.personaId.replace(/Role$/, '')] || '👤';
   const roleLabel = ROLE_LABELS[message.personaId] || ROLE_LABELS[message.personaId.replace(/Role$/, '')] || message.personaId;
@@ -161,7 +163,7 @@ const MessageCard: React.FC<MessageCardProps> = ({ message, index }) => {
                 setExpanded(!expanded);
               }}
             >
-              {expanded ? '收起' : '展开全文'}
+              {expanded ? t('collab.history.collapse') : t('collab.history.expand')}
             </Typography>
           )}
         </Box>
@@ -179,14 +181,16 @@ interface CollabHistoryDetailProps {
   className?: string;
 }
 
-export const CollabHistoryDetail: React.FC<CollabHistoryDetailProps> = ({ entry, className }) => {
+export const CollabHistoryDetail: React.FC<CollabHistoryDetailProps> = ({
+ entry, className }) => {
+  const { t } = useTranslation();
   const messages = entry.messages || [];
 
   const formatDuration = (seconds: number): string => {
-    if (seconds < 60) return `${seconds}秒`;
+    if (seconds < 60) return `${seconds}${t('collab.time.second')}`;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return secs > 0 ? `${mins}分${secs}秒` : `${mins}分钟`;
+    return secs > 0 ? `${mins}${t('collab.time.minute')}${secs}${t('collab.time.second')}` : `${mins}${t('collab.time.minutes')}`;
   };
 
   const formatTimestamp = (ts: number): string => {
@@ -217,7 +221,7 @@ export const CollabHistoryDetail: React.FC<CollabHistoryDetailProps> = ({ entry,
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
           <SummarizeIcon sx={{ fontSize: 14, color: 'primary.main' }} />
           <Typography sx={{ fontSize: 11, fontWeight: 600, color: 'text.secondary' }}>
-            协作总结
+            {t('collab.summary.title')}
           </Typography>
         </Box>
 
@@ -234,7 +238,7 @@ export const CollabHistoryDetail: React.FC<CollabHistoryDetailProps> = ({ entry,
           </Typography>
         ) : (
           <Typography sx={{ fontSize: 11, color: 'text.disabled', fontStyle: 'italic' }}>
-            无聚合结论
+            {t('collab.history.noConclusion')}
           </Typography>
         )}
       </Box>
@@ -245,7 +249,7 @@ export const CollabHistoryDetail: React.FC<CollabHistoryDetailProps> = ({ entry,
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
           <ScheduleIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
           <Typography sx={{ fontSize: 11, color: 'text.secondary' }}>
-            耗时: <strong style={{ color: '#a78bfa' }}>{formatDuration(entry.duration)}</strong>
+            {t('collab.history.duration')}: <strong style={{ color: '#a78bfa' }}>{formatDuration(entry.duration)}</strong>
           </Typography>
         </Box>
 
@@ -268,7 +272,7 @@ export const CollabHistoryDetail: React.FC<CollabHistoryDetailProps> = ({ entry,
       {/* Start time */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
         <Typography sx={{ fontSize: 10, color: 'text.disabled' }}>
-          开始时间: {formatTimestamp(entry.timestamp)}
+          {t('collab.history.startTime')}: {formatTimestamp(entry.timestamp)}
         </Typography>
       </Box>
 
@@ -279,11 +283,11 @@ export const CollabHistoryDetail: React.FC<CollabHistoryDetailProps> = ({ entry,
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
           <MessageIcon sx={{ fontSize: 14, color: 'primary.main' }} />
           <Typography sx={{ fontSize: 11, fontWeight: 600, color: 'text.secondary' }}>
-            对话记录
+            {t('collab.history.messages')}
           </Typography>
           <Chip
             size="small"
-            label={`${messages.length}条`}
+            label={`${messages.length}{t('collab.history.entries')}`}
             sx={{
               height: 16,
               fontSize: 10,
@@ -296,7 +300,7 @@ export const CollabHistoryDetail: React.FC<CollabHistoryDetailProps> = ({ entry,
 
         {messages.length === 0 ? (
           <Typography sx={{ fontSize: 11, color: 'text.disabled', textAlign: 'center', py: 2 }}>
-            无对话记录
+            {t('collab.history.noMessages')}
           </Typography>
         ) : (
           <List disablePadding>

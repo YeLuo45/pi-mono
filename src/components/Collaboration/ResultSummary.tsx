@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, Button, Divider, Collapse, Chip } from '@mui/material';
 import {
   CheckCircle as CheckIcon,
@@ -54,6 +55,7 @@ interface ResultSummaryProps {
  * with role contributions and action buttons.
  */
 export const ResultSummary: React.FC<ResultSummaryProps> = ({
+
   userRequest,
   subtasks = [],
   results,
@@ -67,6 +69,7 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({
   onNewCollaboration,
   className,
 }) => {
+  const { t } = useTranslation();
   const [detailsExpanded, setDetailsExpanded] = useState(false);
 
   // Normalize results to RoleResult array
@@ -131,13 +134,13 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({
             letterSpacing: '0.08em',
           }}
         >
-          {failed ? '协作失败' : '协作完成'}
+          {failed ? t('collab.result.failed') : t('collab.result.completed')}
         </Typography>
         {duration !== null && (
           <>
             <Box sx={{ flex: 1 }} />
             <Typography sx={{ fontSize: 10, color: 'text.disabled' }}>
-              用时 {duration}s
+              {t('collab.result.duration')} {duration}s
             </Typography>
           </>
         )}
@@ -156,7 +159,7 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({
           }}
         >
           <Typography sx={{ fontSize: 10, color: 'text.disabled', mb: 0.25 }}>
-            任务
+            {t('collab.result.task')}
           </Typography>
           <Typography sx={{ fontSize: 12, color: 'text.primary' }}>
             {userRequest}
@@ -195,7 +198,7 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({
           }}
         >
           <Typography sx={{ fontSize: 10, color: 'text.disabled', mb: 0.5 }}>
-            综合结论
+            {t('collab.result.conclusion')}
           </Typography>
           <Typography
             sx={{
@@ -214,7 +217,7 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({
       <Box sx={{ display: 'flex', gap: 0.75, mb: 1.5, flexWrap: 'wrap' }}>
         <Chip
           size="small"
-          label={`✅ ${completedCount} 完成`}
+          label={`✅ ${completedCount} {t('collab.result.completed_count')}`}
           sx={{
             height: 20,
             fontSize: 10,
@@ -226,7 +229,7 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({
         {failedCount > 0 && (
           <Chip
             size="small"
-            label={`❌ ${failedCount} 失败`}
+            label={`❌ ${failedCount} {t('collab.result.failed_count')}`}
             sx={{
               height: 20,
               fontSize: 10,
@@ -238,7 +241,7 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({
         )}
         <Chip
           size="small"
-          label={`共 ${totalCount} 任务`}
+          label={`${"RESULT_total_count"} ${totalCount} {t('collab.result.task')}`}
           sx={{
             height: 20,
             fontSize: 10,
@@ -279,11 +282,11 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({
             onClick={() => setDetailsExpanded(!detailsExpanded)}
           >
             <Typography sx={{ fontSize: 10, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              角色贡献详情
+              {t('collab.result.roleDetails')}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Typography sx={{ fontSize: 10, color: 'text.disabled' }}>
-                {detailsExpanded ? '收起' : '展开'}
+                {detailsExpanded ? t('collab.result.collapse') : t('collab.result.expand')}
               </Typography>
               {detailsExpanded ? (
                 <CollapseIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
@@ -355,7 +358,7 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({
             },
           }}
         >
-          复制结论
+          {t('collab.result.copy')}
         </Button>
         <Button
           size="small"
@@ -372,7 +375,7 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({
             },
           }}
         >
-          新建协作
+          {t('collab.result.newCollab')}
         </Button>
       </Box>
     </Box>

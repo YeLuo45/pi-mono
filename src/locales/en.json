@@ -759,5 +759,95 @@
     "scenesWillBeImported": "scenes will be imported",
     "noValidSceneData": "No valid scene data found",
     "invalidFileFormat": "Invalid file format"
+  },
+  "collab": {
+    "status": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "stopped": "Stopped",
+      "processing": "Processing",
+      "analyzing": "Analyzing...",
+      "waiting": "Waiting for collaboration",
+      "inputHint": "Enter a message to start multi-agent collaboration"
+    },
+    "time": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "second": "s",
+      "minute": "m",
+      "minutes": "min"
+    },
+    "history": {
+      "title": "Collaboration History",
+      "empty": "No collaboration history",
+      "emptyHint": "Completed sessions will appear here",
+      "noTask": "Untitled task",
+      "exportJSON": "Export JSON",
+      "exportCSV": "Export CSV",
+      "clearAll": "Clear all history",
+      "duration": "Duration",
+      "startTime": "Start time",
+      "messages": "Messages",
+      "noMessages": "No messages",
+      "noConclusion": "No conclusion",
+      "entries": "",
+      "expand": "Expand all",
+      "collapse": "Collapse"
+    },
+    "controls": {
+      "decomposing": "Decomposing tasks...",
+      "aggregating": "Aggregating results...",
+      "done": "Collaboration done",
+      "failed": "Collaboration failed",
+      "paused": "Paused",
+      "working": "Working...",
+      "pause": "Pause",
+      "resume": "Resume",
+      "stop": "Stop"
+    },
+    "role": {
+      "memoryExpert": "Memory Expert",
+      "emotionAnalyst": "Emotion Analyst",
+      "advisor": "Strategy Advisor",
+      "researcher": "Researcher",
+      "coder": "Coder"
+    },
+    "result": {
+      "failed": "Collaboration failed",
+      "completed": "Collaboration completed",
+      "duration": "Duration",
+      "task": "Task",
+      "conclusion": "Conclusion",
+      "completed_count": "completed",
+      "failed_count": "failed",
+      "total_count": "Total",
+      "roleDetails": "Role Contributions",
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "copy": "Copy conclusion",
+      "newCollab": "New collaboration"
+    },
+    "task": {
+      "title": "Collaboration Task",
+      "type": "Task type",
+      "dependency": "Dependencies",
+      "error": "Error",
+      "start": "Start",
+      "complete": "Complete",
+      "view": "Division View",
+      "progress": "completed",
+      "depRelation": "Dependencies",
+      "empty": "No task breakdown"
+    },
+    "chat": {
+      "thinking": "Thinking...",
+      "processing": "Processing...",
+      "title": "Live Chat",
+      "roleThinking": "Thinking...",
+      "waiting": "Waiting for roles to start..."
+    },
+    "summary": {
+      "title": "Collaboration Summary"
+    }
   }
 }

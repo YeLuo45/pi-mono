@@ -9,6 +9,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -46,27 +47,27 @@ const ROLE_EMOJI: Record<string, string> = {
   Coder: '💻',
 };
 
-const STATUS_CONFIG = {
-  completed: { color: '#4caf50', icon: CheckCircleIcon, label: '已完成' },
-  failed: { color: '#f44336', icon: ErrorIcon, label: '失败' },
-  stopped: { color: '#ff9800', icon: StopIcon, label: '已停止' },
-};
-
 interface CollabHistoryItemProps {
   entry: CollabHistoryEntry;
   onDelete: (id: string) => void;
 }
 
 const CollabHistoryItem: React.FC<CollabHistoryItemProps> = ({ entry, onDelete }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
-  const status = STATUS_CONFIG[entry.status];
+  const statusConfig = {
+    completed: { color: '#4caf50', icon: CheckCircleIcon, label: t('collab.status.completed') },
+    failed: { color: '#f44336', icon: ErrorIcon, label: t('collab.status.failed') },
+    stopped: { color: '#ff9800', icon: StopIcon, label: t('collab.status.stopped') },
+  };
+  const status = statusConfig[entry.status];
   const StatusIcon = status.icon;
 
   const formatDuration = (seconds: number): string => {
-    if (seconds < 60) return `${seconds}秒`;
+    if (seconds < 60) return `${seconds}${t('collab.time.second')}`;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return secs > 0 ? `${mins}分${secs}秒` : `${mins}分钟`;
+    return secs > 0 ? `${mins}${t('collab.time.minute')}${secs}${t('collab.time.second')}` : `${mins}${t('collab.time.minutes')}`;
   };
 
   const formatTimestamp = (ts: number): string => {
@@ -76,10 +77,10 @@ const CollabHistoryItem: React.FC<CollabHistoryItemProps> = ({ entry, onDelete }
     const isYesterday = new Date(now.getTime() - 86400000).toDateString() === date.toDateString();
 
     if (isToday) {
-      return `今天 ${date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`;
+      return `${t('collab.time.today')} ${date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`;
     }
     if (isYesterday) {
-      return `昨天 ${date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`;
+      return `${t('collab.time.yesterday')} ${date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`;
     }
     return date.toLocaleDateString('zh-CN', {
       month: 'short',
@@ -127,7 +128,7 @@ const CollabHistoryItem: React.FC<CollabHistoryItemProps> = ({ entry, onDelete }
                 mb: 0.5,
               }}
             >
-              {entry.task || '无描述任务'}
+              {entry.task || t('collab.history.noTask')}
             </Typography>
 
             {/* Meta row */}
@@ -230,7 +231,9 @@ interface CollabHistoryProps {
   onEntryClick?: (entry: CollabHistoryEntry) => void;
 }
 
-export const CollabHistory: React.FC<CollabHistoryProps> = ({ className, onEntryClick }) => {
+export const CollabHistory: React.FC<CollabHistoryProps> = ({
+ className, onEntryClick }) => {
+  const { t } = useTranslation();
   const collabHistory = useStore((s) => s.collabHistory);
   const clearCollabHistory = useStore((s) => s.clearCollabHistory);
   const deleteCollabHistoryEntry = useStore((s) => s.deleteCollabHistoryEntry);
@@ -274,10 +277,10 @@ export const CollabHistory: React.FC<CollabHistoryProps> = ({ className, onEntry
       >
         <HistoryIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1.5, opacity: 0.5 }} />
         <Typography sx={{ fontSize: 13, color: 'text.disabled', mb: 0.5 }}>
-          暂无协作历史
+          {t('collab.history.empty')}
         </Typography>
         <Typography sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }}>
-          完成的协作会话将显示在这里
+          {t('collab.history.emptyHint')}
         </Typography>
       </Box>
     );
@@ -307,7 +310,7 @@ export const CollabHistory: React.FC<CollabHistoryProps> = ({ className, onEntry
               letterSpacing: '0.08em',
             }}
           >
-            协作历史
+            {t('collab.history.title')}
           </Typography>
           <Chip
             size="small"
@@ -323,7 +326,7 @@ export const CollabHistory: React.FC<CollabHistoryProps> = ({ className, onEntry
           />
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Tooltip title="导出 JSON">
+          <Tooltip title={t('collab.history.exportJSON')}>
             <IconButton
               size="small"
               onClick={handleExportJSON}
@@ -332,7 +335,7 @@ export const CollabHistory: React.FC<CollabHistoryProps> = ({ className, onEntry
               <JSONDownloadIcon sx={{ fontSize: 14 }} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="导出 CSV">
+          <Tooltip title={t('collab.history.exportCSV')}>
             <IconButton
               size="small"
               onClick={handleExportCSV}
@@ -341,7 +344,7 @@ export const CollabHistory: React.FC<CollabHistoryProps> = ({ className, onEntry
               <DownloadIcon sx={{ fontSize: 14 }} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="清除全部历史">
+          <Tooltip title={t('collab.history.clearAll')}>
             <IconButton
               size="small"
               onClick={clearCollabHistory}

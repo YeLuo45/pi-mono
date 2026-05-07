@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, IconButton, Tooltip, LinearProgress, Chip } from '@mui/material';
 import {
   Pause as PauseIcon,
@@ -40,6 +41,7 @@ interface CollaborationControlsProps {
  * and a progress indicator for the active collaboration session.
  */
 export const CollaborationControls: React.FC<CollaborationControlsProps> = ({
+
   status = 'executing',
   progressMessage,
   progress = 0,
@@ -50,6 +52,7 @@ export const CollaborationControls: React.FC<CollaborationControlsProps> = ({
   disabled = false,
   className,
 }) => {
+  const { t } = useTranslation();
   const [isPaused, setIsPaused] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -115,15 +118,15 @@ export const CollaborationControls: React.FC<CollaborationControlsProps> = ({
 
   // Status to display text
   const getStatusText = (): string => {
-    if (status === 'decomposing') return '正在分解任务…';
-    if (status === 'aggregating') return '正在汇总结果…';
-    if (status === 'done') return '协作完成';
-    if (status === 'failed') return '协作失败';
-    if (isPaused) return '已暂停';
+    if (status === 'decomposing') return t('collab.controls.decomposing');
+    if (status === 'aggregating') return t('collab.controls.aggregating');
+    if (status === 'done') return t('collab.controls.done');
+    if (status === 'failed') return t('collab.controls.failed');
+    if (isPaused) return t('collab.controls.paused');
     if (activeTasks.length > 0) {
-      return `${activeTasks.map(t => getRoleDisplayName(t as any)).join(', ')}工作中…`;
+      return `${activeTasks.map(t => getRoleDisplayName(t as any)).join(', ')}${t('collab.controls.working')}`;
     }
-    return progressMessage || '处理中…';
+    return progressMessage || t('collab.controls.processing');
   };
 
   // Progress bar color
@@ -235,7 +238,7 @@ export const CollaborationControls: React.FC<CollaborationControlsProps> = ({
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
         {/* Pause button */}
         {showPause && (
-          <Tooltip title="暂停" placement="top">
+          <Tooltip title={t('collab.controls.pause')} placement="top">
             <IconButton
               size="small"
               onClick={handlePause}
@@ -253,7 +256,7 @@ export const CollaborationControls: React.FC<CollaborationControlsProps> = ({
 
         {/* Resume button */}
         {showResume && (
-          <Tooltip title="继续" placement="top">
+          <Tooltip title={t('collab.controls.resume')} placement="top">
             <IconButton
               size="small"
               onClick={handleResume}
@@ -271,7 +274,7 @@ export const CollaborationControls: React.FC<CollaborationControlsProps> = ({
 
         {/* Stop button */}
         {showStop && (
-          <Tooltip title="终止" placement="top">
+          <Tooltip title={t('collab.controls.stop')} placement="top">
             <IconButton
               size="small"
               onClick={handleStop}
