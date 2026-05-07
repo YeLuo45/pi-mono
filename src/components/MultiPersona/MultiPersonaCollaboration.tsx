@@ -67,9 +67,11 @@ import {
   Psychology as PsychologyIcon,
   EmojiEmotions as EmojiIcon,
   Insights as InsightsIcon,
+  History as HistoryIcon,
 } from '@mui/icons-material';
 import { useStore } from '../../store';
 import { CollaborationStatus } from '../Collaboration/CollaborationStatus';
+import { CollabHistory } from '../Collaboration/CollabHistory';
 import {
   type PersonaMember,
   type TeamDiscussion,
@@ -790,7 +792,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
           <Collapse in={chatExpanded}>
             <Divider sx={{ my: 1.5 }} />
 
-            {/* Tabs: 分工视图 / 实时对话 / 结果汇总 */}
+            {/* Tabs: 分工视图 / 实时对话 / 结果汇总 / 历史记录 */}
             <Tabs
               value={activeTab}
               onChange={(_, v) => setActiveTab(v)}
@@ -803,6 +805,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
               <Tab icon={<GroupIcon sx={{ fontSize: 14 }} />} iconPosition="start" label="分工视图" />
               <Tab icon={<ChatIcon sx={{ fontSize: 14 }} />} iconPosition="start" label="实时对话" />
               <Tab icon={<SummarizeIcon sx={{ fontSize: 14 }} />} iconPosition="start" label="结果汇总" />
+              <Tab icon={<HistoryIcon sx={{ fontSize: 14 }} />} iconPosition="start" label="历史记录" />
             </Tabs>
 
             {/* Discussion Topic Input */}
@@ -1167,6 +1170,13 @@ export const MultiPersonaCollaboration: React.FC = () => {
                     </Typography>
                   </Box>
                 )}
+              </Box>
+            )}
+
+            {/* 历史记录 Tab */}
+            {activeTab === 3 && (
+              <Box sx={{ mb: 1.5 }}>
+                <CollabHistory />
               </Box>
             )}
           </Collapse>

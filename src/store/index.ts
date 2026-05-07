@@ -46,6 +46,18 @@ export interface GameSession {
   data: Record<string, unknown>;
 }
 
+// V42: Collaboration History Entry
+export interface CollabHistoryEntry {
+  id: string;
+  task: string;           // 任务描述
+  timestamp: number;      // 开始时间
+  duration: number;       // 持续时长（秒）
+  status: 'completed' | 'failed' | 'stopped';
+  participants: string[];  // personaIds
+  conclusion?: string;    // 聚合结论摘要
+  messages: CollabMessage[]; // 完整对话记录
+}
+
 interface AppState {
   // AI Config
   aiConfig: AIConfig;
@@ -202,6 +214,12 @@ interface AppState {
   collaborationProgress: CollaborationProgress[];
   setCollaborationProgress: (progress: CollaborationProgress[]) => void;
   updateCollaborationProgress: (role: string, status: 'pending' | 'running' | 'done', output?: string) => void;
+
+  // V42: Collaboration History (persisted in localStorage)
+  collabHistory: CollabHistoryEntry[];
+  addCollabHistoryEntry: (entry: Omit<CollabHistoryEntry, 'id'>) => void;
+  deleteCollabHistoryEntry: (id: string) => void;
+  clearCollabHistory: () => void;
 }
 
 // V40: Collaboration progress tracking
@@ -745,6 +763,30 @@ export const useStore = create<AppState>()(
             ],
           };
         }),
+
+      // V42: Collaboration History (persisted in localStorage, key: pixel_pal_collab_history)
+      collabHistory: JSON.parse(localStorage.getItem('pixel_pal_collab_history') || '[]'),
+      addCollabHistoryEntry: (entry) =>
+        set((state) => {
+          const newEntry: CollabHistoryEntry = {
+            ...entry,
+            id: crypto.randomUUID(),
+          };
+          // Keep only the last 10 entries
+          const updated = [newEntry, ...state.collabHistory].slice(0, 10);
+          localStorage.setItem('pixel_pal_collab_history', JSON.stringify(updated));
+          return { collabHistory: updated };
+        }),
+      clearCollabHistory: () => {
+        localStorage.setItem('pixel_pal_collab_history', JSON.stringify([]));
+        set({ collabHistory: [] });
+      },
+      deleteCollabHistoryEntry: (id) =>
+        set((state) => {
+          const updated = state.collabHistory.filter((e) => e.id !== id);
+          localStorage.setItem('pixel_pal_collab_history', JSON.stringify(updated));
+          return { collabHistory: updated };
+        }),
     }),
     {
       name: 'pixelpal-storage',
@@ -811,6 +853,8 @@ export const useStore = create<AppState>()(
         customTheme: state.customTheme,
         // V36: memos
         memos: state.memos,
+        // V42: collab history
+        collabHistory: state.collabHistory,
       }),
     }
   )

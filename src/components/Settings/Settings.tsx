@@ -21,6 +21,7 @@ import { PERSONAS, MOODS } from '../../services/companion/personalityTypes';
 import { getMemoryStats, clearAllMemories, compactMemory } from '../../services/memory/memoryStorage';
 import { voiceService } from '../../services/voice/voiceService';
 import { WebhookSettings } from './WebhookSettings';
+import { VersionInfo } from './VersionInfo';
 import { decodeTemplate, templateToPersonaData, copyToClipboard } from '../../services/template/templateShare';
 import { ONLINE_TEMPLATES, type OnlineTemplate } from '../../services/template/onlineTemplates';
 import { createPersona } from '../../services/persona/personaStorage';
@@ -1614,10 +1615,11 @@ export const Settings: React.FC = () => {
             ℹ️ About PixelPal
           </Typography>
           <Typography variant="body2" sx={{ fontSize: 12, color: 'text.secondary', lineHeight: 1.6 }}>
-            PixelPal v0.2.0 — A pixel art AI companion and productivity assistant.
+            PixelPal — A pixel art AI companion and productivity assistant.
             <br />
             All AI features use your own API key. No data leaves your browser except to the AI provider you configure.
           </Typography>
+          <VersionInfo />
         </Paper>
 
         {error && <Alert severity="error" sx={{ fontSize: 12 }} onClose={() => setError('')}>{error}</Alert>}

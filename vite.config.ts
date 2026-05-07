@@ -6,6 +6,10 @@ import path from 'node:path'
 const isGitHubPages = !!process.env.GITHUB_PAGES
 
 export default defineConfig({
+  define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(process.env.npm_package_version || '0.0.0'),
+    'import.meta.env.VITE_BUILD_TIME': JSON.stringify(new Date().toISOString()),
+  },
   plugins: [
     react(),
     ...(isGitHubPages ? [] : [
