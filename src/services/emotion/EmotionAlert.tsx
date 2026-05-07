@@ -357,7 +357,7 @@ export const EmotionAlert: React.FC<EmotionAlertProps> = ({
  */
 function checkPersistentNegativeEmotion(logs: EmotionLogEntry[]): {
   triggered: boolean;
-  level: 'mild' | 'moderate' | 'high';
+  level: 'normal' | 'mild' | 'moderate' | 'high';
   message: string;
 } {
   // Group logs by date
@@ -412,7 +412,7 @@ function checkPersistentNegativeEmotion(logs: EmotionLogEntry[]): {
  */
 function checkHighNegativeRatio(logs: EmotionLogEntry[]): {
   triggered: boolean;
-  level: 'mild' | 'moderate' | 'high';
+  level: 'normal' | 'mild' | 'moderate' | 'high';
   message: string;
 } {
   const today = new Date().toISOString().split('T')[0];
@@ -446,7 +446,7 @@ function checkHighNegativeRatio(logs: EmotionLogEntry[]): {
  */
 function checkEmotionDrop(logs: EmotionLogEntry[]): {
   triggered: boolean;
-  level: 'mild' | 'moderate' | 'high';
+  level: 'normal' | 'mild' | 'moderate' | 'high';
   message: string;
 } {
   if (logs.length < 2) {
@@ -507,8 +507,6 @@ function checkEmotionDrop(logs: EmotionLogEntry[]): {
 }
 
 // --- Export for external use ---
-
-export type { AlertType, AlertState };
 
 /**
  * Helper to trigger alert check externally

@@ -7,7 +7,7 @@
  * - Observation: Result that informs next steps
  */
 
-import type { PlanResult, TaskStep, ReActThought, ToolDefinition } from './types';
+import type { PlanResult, TaskStep, ReActThought, ToolDefinition, Task, ToolExecutionContext } from './types';
 import { toolRegistry } from './toolRegistry';
 
 // ============================================================================

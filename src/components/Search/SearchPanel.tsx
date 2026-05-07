@@ -52,6 +52,10 @@ const MEMORY_TYPE_COLORS: Record<MemoryType, string> = {
   preference: '#81C784',
   routine: '#BA68C8',
   custom: '#90A4AE',
+  daily_summary: '#9B7FD4',
+  weekly_summary: '#4DB6AC',
+  monthly_summary: '#FFB74D',
+  important_event: '#E57373',
 };
 
 const MEMORY_TYPE_LABELS: Record<MemoryType, string> = {
@@ -63,6 +67,10 @@ const MEMORY_TYPE_LABELS: Record<MemoryType, string> = {
   preference: '偏好',
   routine: '习惯',
   custom: '自定义',
+  daily_summary: '日总结',
+  weekly_summary: '周总结',
+  monthly_summary: '月总结',
+  important_event: '重要事件',
 };
 
 export const SearchPanel: React.FC = () => {

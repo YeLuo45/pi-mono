@@ -74,6 +74,7 @@ export const ActionConfig: React.FC<ActionConfigProps> = ({ actions, onChange })
           getActionParams={getActionParams}
           onUpdateNestedActions={updateNestedActions}
           onUpdateRandomOptions={updateRandomOptions}
+          t={t}
         />
       ))}
 

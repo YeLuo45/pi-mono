@@ -131,7 +131,7 @@ export const PersonaProfile: React.FC<PersonaProfileProps> = ({ personaId, open,
       ]);
       if (!cancelled) {
         setMilestones(ms);
-        setMemoryCount(memResult.total);
+        setMemoryCount(memResult.length);
       }
     };
     load();
@@ -175,7 +175,14 @@ export const PersonaProfile: React.FC<PersonaProfileProps> = ({ personaId, open,
           </Typography>
           <br />
           <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
-            声音：{persona.voice === 'warm' ? '温暖' : persona.voice === 'rational' ? '理性' : persona.voice === 'humorous' ? '幽默' : '严肃'}
+            声音：{(() => {
+              switch (persona.voiceType) {
+                case 'warm': return '温暖';
+                case 'rational': return '理性';
+                case 'humorous': return '幽默';
+                case 'serious': return '严肃';
+              }
+            })()}
             {' · '}
             创建于 {formatDate(persona.createdAt)}
           </Typography>

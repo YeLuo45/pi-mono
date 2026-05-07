@@ -72,8 +72,6 @@ export const SceneEditorDialog: React.FC<SceneEditorDialogProps> = ({ open, onCl
     setTags(tags.filter((t) => t !== tag));
   };
 
-  const isValid = name.trim().length > 0 && triggers.length > 0 && actions.length > 0;
-
   return (
     <Dialog
       open={open}

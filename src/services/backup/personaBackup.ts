@@ -73,8 +73,8 @@ export async function exportPersonaData(personaId: string): Promise<ExportData> 
   // Get global settings
   const settings = {
     language: store.language,
-    interactionSettings: store.interactionSettings,
-    voiceSettings: store.voiceSettings,
+    interactionSettings: store.interactionSettings as unknown as Record<string, unknown>,
+    voiceSettings: store.voiceSettings as unknown as Record<string, unknown>,
   };
 
   return {
@@ -83,7 +83,7 @@ export async function exportPersonaData(personaId: string): Promise<ExportData> 
     persona,
     messages: personaMessages,
     memories: personaMemories,
-    intimacy,
+    intimacy: intimacy as unknown as Record<string, number>,
     settings,
   };
 }
@@ -107,8 +107,8 @@ export async function exportAllData(): Promise<ExportData> {
   // Global settings
   const settings = {
     language: store.language,
-    interactionSettings: store.interactionSettings,
-    voiceSettings: store.voiceSettings,
+    interactionSettings: store.interactionSettings as unknown as Record<string, unknown>,
+    voiceSettings: store.voiceSettings as unknown as Record<string, unknown>,
   };
 
   return {
@@ -246,9 +246,9 @@ export async function importPersonaData(jsonStr: string): Promise<ImportResult> 
       if (data.memories && data.memories.length > 0) {
         const { addMemory } = await import('../memory/memoryStorage');
         for (const memory of data.memories) {
+          const { id: _id, ...rest } = memory;
           await addMemory({
-            ...memory,
-            id: crypto.randomUUID(), // Generate new ID
+            ...rest,
             personaId: targetPersona!.id, // Point to new persona ID
           });
         }
@@ -257,10 +257,11 @@ export async function importPersonaData(jsonStr: string): Promise<ImportResult> 
       
       // Import intimacy if provided
       if (data.intimacy !== undefined) {
+        const intimacyValue = Object.values(data.intimacy)[0] ?? 0;
         const currentIntimacy = store.personaIntimacy;
-        currentIntimacy[targetPersona!.id] = data.intimacy;
+        currentIntimacy[targetPersona!.id] = intimacyValue;
         // Note: setting entire object won't trigger store update, so we use setPersonaIntimacy
-        store.setPersonaIntimacy(targetPersona!.id, data.intimacy);
+        store.setPersonaIntimacy(targetPersona!.id, intimacyValue);
       }
       
       return {
@@ -302,7 +303,7 @@ export async function importPersonaData(jsonStr: string): Promise<ImportResult> 
       // Import messages with remapped persona IDs
       if (data.messages && data.messages.length > 0) {
         for (const msg of data.messages) {
-          const newPersonaId = idMapping[msg.personaId];
+          const newPersonaId = msg.personaId ? idMapping[msg.personaId] : undefined;
           if (newPersonaId) {
             store.addMessage({
               role: msg.role,
@@ -318,11 +319,11 @@ export async function importPersonaData(jsonStr: string): Promise<ImportResult> 
       if (data.memories && data.memories.length > 0) {
         const { addMemory } = await import('../memory/memoryStorage');
         for (const memory of data.memories) {
-          const newPersonaId = idMapping[memory.personaId];
+          const newPersonaId = memory.personaId ? idMapping[memory.personaId] : undefined;
           if (newPersonaId) {
+            const { id: _id, ...rest } = memory;
             await addMemory({
-              ...memory,
-              id: crypto.randomUUID(),
+              ...rest,
               personaId: newPersonaId,
             });
             memoriesCount++;

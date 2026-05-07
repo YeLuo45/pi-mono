@@ -144,7 +144,7 @@ const TaskNode: React.FC<TaskNodeProps> = ({ subtask, level, isLast, childLines 
               <Typography sx={{ fontSize: 10, color: 'text.disabled' }}>{t('collab.task.dependency')}:</Typography>
               {subtask.dependencies.map((depId, i) => (
                 <Box
-                  key={depId}
+                  key={String(depId)}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -152,7 +152,7 @@ const TaskNode: React.FC<TaskNodeProps> = ({ subtask, level, isLast, childLines 
                   }}
                 >
                   <Typography sx={{ fontSize: 10, color: '#863bff', fontFamily: 'monospace' }}>
-                    {depId}
+                    {String(depId)}
                   </Typography>
                   {i < subtask.dependencies.length - 1 && (
                     <ArrowIcon sx={{ fontSize: 10, color: 'rgba(134, 59, 255, 0.4)' }} />

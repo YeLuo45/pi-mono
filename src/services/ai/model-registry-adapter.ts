@@ -82,7 +82,7 @@ export async function chatCompletion(
 ): Promise<string> {
   // Convert PixelPal Message to the simpler Message format expected by ModelRegistry
   const apiMessages = messages.map((m) => ({
-    role: m.role,
+    role: m.role as 'user' | 'assistant' | 'system',
     content: m.content,
   }));
 
@@ -105,7 +105,7 @@ export async function chatCompletionWithTools(
   sessionId?: string
 ): Promise<CallResult> {
   const apiMessages = messages.map((m) => ({
-    role: m.role,
+    role: m.role as 'user' | 'assistant' | 'system',
     content: m.content,
   }));
 

@@ -77,11 +77,11 @@ interface MemorySearchDocument {
   createdAt: string;
 }
 
-let searchIndex: FlexSearch.Index | null = null;
+let searchIndex: InstanceType<typeof FlexSearch.Index> | null = null;
 let idbStore: IDBPDatabase<{ memories: { key: string; value: MemoryEntry } }> | null = null;
 
 // Initialize FlexSearch index
-function createSearchIndex(): FlexSearch.Index {
+function createSearchIndex(): InstanceType<typeof FlexSearch.Index> {
   return new FlexSearch.Index({
     tokenize: 'forward',
     resolution: 9,
@@ -264,7 +264,7 @@ export const useMemoryStore = create<MemoryStoreState>((set, get) => ({
       const { tags, types, personaId, sortBy = 'recent', limit = 30 } = options || {};
       
       // Perform FlexSearch search
-      const searchResults = searchIndex.search(query, { limit: limit * 2 });
+      const searchResults = searchIndex.search(query, { limit: limit * 2 }) as Iterable<string>;
       
       // Get full memory entries for search results
       const db = await getDB();

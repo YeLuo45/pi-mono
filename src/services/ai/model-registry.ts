@@ -371,7 +371,7 @@ async function callModel(
   config: ModelConfig,
   messages: SimpleMessage[],
   options: CallOptions
-): Promise<{ success: boolean; content: string; error?: string }> {
+): Promise<CallResult> {
   const { provider } = config;
 
   switch (provider) {
@@ -390,7 +390,7 @@ async function callModel(
     case 'custom':
       return callOpenAICompatible(config, messages, options);
     default:
-      return { success: false, content: '', error: `Unknown provider: ${provider}` };
+      return { success: false, content: '', error: `Unknown provider: ${provider}`, modelUsed: config.name, modelId: config.id };
   }
 }
 
@@ -398,7 +398,7 @@ async function callMiniMax(
   config: ModelConfig,
   messages: SimpleMessage[],
   options: CallOptions
-): Promise<{ success: boolean; content: string; error?: string }> {
+): Promise<CallResult> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${config.apiKey}`,
@@ -428,7 +428,7 @@ async function callMiniMax(
 
   if (!response.ok) {
     const errorText = await response.text();
-    return { success: false, content: '', error: `HTTP ${response.status}: ${errorText}` };
+    return { success: false, content: '', error: `HTTP ${response.status}: ${errorText}`, modelUsed: config.name, modelId: config.id };
   }
 
   const data = await response.json();
@@ -441,21 +441,21 @@ async function callMiniMax(
       name: tc.function.name,
       arguments: tc.function.arguments,
     }));
-    return { success: true, content: textContent, toolCalls };
+    return { success: true, content: textContent, toolCalls, modelUsed: config.name, modelId: config.id };
   }
 
   if (data.choices?.[0]?.message?.content) {
-    return { success: true, content: data.choices[0].message.content };
+    return { success: true, content: data.choices[0].message.content, modelUsed: config.name, modelId: config.id };
   }
 
-  return { success: false, content: '', error: '未知响应格式' };
+  return { success: false, content: '', error: '未知响应格式', modelUsed: config.name, modelId: config.id };
 }
 
 async function callAnthropic(
   config: ModelConfig,
   messages: SimpleMessage[],
   options: CallOptions
-): Promise<{ success: boolean; content: string; error?: string }> {
+): Promise<CallResult> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'x-api-key': config.apiKey,
@@ -481,7 +481,7 @@ async function callAnthropic(
 
   if (!response.ok) {
     const errorText = await response.text();
-    return { success: false, content: '', error: `HTTP ${response.status}: ${errorText}` };
+    return { success: false, content: '', error: `HTTP ${response.status}: ${errorText}`, modelUsed: config.name, modelId: config.id };
   }
 
   const data = await response.json();
@@ -497,21 +497,21 @@ async function callAnthropic(
     // Get text content excluding tool_use blocks
     const textBlocks = data.content?.filter((c: { type: string }) => c.type === 'text') || [];
     const textContent = textBlocks.map((c: { text: string }) => c.text).join('\n');
-    return { success: true, content: textContent, toolCalls };
+    return { success: true, content: textContent, toolCalls, modelUsed: config.name, modelId: config.id };
   }
 
   if (data.content?.[0]?.text) {
-    return { success: true, content: data.content[0].text };
+    return { success: true, content: data.content[0].text, modelUsed: config.name, modelId: config.id };
   }
 
-  return { success: false, content: '', error: '未知响应格式' };
+  return { success: false, content: '', error: '未知响应格式', modelUsed: config.name, modelId: config.id };
 }
 
 async function callOpenAICompatible(
   config: ModelConfig,
   messages: SimpleMessage[],
   options: CallOptions
-): Promise<{ success: boolean; content: string; error?: string }> {
+): Promise<CallResult> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${config.apiKey}`,
@@ -540,7 +540,7 @@ async function callOpenAICompatible(
 
   if (!response.ok) {
     const errorText = await response.text();
-    return { success: false, content: '', error: `HTTP ${response.status}: ${errorText}` };
+    return { success: false, content: '', error: `HTTP ${response.status}: ${errorText}`, modelUsed: config.name, modelId: config.id };
   }
 
   const data = await response.json();
@@ -553,21 +553,21 @@ async function callOpenAICompatible(
       name: tc.function.name,
       arguments: tc.function.arguments,
     }));
-    return { success: true, content: textContent, toolCalls };
+    return { success: true, content: textContent, toolCalls, modelUsed: config.name, modelId: config.id };
   }
 
   if (data.choices?.[0]?.message?.content) {
-    return { success: true, content: data.choices[0].message.content };
+    return { success: true, content: data.choices[0].message.content, modelUsed: config.name, modelId: config.id };
   }
 
-  return { success: false, content: '', error: '未知响应格式' };
+  return { success: false, content: '', error: '未知响应格式', modelUsed: config.name, modelId: config.id };
 }
 
 async function callGemini(
   config: ModelConfig,
   messages: SimpleMessage[],
   options: CallOptions
-): Promise<{ success: boolean; content: string; error?: string }> {
+): Promise<CallResult> {
   // Gemini 使用不同的 API 格式
   const contents = messages.map(m => ({
     role: m.role === 'assistant' ? 'model' : 'user',
@@ -596,16 +596,16 @@ async function callGemini(
 
   if (!response.ok) {
     const errorText = await response.text();
-    return { success: false, content: '', error: `HTTP ${response.status}: ${errorText}` };
+    return { success: false, content: '', error: `HTTP ${response.status}: ${errorText}`, modelUsed: config.name, modelId: config.id };
   }
 
   const data = await response.json();
 
   if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-    return { success: true, content: data.candidates[0].content.parts[0].text };
+    return { success: true, content: data.candidates[0].content.parts[0].text, modelUsed: config.name, modelId: config.id };
   }
 
-  return { success: false, content: '', error: '未知响应格式' };
+  return { success: false, content: '', error: '未知响应格式', modelUsed: config.name, modelId: config.id };
 }
 
 // ============================================================

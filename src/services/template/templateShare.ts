@@ -3,14 +3,14 @@
  * Encode/decode persona as shareable Base64 code
  */
 
-import type { Persona, PersonaTheme } from '../persona/personaStorage';
+import type { Persona, PersonaTheme, PersonaAppearance, PersonaVoiceType } from '../persona/personaStorage';
 
 export interface TemplatePayload {
   v: 1;  // version
   n: string;  // name
   a: string;  // avatar
   b: string;  // bio
-  v2: Persona['voice'];  // voice
+  v2: PersonaVoiceType;  // voice personality type (warm/rational/humorous/serious)
   t?: [string, string, string];  // theme: [primaryColor, secondaryColor, accentColor]
 }
 
@@ -23,7 +23,7 @@ export function encodeTemplate(persona: Persona): string {
     n: persona.name,
     a: persona.avatar,
     b: persona.bio,
-    v2: persona.voice,
+    v2: persona.voiceType,
     t: persona.theme
       ? [persona.theme.primaryColor, persona.theme.secondaryColor, persona.theme.accentColor]
       : undefined,
@@ -52,7 +52,7 @@ export function decodeTemplate(code: string): TemplatePayload | null {
 /**
  * Convert TemplatePayload to partial Persona fields (for creating a new persona)
  */
-export function templateToPersonaData(payload: TemplatePayload): Pick<Persona, 'name' | 'avatar' | 'bio' | 'voice' | 'theme'> {
+export function templateToPersonaData(payload: TemplatePayload): Pick<Persona, 'name' | 'avatar' | 'bio' | 'voice' | 'voiceType' | 'theme' | 'appearance'> {
   const theme: PersonaTheme | undefined = payload.t
     ? {
         primaryColor: payload.t[0],
@@ -63,11 +63,22 @@ export function templateToPersonaData(payload: TemplatePayload): Pick<Persona, '
       }
     : undefined;
 
+  const appearance: PersonaAppearance = {
+    expression: '😊',
+    accessory: '🤍',
+    outfit: '👕',
+  };
+
+  // Determine voiceType from voice object
+  const voiceType: PersonaVoiceType = (payload.v2 as PersonaVoiceType) || 'warm';
+
   return {
     name: payload.n,
     avatar: payload.a,
     bio: payload.b,
-    voice: payload.v2,
+    voice: { rate: 1.0, pitch: 1.0, volume: 1.0 },
+    voiceType,
+    appearance,
     ...(theme ? { theme } : {}),
   };
 }

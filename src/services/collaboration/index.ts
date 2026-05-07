@@ -24,6 +24,7 @@ export { TaskDecomposer, createTaskDecomposer } from './taskDecomposer';
 export { ResultAggregator, createResultAggregator } from './resultAggregator';
 export { PersonaRoleRegistry, getRoleRegistry, getAvailableRoles, isValidRole, getRoleDisplayName, getRoleEmoji } from './personaRoleRegistry';
 export { CollaborationOrchestrator, createOrchestrator } from './orchestrator';
+export type { OrchestratorConfig } from './types';
 
 // ============================================================================
 // Quick Start Example
@@ -62,8 +63,15 @@ export { CollaborationOrchestrator, createOrchestrator } from './orchestrator';
 // Default Export
 // ============================================================================
 
+// Import for use in default export (re-exported above for external use)
+import { createOrchestrator } from './orchestrator';
+import { getRoleRegistry } from './personaRoleRegistry';
+import { createResultAggregator } from './resultAggregator';
+import type { OrchestratorConfig } from './types';
+import type { SharedContext } from './sharedContext';
+
 export default {
-  orchestrator: createOrchestrator,
+  orchestrator: (config?: Partial<OrchestratorConfig>) => createOrchestrator(config),
   roleRegistry: getRoleRegistry,
   resultAggregator: createResultAggregator,
 };

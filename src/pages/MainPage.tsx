@@ -84,7 +84,9 @@ export const MainPage: React.FC = () => {
     return PANEL_COMPONENTS[activePanel as keyof typeof PANEL_COMPONENTS] || ChatPanel;
   };
 
-  const ActivePanelComponent = resolvePanelComponent();
+  // Cast to React.FC to handle cases where TypeScript can't infer the component props
+  // The resolvePanelComponent function always handles pluginId correctly when needed
+  const ActivePanelComponent = resolvePanelComponent() as React.FC<Record<string, unknown>>;
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'rgba(10, 5, 20, 1)' }}>

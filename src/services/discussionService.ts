@@ -117,7 +117,14 @@ You should provide your unique perspective while being engaging and relevant to 
   ];
 
   try {
-    const response = await chatCompletion(messages);
+    const response = await chatCompletion(
+      [
+        { id: `sys-${Date.now()}`, role: 'system' as const, content: systemWithContext, timestamp: Date.now() },
+        ...(historyText ? [{ id: `user-${Date.now()}`, role: 'user' as const, content: `讨论历史：\n${historyText}`, timestamp: Date.now() }] : []),
+        { id: `user-${Date.now() + 1}`, role: 'user' as const, content: `用户的新观点：${userMessage}\n\n请作为 ${persona.name} 贡献你的观点。`, timestamp: Date.now() },
+      ],
+      null
+    );
     return response;
   } catch (error) {
     console.error(`[discussionService] chatCompletion error for ${personaId}:`, error);
@@ -143,9 +150,9 @@ async function addDiscussionSummary(callbacks: DiscussionCallbacks): Promise<voi
 
   try {
     const summaryResponse = await chatCompletion([
-      { role: 'system', content: `你是一个讨论总结助手。请根据以下讨论内容，生成一段简洁的总结（100字以内），概括主要观点和结论。` },
-      { role: 'user', content: summaryPrompt },
-    ]);
+      { id: `sys-${Date.now()}`, role: 'system' as const, content: `你是一个讨论总结助手。请根据以下讨论内容，生成一段简洁的总结（100字以内），概括主要观点和结论。`, timestamp: Date.now() },
+      { id: `user-${Date.now()}`, role: 'user' as const, content: summaryPrompt, timestamp: Date.now() },
+    ], null);
 
     const summaryMsg = svcAddDiscussionMessage(
       'default' as PersonaId, // Use a valid PersonaId

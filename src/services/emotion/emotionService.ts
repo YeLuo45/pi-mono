@@ -153,7 +153,7 @@ export function detectTextEmotion(text: string): { emotion: TextEmotion; intensi
       ? [INTENSITY_PATTERNS.question]
       : [INTENSITY_PATTERNS.negation];
     
-    if (regex[0].test(text)) {
+    if ((regex[0] as RegExp).test(text)) {
       intensity = Math.max(0, Math.min(100, intensity + (regex[1] as number)));
     }
   }

@@ -16,12 +16,12 @@ import {
   getRecentEmotionLogs,
   getEmotionLogsForDay,
   getEmotionStats,
-  type EmotionLogEntry,
 } from '../../services/emotion/emotionStorage';
 import {
   getTextEmotionColor,
   getTextEmotionEmoji,
   type TextEmotion,
+  type EmotionLogEntry,
 } from '../../services/emotion/emotionService';
 
 // --- Types ---
@@ -64,7 +64,7 @@ const EMOTION_ORDER: TextEmotion[] = ['happy', 'excited', 'calm', 'anxious', 'sa
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function getLast7Days(): { date: string; dayLabel: string }[] {
-  const result = [];
+  const result: { date: string; dayLabel: string }[] = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
@@ -77,7 +77,7 @@ function getLast7Days(): { date: string; dayLabel: string }[] {
 }
 
 function getLast30Days(): { date: string; dayLabel: string }[] {
-  const result = [];
+  const result: { date: string; dayLabel: string }[] = [];
   for (let i = 29; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
@@ -446,7 +446,7 @@ export const EmotionCurve: React.FC<{
       <Box sx={{ px: 2, pb: 1 }}>
         {hasData ? (
           <ResponsiveContainer width="100%" height={chartHeight}>
-            <AreaChart data={currentChartData} margin={{ top: 5, right: 5, bottom: 5, left: -15 }}>
+            <AreaChart data={currentChartData as any} margin={{ top: 5, right: 5, bottom: 5, left: -15 }}>
               <defs>
                 <linearGradient id="intensityGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
@@ -471,7 +471,7 @@ export const EmotionCurve: React.FC<{
                 contentStyle={{ background: '#1e1e2e', border: '1px solid #ffffff20', borderRadius: 8, fontSize: 11 }}
                 labelStyle={{ color: '#ffffff80' }}
                 formatter={(value: any, _name: any, props: any) => {
-                  const d = props.payload as WeekChartPoint | MonthChartPoint | DayChartPoint;
+                  const d = props.payload as WeekChartPoint | MonthChartPoint;
                   return d.avgIntensity !== null
                     ? [`${d.emoji} ${d.avgIntensity}%`, (d as any).date || d.day]
                     : ['No data', (d as any).date || d.day];

@@ -6,9 +6,9 @@
  * intended persona voice (warm, rational, humorous, serious).
  */
 
-import type { Persona } from './personaStorage';
+import type { Persona, PersonaVoiceType } from './personaStorage';
 
-const VOICE_INSTRUCTIONS: Record<string, string> = {
+const VOICE_INSTRUCTIONS: Record<PersonaVoiceType, string> = {
   warm: '多用鼓励性语言，适当使用 emoji，保持温暖友好的氛围',
   rational: '结构化输出，逻辑清晰，避免无关情绪化表达',
   humorous: '轻松幽默的语气，可以适当调侃，但不失专业',
@@ -29,7 +29,7 @@ const INTIMACY_DESCRIPTIONS: Record<string, string> = {
  * Optionally appends intimacy level context if intimacyLevel is provided.
  */
 export function getPersonaSystemPrompt(persona: Persona, intimacyLevel?: string): string {
-  const base = `你是一个${persona.bio}。\n语气要求：${VOICE_INSTRUCTIONS[persona.voice]}`;
+  const base = `你是一个${persona.bio}。\n语气要求：${VOICE_INSTRUCTIONS[persona.voiceType]}`;
   if (intimacyLevel) {
     const desc = INTIMACY_DESCRIPTIONS[intimacyLevel] || '';
     return `${base}\n[当前关系：${intimacyLevel} — ${desc}]`;

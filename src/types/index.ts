@@ -1,5 +1,12 @@
 // Core types for PixelPal
 
+export type PersonaRole =
+  | 'MemoryExpert'
+  | 'EmotionAnalyst'
+  | 'Advisor'
+  | 'Researcher'
+  | 'Coder';
+
 export interface AIConfig {
   provider: 'openai' | 'anthropic' | 'azure-openai' | 'custom' | 'minimax' | 'xiaomi' | 'zhipu' | 'qwen';
   apiKey: string;

@@ -42,7 +42,7 @@ export function collabHistoryToCSV(entries: CollabHistoryEntry[]): string {
     const time = new Date(e.timestamp).toLocaleString('zh-CN');
     const status = e.status;
     const participants = e.participants.join(';');
-    const summary = escapeCSV(e.summary || '');
+    const summary = escapeCSV((e as any).summary || e.conclusion || '');
     return `${time},${status},${participants},${summary}`;
   });
   return BOM + [header, ...rows].join('\n');

@@ -611,6 +611,7 @@ export const MemoryPanel: React.FC = () => {
             onImportanceRangeChange={setImportanceRange}
             tagFilter={tagFilter}
             tagCounts={tagCounts}
+            tagSearchQuery={''}
             onAddTag={addTagFilter}
             onRemoveTag={removeTagFilter}
             tagSuggestions={tagSuggestions}
@@ -1068,7 +1069,7 @@ function AllMemoriesTab({
           onChange={(e) => {
             onTagSearchQueryChange(e.target.value);
             if (!tagSearchAnchor) {
-              onTagSearchAnchorChange(document.activeElement);
+              onTagSearchAnchorChange(document.activeElement as HTMLElement);
             }
           }}
           onFocus={(e) => onTagSearchAnchorChange(e.currentTarget)}

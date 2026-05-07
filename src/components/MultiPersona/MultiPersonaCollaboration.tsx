@@ -102,7 +102,7 @@ import {
 import type { PersonaId } from '../../services/companion/personalityTypes';
 import { getPersona } from '../../services/companion/personalityTypes';
 import { runSequentialDiscussion, getPersonaInfo } from '../../services/discussionService';
-import { getEmotionLabel, emotionToScore, getEmotionColor, emotionColors } from '../../services/voice/emotionDetector';
+import { getEmotionLabel, emotionToScore, getEmotionColor, emotionColors, type EmotionState } from '../../services/voice/emotionDetector';
 import { getAllPersonas } from '../../services/persona/personaStorage';
 
 const roleIcons: Record<PersonaRole, React.ReactNode> = {
@@ -158,8 +158,8 @@ export const MultiPersonaCollaboration: React.FC = () => {
       setEmotionHistory(prev => {
         const next = { ...prev };
         for (const msg of discussion.messages) {
-          if (msg.type === 'contribution' && msg.emotion) {
-            const score = emotionToScore(msg.emotion);
+          if (msg.type === 'contribution' && (msg as any).emotion) {
+            const score = emotionToScore((msg as any).emotion);
             if (!next[msg.personaId]) {
               next[msg.personaId] = [];
             }
@@ -383,7 +383,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
           {personaIds.map((pid, pIdx) => {
             const scores = emotionHistory[pid];
             if (scores.length < 2) return null;
-            const color = personaColors[pid as PersonaId] || roleColors[getPersonaInfo(pid)?.role || 'observer'] || '#9B7FD4';
+            const color = personaColors[pid as PersonaId] || roleColors[(getPersonaInfo(pid) as any)?.role || 'observer'] || '#9B7FD4';
             const points = scores.map((s, i) => `${getX(i)},${getY(s)}`).join(' ');
             return (
               <polyline
@@ -863,8 +863,8 @@ export const MultiPersonaCollaboration: React.FC = () => {
             }}>
               {localDiscussion?.messages.map((msg, msgIdx) => {
                 const personaColor = personaColors[msg.personaId as PersonaId] || '#9B7FD4';
-                const isUser = msg.personaId === 'user' || msg.personaId === companion.personaId || String(msg.personaId) === 'user';
-                const isSystem = msg.personaId === 'system' || String(msg.personaId) === 'system';
+                const isUser = msg.personaId === companion.personaId || String(msg.personaId) === 'user';
+                const isSystem = String(msg.personaId) === 'system';
                 const personaInfo = getPersonaInfo(msg.personaId);
 
                 // V28: Emotion calculation
@@ -919,7 +919,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
                               }}
                             />
                             <Chip
-                              label={getEmotionLabel(msgEmotion)}
+                              label={getEmotionLabel(msgEmotion as EmotionState)}
                               size="small"
                               sx={{
                                 height: 14,

@@ -35,7 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
     if (panelId === 'plugin') {
       setActivePanel(panelId);
       setActivePluginId(null);
-    } else if (panelId === 'graph') {
+    } else if ((panelId as string) === 'graph') {
       // RelationGraph is a dialog, not a panel — fire event to open it
       window.dispatchEvent(new CustomEvent('pixelpal:openRelationGraph'));
     } else {
@@ -83,12 +83,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 0.5, px: 1 }}>
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
-          const isActive = activePanel === item.id;
+          const isActive = (activePanel as string) === item.id;
           return (
             <Tooltip key={item.id} title="" placement="right">
               <Box
                 component="button"
-                onClick={() => handleNavClick(item.id)}
+                onClick={() => handleNavClick(item.id as typeof activePanel)}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
@@ -121,7 +121,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
 
         {/* Plugin nav items */}
         {pluginNavItems.map((plugin) => {
-          const Icon = plugin.icon;
+          const Icon = plugin.icon as any;
           const isActive = activePanel === 'plugin';
           return (
             <Tooltip key={plugin.id} title="" placement="right">
@@ -172,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         <Tooltip title="" placement="right">
           <Box
             component="button"
-            onClick={() => handleNavClick('settings')}
+                onClick={() => handleNavClick(item.id as typeof activePanel)}
             sx={{
               display: 'flex',
               alignItems: 'center',

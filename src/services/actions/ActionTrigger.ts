@@ -86,7 +86,7 @@ export function checkReminders(): void {
   if (isUserTyping()) return;
   if (now - cooldowns.lastInactivityNoticeTime < REMIND_COOLDOWN_MS) return;
 
-  const pendingTasks = state.tasks.filter((t) => t.status === 'pending' && t.dueDate);
+  const pendingTasks = state.tasks.filter((t) => t.status === 'todo' && t.dueDate);
 
   for (const task of pendingTasks) {
     if (!task.dueDate) continue;
@@ -160,7 +160,7 @@ export function checkSuggestions(): void {
 
   // Check if user has been idle for a while
   if (isUserIdle(45 * 60 * 1000)) {
-    const pendingTasks = state.tasks.filter((t) => t.status === 'pending');
+    const pendingTasks = state.tasks.filter((t) => t.status === 'todo');
     if (pendingTasks.length > 0) {
       const taskList = pendingTasks.slice(0, 2).map((t) => `"${t.title}"`).join(', ');
       enqueueAction({

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   Box, TextField, IconButton,
   Typography, Paper, Divider,
-  Tooltip, Chip, Avatar, Menu, MenuItem,
+  Tooltip, Chip, Avatar, Menu, MenuItem, Button,
 } from '@mui/material';
 import { Send as SendIcon, Mic as MicIcon, MicOff as MicOffIcon, VolumeUp as VolumeUpIcon, VolumeOff as VolumeOffIcon, Stop as StopIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
@@ -12,7 +12,7 @@ import { chatCompletion, chatCompletionWithTools, initModelRegistry, getDefaultM
 import { injectCompanionContext, autoSummarizeChat, adjustMoodForInteraction } from '../../services/companion';
 import { queryKnowledgeBase, buildRAGContext, isDocumentIndexed, reindexAllDocuments } from '../../services/rag';
 import { voiceService } from '../../services/voice/voiceService';
-import { detectEmotion, getEmotionLabel, type EmotionState } from '../../services/voice/emotionDetector';
+import { detectEmotion, type EmotionState } from '../../services/voice/emotionDetector';
 import { PluginService } from '../../plugins';
 import type { Message } from '../../types';
 import { useTranslation } from 'react-i18next';
@@ -106,7 +106,6 @@ export const ChatPanel: React.FC = () => {
   const [showCollabSuggestion, setShowCollabSuggestion] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [currentEmotion, setCurrentEmotionLocal] = useState<EmotionState>('unknown');
   const setCurrentEmotion = useStore((s) => s.setCurrentEmotion);
   const addEmotionEntry = useStore((s) => s.addEmotionEntry);
   const messages = useStore((s) => s.messages);
@@ -208,7 +207,6 @@ export const ChatPanel: React.FC = () => {
           return prev ? `${prev} ${event.transcription}` : event.transcription || prev;
         });
         const result = detectEmotion(event.transcription, 2000);
-        setCurrentEmotionLocal(result.emotion);
         setCurrentEmotion(result.emotion);
         addEmotionEntry(result.emotion, result.confidence);
       }
@@ -399,13 +397,9 @@ export const ChatPanel: React.FC = () => {
         { id: 'temp', role: 'user', content: `用户说了：${userMsg}\n请依次以[${participantNames}]的身份各自发表看法，用[姓名]:格式。`, timestamp: Date.now() },
       ];
 
-      const result = await chatCompletion(apiMessages);
+      const result = await chatCompletion(apiMessages, null);
 
-      if (!result.success) {
-        throw new Error(result.error || 'AI request failed');
-      }
-
-      const aiResponse = result.content || '';
+      const aiResponse = result || '';
 
       // Parse AI response into per-persona messages
       const parsed = parseCollabAIResponse(aiResponse, participants);
@@ -552,10 +546,8 @@ export const ChatPanel: React.FC = () => {
           const summaryPrompt = `请总结以下多人协作讨论的要点：\n${collabMessages.map(m => `[${m.personaId === 'user' ? '用户' : getPersonaName(m.personaId)}]: ${m.content}`).join('\n')}`;
           let summary = '';
           try {
-            const result = await chatCompletion([{ id: 's', role: 'user', content: summaryPrompt, timestamp: Date.now() }]);
-            if (result.success) {
-              summary = result.content || '';
-            }
+            const result = await chatCompletion([{ id: 's', role: 'user', content: summaryPrompt, timestamp: Date.now() }], null);
+            summary = result || '';
           } catch (e) {
             summary = '(无法生成摘要)';
           }
@@ -659,10 +651,10 @@ export const ChatPanel: React.FC = () => {
       console.log('[Emotion] Text emotion detected:', emotionEntry.emotion, 'intensity:', emotionEntry.intensity);
 
       // V21 Emotion Response: Check if AI should respond with emotion-aware message
-      if (emotionResponseEngine.shouldRespond(emotionEntry.emotion, emotionEntry.intensity)) {
+      if (emotionResponseEngine.shouldRespond(emotionEntry.emotion, { messageCount: emotionEntry.intensity })) {
         const responseStyle = emotionResponseEngine.getResponseStyle(emotionEntry.emotion);
-        const behaviorGuidance = emotionResponseEngine.getBehaviorGuidance(emotionEntry.emotion, emotionEntry.intensity, responseStyle);
-        console.log('[EmotionResponse] Triggering emotion-aware response:', behaviorGuidance.toneHint);
+        const behaviorGuidance = emotionResponseEngine.getBehaviorGuidance(emotionEntry.emotion);
+        console.log('[EmotionResponse] Triggering emotion-aware response:', behaviorGuidance);
         // Emotion response guidance is injected via emotionContext in the API call below
       }
     } catch (err) {
@@ -941,21 +933,6 @@ export const ChatPanel: React.FC = () => {
             )}
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {!collabSession.active && currentEmotion !== 'unknown' && (
-              <Box sx={{
-                px: 1.5,
-                py: 0.5,
-                borderRadius: 2,
-                bgcolor: 'rgba(155, 127, 212, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-              }}>
-                <Typography variant="caption" sx={{ fontSize: 12 }}>
-                  {getEmotionLabel(currentEmotion)}
-                </Typography>
-              </Box>
-            )}
             {!collabSession.active && (
               <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
                 {displayModel}
@@ -966,8 +943,8 @@ export const ChatPanel: React.FC = () => {
                 <IconButton size="small" onClick={() => {
                   if (collabMessages.length > 0) {
                     const summaryPrompt = `请总结以下多人协作讨论的要点：\n${collabMessages.map(m => `[${m.personaId === 'user' ? '用户' : getPersonaName(m.personaId)}]: ${m.content}`).join('\n')}`;
-                    chatCompletion([{ id: 's', role: 'user', content: summaryPrompt, timestamp: Date.now() }]).then(result => {
-                      const summary = result.success ? (result.content || '') : '(无法生成摘要)';
+                    chatCompletion([{ id: 's', role: 'user', content: summaryPrompt, timestamp: Date.now() }], null).then(result => {
+                      const summary = result || '(无法生成摘要)';
                       endCollab();
                       addMessage({ role: 'system', content: `协作已结束。\n摘要：${summary}`, personaId: activePersonaId });
                     }).catch(() => {
@@ -1028,7 +1005,7 @@ export const ChatPanel: React.FC = () => {
               size="small"
               variant="contained"
               onClick={() => {
-                setCollaborationMode(true);
+                useStore.getState().setCollaborationMode(true);
                 setShowCollabSuggestion(false);
               }}
               sx={{ fontSize: 11, py: 0.25, minWidth: 'auto', bgcolor: '#863bff', '&:hover': { bgcolor: '#6b2fe0' } }}

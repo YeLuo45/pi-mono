@@ -33,6 +33,8 @@ import {
   getActivePersona,
   type Persona,
   type PersonaAppearance,
+  type PersonaVoiceType,
+  type PersonaVoice,
 } from '../../services/persona';
 import { useStore } from '../../store';
 import { PersonaDetail } from './PersonaDetail';
@@ -84,7 +86,9 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
       name: newName.trim(),
       avatar: newAvatar,
       bio: newBio.trim(),
-      voice: newVoice,
+      voice: { rate: 1.0, pitch: 1.0, volume: 1.0 },
+      voiceType: newVoice,
+      appearance: { expression: '😊', accessory: '🤍', outfit: '👕' },
     });
     setPersonas(getAllPersonas());
     setActive(created);

@@ -42,10 +42,12 @@ import {
   CameraAlt as CameraAltIcon,
   Face as FaceIcon,
   VolumeUp as VolumeUpIcon,
+  AccessTime as TimeIcon,
 } from '@mui/icons-material';
 import { PersonaProfile } from './PersonaProfile';
 import { encodeTemplate, copyToClipboard } from '../../services/template/templateShare';
-import { getPersonaSystemPrompt, updatePersona, type Persona, type PersonaAppearance, AVATAR_PRESETS } from '../../services/persona';
+import { getPersonaSystemPrompt, updatePersona, type Persona, type PersonaAppearance, type PersonaVoice, type PersonaVoiceType, AVATAR_PRESETS } from '../../services/persona';
+import { getAllPersonas } from '../../services/persona/personaStorage';
 import { useStore } from '../../store';
 import { queryMemories } from '../../services/memory/memoryStorage';
 import { getIntimacyLevel, getIntimacyColor } from '../../store';
@@ -69,14 +71,14 @@ const EMOJI_CATEGORIES: Record<string, string[]> = {
   '食物': ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🍑', '🥭', '🍕', '🍔', '🍟', '🌭', '🍰', '🎂', '🍫', '🍬', '☕', '🧁'],
 };
 
-const VOICE_OPTIONS: Array<{ value: Persona['voice']; label: string }> = [
+const VOICE_OPTIONS: Array<{ value: PersonaVoiceType; label: string }> = [
   { value: 'warm', label: '温暖' },
   { value: 'rational', label: '理性' },
   { value: 'humorous', label: '幽默' },
   { value: 'serious', label: '严肃' },
 ];
 
-function formatRelativeTime(timestamp: number, t: (key: string, opts?: object) => string): string {
+function formatRelativeTime(timestamp: number, t: import('i18next').TFunction): string {
   const diff = Date.now() - timestamp;
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
@@ -96,7 +98,8 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
 }) => {
   const { t } = useTranslation();
   const [bio, setBio] = useState(persona.bio);
-  const [voice, setVoice] = useState<Persona['voice']>(persona.voice);
+  const [voice, setVoice] = useState<PersonaVoice>(persona.voice);
+  const [voiceType, setVoiceType] = useState<PersonaVoiceType>(persona.voiceType);
   const [avatar, setAvatar] = useState(persona.avatar);
   const [appearance, setAppearance] = useState<PersonaAppearance>(persona.appearance);
   const [activeTab, setActiveTab] = useState(0);
@@ -129,6 +132,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
   useEffect(() => {
     setBio(persona.bio);
     setVoice(persona.voice);
+    setVoiceType(persona.voiceType);
     setAvatar(persona.avatar);
     setAppearance(persona.appearance);
   }, [persona]);
@@ -154,14 +158,14 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
 
   // Preview prompt
   const previewPrompt = useMemo(
-    () => getPersonaSystemPrompt({ ...persona, bio, voice, avatar } as Persona),
-    [bio, voice, avatar, persona.id]
+    () => getPersonaSystemPrompt({ ...persona, bio, voice, voiceType, avatar } as Persona),
+    [bio, voice, voiceType, avatar, persona.id]
   );
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const updated = updatePersona(persona.id, { bio, voice, avatar, appearance });
+      const updated = updatePersona(persona.id, { bio, voice, voiceType, avatar, appearance });
       if (updated && onPersonaUpdated) {
         onPersonaUpdated(updated);
       }
@@ -213,12 +217,16 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
     // Reset to original values
     setBio(persona.bio);
     setVoice(persona.voice);
+    setVoiceType(persona.voiceType);
     setAvatar(persona.avatar);
     setAppearance(persona.appearance);
     onClose();
   };
 
-  const isModified = bio !== persona.bio || voice !== persona.voice || avatar !== persona.avatar ||
+  const isModified = bio !== persona.bio || voiceType !== persona.voiceType ||
+    voice.rate !== persona.voice.rate || voice.pitch !== persona.voice.pitch ||
+    voice.volume !== persona.voice.volume || voice.voiceName !== persona.voice.voiceName ||
+    avatar !== persona.avatar ||
     appearance.expression !== persona.appearance.expression ||
     appearance.accessory !== persona.appearance.accessory ||
     appearance.outfit !== persona.appearance.outfit;
@@ -456,8 +464,8 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
                 {t('persona.detail.voice', '语气')}
               </Typography>
               <Select
-                value={voice}
-                onChange={(e) => setVoice(e.target.value as Persona['voice'])}
+                value={voiceType}
+                onChange={(e) => setVoiceType(e.target.value as PersonaVoiceType)}
                 size="small"
                 fullWidth
               >
@@ -505,7 +513,7 @@ export const PersonaDetail: React.FC<PersonaDetailProps> = ({
             </Box>
             <Box sx={{ mt: 1.5, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               <Chip
-                label={`语气: ${VOICE_OPTIONS.find((v) => v.value === voice)?.label}`}
+                label={`语气: ${VOICE_OPTIONS.find((v) => v.value === voiceType)?.label}`}
                 size="small"
                 variant="outlined"
               />

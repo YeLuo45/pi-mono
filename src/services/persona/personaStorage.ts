@@ -13,7 +13,10 @@ export interface PersonaTheme {
   textColor: string;
 }
 
-// V37: Voice personality differentiation
+// V37: Voice personality differentiation (string union for personality traits)
+export type PersonaVoiceType = 'warm' | 'rational' | 'humorous' | 'serious';
+
+// V37b: Web Speech API voice settings
 export interface PersonaVoice {
   rate: number;    // 0.5-2.0, default 1.0
   pitch: number;   // 0.5-2.0, default 1.0
@@ -34,6 +37,7 @@ export interface Persona {
   avatar: string;        // emoji or base64 image
   bio: string;            // short description
   voice: PersonaVoice;
+  voiceType: PersonaVoiceType;  // AI personality type for prompts
   appearance: PersonaAppearance;
   theme?: PersonaTheme;
   isDefault: boolean;
@@ -67,6 +71,7 @@ const DEFAULT_PERSONAS: Persona[] = [
     avatar: '😊',
     bio: '温暖友善的朋友，随时陪伴你',
     voice: { rate: 1.0, pitch: 1.1, volume: 1.0 },
+    voiceType: 'warm',
     appearance: DEFAULT_APPEARANCE['preset-friend'],
     theme: {
       primaryColor: '#f472b6',
@@ -85,6 +90,7 @@ const DEFAULT_PERSONAS: Persona[] = [
     avatar: '📚',
     bio: '耐心的老师，帮你解答问题',
     voice: { rate: 0.9, pitch: 1.0, volume: 1.0 },
+    voiceType: 'rational',
     appearance: DEFAULT_APPEARANCE['preset-teacher'],
     theme: {
       primaryColor: '#3b82f6',
@@ -103,6 +109,7 @@ const DEFAULT_PERSONAS: Persona[] = [
     avatar: '💪',
     bio: '激励型教练，帮你达成目标',
     voice: { rate: 1.1, pitch: 0.9, volume: 1.0 },
+    voiceType: 'humorous',
     appearance: DEFAULT_APPEARANCE['preset-coach'],
     theme: {
       primaryColor: '#f97316',
@@ -121,6 +128,7 @@ const DEFAULT_PERSONAS: Persona[] = [
     avatar: '💕',
     bio: '浪漫贴心的伴侣，情感支持',
     voice: { rate: 0.95, pitch: 0.95, volume: 1.0 },
+    voiceType: 'serious',
     appearance: DEFAULT_APPEARANCE['preset-lover'],
     theme: {
       primaryColor: '#ef4444',
@@ -175,6 +183,8 @@ export function createPersona(data: Omit<Persona, 'id' | 'isDefault' | 'createdA
     isDefault: false,
     createdAt: Date.now(),
     updatedAt: Date.now(),
+    voice: data.voice || { rate: 1.0, pitch: 1.0, volume: 1.0 },
+    voiceType: data.voiceType || 'warm',
     appearance: data.appearance || { expression: '😊', accessory: '🤍', outfit: '👕' },
   };
   const personas = getAllPersonas();

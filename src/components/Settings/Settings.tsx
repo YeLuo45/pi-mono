@@ -24,9 +24,9 @@ import { WebhookSettings } from './WebhookSettings';
 import { VersionInfo } from './VersionInfo';
 import { decodeTemplate, templateToPersonaData, copyToClipboard } from '../../services/template/templateShare';
 import { ONLINE_TEMPLATES, type OnlineTemplate } from '../../services/template/onlineTemplates';
-import { createPersona } from '../../services/persona/personaStorage';
+import { createPersona, type PersonaVoice, type PersonaAppearance } from '../../services/persona/personaStorage';
 import type { ModelConfig } from '../../services/ai/model-registry';
-import type { PersonaId } from '../../types';
+import type { PersonaId, PersonaRole } from '../../types';
 import { APP_THEME_PRESETS, createCustomPreset, applyAppTheme, applyCustomTheme, getPresetById, getSystemTheme, resetToDefault } from '../../utils/appTheme';
 
 const PROVIDER_LABELS: Record<string, string> = {
@@ -208,7 +208,9 @@ export const Settings: React.FC = () => {
         name: template.name,
         avatar: template.avatar,
         bio: template.bio,
-        voice: template.voice,
+        voice: { rate: 1.0, pitch: 1.0, volume: 1.0 } as PersonaVoice,
+        voiceType: template.voice,
+        appearance: { expression: '😊', accessory: '🤍', outfit: '👕' } as PersonaAppearance,
         theme: template.theme,
       };
       const newPersona = createPersona(personaData);
@@ -497,7 +499,7 @@ export const Settings: React.FC = () => {
                     onClick={() => {
                       const updated = { ...(interactionSettings.collabRoleIcons || {}) };
                       delete updated[role];
-                      setInteractionSettings({ collabRoleIcons: updated });
+                      setInteractionSettings({ collabRoleIcons: updated as Record<PersonaRole, string> });
                     }}
                     sx={{
                       width: 28, height: 28, borderRadius: 1, border: '1px solid rgba(255,255,255,0.2)',
@@ -514,7 +516,7 @@ export const Settings: React.FC = () => {
                       key={emoji}
                       onClick={() => {
                         setInteractionSettings({
-                          collabRoleIcons: { ...(interactionSettings.collabRoleIcons || {}), [role]: emoji },
+                          collabRoleIcons: { ...(interactionSettings.collabRoleIcons || {}), [role]: emoji } as Record<PersonaRole, string>,
                         });
                       }}
                       sx={{
@@ -1169,7 +1171,7 @@ export const Settings: React.FC = () => {
                         {installPreview.name}
                       </Typography>
                       <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 10 }}>
-                        {installPreview.voice === 'warm' ? t('persona.warm') : installPreview.voice === 'rational' ? t('persona.rational') : installPreview.voice === 'humorous' ? t('persona.humorous') : t('persona.serious')}
+                        {installPreview.voiceType === 'warm' ? t('persona.warm') : installPreview.voiceType === 'rational' ? t('persona.rational') : installPreview.voiceType === 'humorous' ? t('persona.humorous') : t('persona.serious')}
                       </Typography>
                     </Box>
                   </Box>
