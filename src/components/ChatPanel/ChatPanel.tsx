@@ -1117,15 +1117,15 @@ export const ChatPanel: React.FC = () => {
                   p: 1.5,
                   borderRadius: 2,
                   bgcolor: msg.role === 'user'
-                    ? 'rgba(94, 106, 210, 0.15)'
-                    : '#191a1b',
-                  color: '#f7f8f8',
+                    ? 'var(--color-chat-user-bg, rgba(94, 106, 210, 0.15))'
+                    : 'var(--color-chat-ai-bg, #191a1b)',
+                  color: 'var(--color-text-primary, #f7f8f8)',
                   fontSize: { xs: 14, md: 13 },
                   borderBottomRightRadius: msg.role === 'user' ? 4 : 16,
                   borderBottomLeftRadius: msg.role === 'assistant' ? 4 : 16,
                   boxShadow: 'none',
                   border: msg.role === 'assistant'
-                    ? '1px solid rgba(255, 255, 255, 0.08)'
+                    ? '1px solid var(--color-border, rgba(255, 255, 255, 0.08))'
                     : 'none',
                 }}
               >

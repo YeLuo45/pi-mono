@@ -180,10 +180,10 @@ interface AppState {
   removeLocalTemplate: (templateId: string) => void;
 
   // V33: App-Level Theme System
-  appThemeMode: 'light' | 'dark' | 'system';
+  appThemeMode: 'light' | 'dark' | 'system' | 'minimax';
   appThemePresetId: string; // 'light' | 'dark' | 'sunset' | 'forest' | 'custom'
   customTheme: AppThemePreset | null;
-  setAppThemeMode: (mode: 'light' | 'dark' | 'system') => void;
+  setAppThemeMode: (mode: 'light' | 'dark' | 'system' | 'minimax') => void;
   setAppThemePreset: (id: string) => void;
   setCustomTheme: (theme: AppThemePreset | null) => void;
 

@@ -56,8 +56,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        bgcolor: '#0f1011',
-        borderRight: '1px solid rgba(255,255,255,0.05)',
+        bgcolor: 'var(--color-bg-primary, #0f1011)',
+        borderRight: '1px solid var(--color-border, rgba(255,255,255,0.05))',
         flexShrink: 0,
         overflow: 'hidden',
       }}
@@ -99,13 +99,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
                   borderRadius: 1.5,
                   border: 'none',
                   cursor: 'pointer',
-                  bgcolor: isActive ? 'rgba(94, 106, 210, 0.15)' : 'transparent',
-                  color: isActive ? '#f7f8f8' : '#d0d6e0',
+                  bgcolor: isActive ? 'var(--persona-bg, rgba(94, 106, 210, 0.15))' : 'transparent',
+                  color: isActive ? 'var(--persona-text, #f7f8f8)' : 'var(--color-text-secondary, #d0d6e0)',
                   transition: 'all 0.15s ease',
                   width: '100%',
                   textAlign: 'left',
                   '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.05)',
+                    bgcolor: 'var(--color-button-hover, rgba(255,255,255,0.05))',
                     transform: 'scale(1.05)',
                   },
                 }}

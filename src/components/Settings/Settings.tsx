@@ -551,9 +551,9 @@ export const Settings: React.FC = () => {
                 {t('settings.themeMode')}
               </Typography>
             <Box sx={{ display: 'flex', gap: 0.5 }}>
-              {(['light', 'dark', 'system'] as const).map((mode) => {
+              {(['light', 'dark', 'minimax', 'system'] as const).map((mode) => {
                 const isActive = appThemeMode === mode;
-                const labels = { light: t('settings.light'), dark: t('settings.dark'), system: t('settings.followSystem') };
+                const labels = { light: t('settings.light'), dark: t('settings.dark'), minimax: 'MiniMax', system: t('settings.followSystem') };
                 return (
                   <Box
                     key={mode}
