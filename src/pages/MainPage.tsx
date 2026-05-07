@@ -89,7 +89,7 @@ export const MainPage: React.FC = () => {
   const ActivePanelComponent = resolvePanelComponent() as React.FC<Record<string, unknown>>;
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'rgba(10, 5, 20, 1)' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: '#08090a' }}>
       {/* Desktop sidebar */}
       {!isMobile && !sidebarCollapsed && <Sidebar />}
 
@@ -105,8 +105,8 @@ export const MainPage: React.FC = () => {
             width: 40,
             height: 40,
             borderRadius: '50%',
-            bgcolor: 'rgba(15, 10, 30, 0.95)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            bgcolor: '#0f1011',
+            border: '1px solid rgba(255,255,255,0.05)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -141,7 +141,8 @@ export const MainPage: React.FC = () => {
             hideBackdrop
             sx={{
               '& .MuiDrawer-paper': {
-                bgcolor: 'rgba(15, 10, 30, 0.98)',
+                bgcolor: '#0f1011',
+                border: '1px solid rgba(255,255,255,0.05)',
                 width: 260,
                 pt: 2,
                 touchAction: 'none',
@@ -172,12 +173,11 @@ export const MainPage: React.FC = () => {
             display: 'flex',
             flexDirection: 'column',
             width: '100%',
-            bgcolor: 'rgba(15, 10, 30, 0.92)',
-            backgroundImage: 'linear-gradient(180deg, rgba(20,10,40,0.3) 0%, rgba(15,10,30,0.95) 100%)',
+            bgcolor: '#08090a',
           }}
         >
           {/* Top divider line */}
-          <Box sx={{ height: 1, bgcolor: 'rgba(155, 127, 212, 0.15)' }} />
+          <Box sx={{ height: 1, bgcolor: 'rgba(255,255,255,0.05)' }} />
           <ActivePanelComponent />
         </Box>
       </Box>

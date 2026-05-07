@@ -56,8 +56,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        bgcolor: 'rgba(15, 10, 30, 0.95)',
-        borderRight: '1px solid rgba(255,255,255,0.08)',
+        bgcolor: '#0f1011',
+        borderRight: '1px solid rgba(255,255,255,0.05)',
         flexShrink: 0,
         overflow: 'hidden',
       }}
@@ -99,13 +99,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
                   borderRadius: 1.5,
                   border: 'none',
                   cursor: 'pointer',
-                  bgcolor: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
-                  color: isActive ? 'primary.main' : 'rgba(255,255,255,0.7)',
+                  bgcolor: isActive ? 'rgba(94, 106, 210, 0.15)' : 'transparent',
+                  color: isActive ? '#f7f8f8' : '#d0d6e0',
                   transition: 'all 0.15s ease',
                   width: '100%',
                   textAlign: 'left',
                   '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.08)',
+                    bgcolor: 'rgba(255,255,255,0.05)',
                     transform: 'scale(1.05)',
                   },
                 }}
@@ -142,13 +142,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
                   borderRadius: 1.5,
                   border: 'none',
                   cursor: 'pointer',
-                  bgcolor: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
-                  color: isActive ? 'primary.main' : 'rgba(255,255,255,0.7)',
+                  bgcolor: isActive ? 'rgba(94, 106, 210, 0.15)' : 'transparent',
+                  color: isActive ? '#f7f8f8' : '#d0d6e0',
                   transition: 'all 0.15s ease',
                   width: '100%',
                   textAlign: 'left',
                   '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.08)',
+                    bgcolor: 'rgba(255,255,255,0.05)',
                     transform: 'scale(1.05)',
                   },
                 }}
@@ -172,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         <Tooltip title="" placement="right">
           <Box
             component="button"
-                onClick={() => handleNavClick(item.id as typeof activePanel)}
+                onClick={() => handleNavClick('settings')}
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -183,13 +183,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
               borderRadius: 1.5,
               border: 'none',
               cursor: 'pointer',
-              bgcolor: activePanel === 'settings' ? 'rgba(255,255,255,0.12)' : 'transparent',
-              color: activePanel === 'settings' ? 'primary.main' : 'rgba(255,255,255,0.7)',
+              bgcolor: activePanel === 'settings' ? 'rgba(94, 106, 210, 0.15)' : 'transparent',
+              color: activePanel === 'settings' ? '#f7f8f8' : '#d0d6e0',
               transition: 'all 0.15s ease',
               width: '100%',
               textAlign: 'left',
               '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.08)',
+                bgcolor: 'rgba(255,255,255,0.05)',
                 transform: 'scale(1.05)',
               },
             }}

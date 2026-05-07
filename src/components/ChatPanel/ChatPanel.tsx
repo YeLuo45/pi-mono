@@ -37,7 +37,7 @@ const TypingIndicator: React.FC = () => {
             width: 6,
             height: 6,
             borderRadius: '50%',
-            bgcolor: 'primary.light',
+            bgcolor: '#5e6ad2',
             animation: 'bounce 1.2s infinite ease-in-out',
             animationDelay: `${i * 0.16}s`,
             '@keyframes bounce': {
@@ -70,13 +70,13 @@ const CollabBubble: React.FC<CollabBubbleProps> = ({ personaName, avatar, conten
         maxWidth: '80%',
         p: 1.5,
         borderRadius: 2,
-        bgcolor: isUser ? 'primary.main' : 'rgba(30, 20, 55, 0.95)',
+        bgcolor: isUser ? 'rgba(94, 106, 210, 0.15)' : '#191a1b',
         border: isUser ? 'none' : `1px solid ${color}40`,
-        color: 'white',
+        color: '#f7f8f8',
         fontSize: { xs: 14, md: 13 },
         borderBottomRightRadius: isUser ? 4 : 16,
         borderBottomLeftRadius: isUser ? 16 : 4,
-        boxShadow: isUser ? 'none' : '0 2px 8px rgba(0,0,0,0.3)',
+        boxShadow: 'none',
       }}
     >
       {/* Persona header */}
@@ -1028,7 +1028,7 @@ export const ChatPanel: React.FC = () => {
         <Box
           sx={{
             mx: 2, mt: 1, p: 1, borderRadius: 1,
-            bgcolor: 'primary.main', color: 'white',
+            bgcolor: 'rgba(94, 106, 210, 0.15)', color: '#f7f8f8',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             cursor: 'pointer', fontSize: 12,
           }}
@@ -1038,7 +1038,7 @@ export const ChatPanel: React.FC = () => {
             <Typography sx={{ fontSize: 14 }}>📬</Typography>
             <Typography sx={{ fontSize: 12 }}>{memoNotification}</Typography>
           </Box>
-          <Button size="small" sx={{ color: 'white', minWidth: 'auto', fontSize: 11 }}>查看</Button>
+          <Button size="small" sx={{ color: '#f7f8f8', minWidth: 'auto', fontSize: 11 }}>查看</Button>
         </Box>
       )}
 
@@ -1117,17 +1117,15 @@ export const ChatPanel: React.FC = () => {
                   p: 1.5,
                   borderRadius: 2,
                   bgcolor: msg.role === 'user'
-                    ? 'primary.main'
-                    : 'rgba(30, 20, 55, 0.95)',
-                  color: 'white',
+                    ? 'rgba(94, 106, 210, 0.15)'
+                    : '#191a1b',
+                  color: '#f7f8f8',
                   fontSize: { xs: 14, md: 13 },
                   borderBottomRightRadius: msg.role === 'user' ? 4 : 16,
                   borderBottomLeftRadius: msg.role === 'assistant' ? 4 : 16,
-                  boxShadow: msg.role === 'assistant'
-                    ? '0 2px 8px rgba(0,0,0,0.3)'
-                    : 'none',
+                  boxShadow: 'none',
                   border: msg.role === 'assistant'
-                    ? '1px solid rgba(155, 127, 212, 0.2)'
+                    ? '1px solid rgba(255, 255, 255, 0.08)'
                     : 'none',
                 }}
               >
@@ -1178,8 +1176,8 @@ export const ChatPanel: React.FC = () => {
           position: { xs: 'sticky', md: 'relative' },
           bottom: { xs: 0, md: 'auto' },
           zIndex: { xs: 10, md: 0 },
-          bgcolor: { xs: 'rgba(15, 10, 30, 0.98)', md: 'transparent' },
-          borderTop: { xs: '1px solid rgba(255,255,255,0.06)', md: 'none' },
+          bgcolor: { xs: '#0f1011', md: 'transparent' },
+          borderTop: { xs: '1px solid rgba(255,255,255,0.05)', md: 'none' },
         }}
       >
         <TextField
@@ -1207,16 +1205,29 @@ export const ChatPanel: React.FC = () => {
           sx={{
             '& .MuiInputBase-root': {
               fontSize: 13,
-              borderRadius: 2,
-              transition: 'box-shadow 0.2s ease',
+              borderRadius: 6,
+              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              transition: 'box-shadow 0.2s ease, border-color 0.2s ease',
+              '&:hover': {
+                borderColor: 'rgba(255, 255, 255, 0.15)',
+              },
               '&.Mui-focused': {
-                boxShadow: '0 0 0 2px rgba(155, 127, 212, 0.4)',
+                boxShadow: '0 0 0 2px rgba(94, 106, 210, 0.3)',
+                borderColor: '#5e6ad2',
               },
             },
-            '& fieldset': { borderColor: 'rgba(255,255,255,0.12)' },
-            '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+            '& .MuiInputBase-input': {
+              color: '#f7f8f8',
+              '&::placeholder': {
+                color: '#62666d',
+                opacity: 1,
+              },
+            },
+            '& fieldset': { borderColor: 'transparent' },
+            '&:hover fieldset': { borderColor: 'transparent' },
             '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'primary.main',
+              borderColor: 'transparent',
             },
           }}
         />

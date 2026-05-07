@@ -14,8 +14,10 @@ body {
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #0A0514;
-  color: #FFFFFF;
+  background: #08090a;
+  color: #f7f8f8;
+  font-feature-settings: "cv01", "ss03";
+  font-variation-settings: "wght" 400;
 }
 
 /* Prevent pull-to-refresh on mobile */
@@ -31,60 +33,97 @@ body {
 
 /* Selection color */
 ::selection {
-  background: rgba(155, 127, 212, 0.4);
-  color: white;
+  background: rgba(94, 106, 210, 0.4);
+  color: #f7f8f8;
 }
 
 /* ============================================
-   V33: App-Level Theme System CSS Variables
+   V50: Linear Dark Mode Design System
+   Based on Linear.app design language
    ============================================ */
 
-/* Default (light) theme variables */
+/* Linear Color Palette */
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f5f5;
-  --text-primary: #1a1a1a;
-  --text-secondary: #666666;
-  --border-color: #e0e0e0;
-  --accent-color: #6366f1;
-  --shadow: 0 2px 8px rgba(0,0,0,0.1);
-  /* persona overlay - tinted on top of app theme */
-  --persona-primary: #6366f1;
-  --persona-secondary: #8b5cf6;
-  --persona-accent: #a78bfa;
-  --persona-bg: rgba(99,102,241,0.1);
-  --persona-text: #e0e7ff;
+  /* Marketing & Background */
+  --color-marketing-black: #08090a;
+  --color-panel-dark: #0f1011;
+  --color-surface-3: #191a1b;
+  --color-surface-4: #28282c;
+
+  /* Text */
+  --color-text-primary: #f7f8f8;
+  --color-text-secondary: #d0d6e0;
+  --color-text-tertiary: #8a8f98;
+  --color-text-quaternary: #62666d;
+
+  /* Brand */
+  --color-brand-indigo: #5e6ad2;
+  --color-accent-violet: #7170ff;
+
+  /* Borders */
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-standard: rgba(255, 255, 255, 0.08);
+
+  /* Button */
+  --color-button-ghost-bg: rgba(255, 255, 255, 0.02);
+  --color-button-ghost-border: rgba(255, 255, 255, 0.08);
+
+  /* Chat bubbles */
+  --color-chat-ai-bg: #191a1b;
+  --color-chat-user-bg: rgba(94, 106, 210, 0.15);
+
+  /* Persona overlay */
+  --persona-primary: #5e6ad2;
+  --persona-secondary: #7170ff;
+  --persona-accent: #7170ff;
+  --persona-bg: rgba(94, 106, 210, 0.1);
+  --persona-text: #f7f8f8;
+
+  /* Border radii (Linear style) */
+  --radius-micro: 2px;
+  --radius-standard: 4px;
+  --radius-comfortable: 6px;
+  --radius-card: 8px;
+  --radius-panel: 12px;
+  --radius-pill: 9999px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  /* Typography */
+  --font-weight-reading: 400;
+  --font-weight-nav: 510;
+  --font-weight-strong: 590;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
-/* Dark theme */
-:root[data-theme="dark"] {
-  --bg-primary: #121212;
-  --bg-secondary: #1e1e1e;
-  --text-primary: #e0e0e0;
-  --text-secondary: #999999;
-  --border-color: #333333;
-  --accent-color: #8b5cf6;
-  --shadow: 0 2px 8px rgba(0,0,0,0.4);
+/* Scrollbar styling (WebKit) */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
-/* Sunset theme */
-:root[data-theme="sunset"] {
-  --bg-primary: #1a1410;
-  --bg-secondary: #2d1f15;
-  --text-primary: #f5e6d3;
-  --text-secondary: #b8998a;
-  --border-color: #4a3525;
-  --accent-color: #f97316;
-  --shadow: 0 2px 8px rgba(0,0,0,0.5);
-}
-
-/* Forest theme */
-:root[data-theme="forest"] {
-  --bg-primary: #0f1a14;
-  --bg-secondary: #1a2d20;
-  --text-primary: #e0f0e8;
-  --text-secondary: #8ab89a;
-  --border-color: #2d4a35;
-  --accent-color: #22c55e;
-  --shadow: 0 2px 8px rgba(0,0,0,0.5);
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
