@@ -870,6 +870,26 @@ export const Settings: React.FC = () => {
               <Button
                 size="small"
                 variant="outlined"
+                startIcon={<DownloadIcon sx={{ fontSize: 14 }} />}
+                onClick={async () => {
+                  try {
+                    const { messagesToCSV, downloadCSV } = await import('../../services/backup/csvExport');
+                    const store = (await import('../../store')).useStore.getState();
+                    const csv = messagesToCSV(store.messages);
+                    const date = new Date();
+                    const dateStr = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+                    downloadCSV(csv, `pixelpal_messages_${dateStr}.csv`);
+                  } catch (err) {
+                    setError(t('settings.exportFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
+                  }
+                }}
+                sx={{ fontSize: 10 }}
+              >
+                {t('settings.exportMessagesCSV', '导出聊天记录(CSV)')}
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
                 component="label"
                 startIcon={<UploadIcon sx={{ fontSize: 14 }} />}
                 sx={{ fontSize: 10 }}

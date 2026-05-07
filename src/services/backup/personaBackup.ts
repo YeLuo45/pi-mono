@@ -14,8 +14,9 @@ import { getAllPersonas, type Persona } from '../persona/personaStorage';
 import { queryMemories } from '../memory/memoryStorage';
 import type { MemoryEntry } from '../memory/memoryTypes';
 import type { Message } from '../../types';
+import type { CollabHistoryEntry, GameSession } from '../../store';
 
-export const BACKUP_VERSION = '1.0.0';
+export const BACKUP_VERSION = '1.0.1';
 
 export interface ExportData {
   version: string;
@@ -30,6 +31,8 @@ export interface ExportData {
     interactionSettings: Record<string, unknown>;
     voiceSettings: Record<string, unknown>;
   };
+  collabHistory?: CollabHistoryEntry[];  // V42 collaboration history
+  gameSessions?: GameSession[];            // V39 game sessions
 }
 
 export interface ImportResult {
@@ -91,16 +94,16 @@ export async function exportPersonaData(personaId: string): Promise<ExportData> 
 export async function exportAllData(): Promise<ExportData> {
   const store = useStore.getState();
   const personas = getAllPersonas();
-  
+
   // All messages (no filter)
   const messages = store.messages;
-  
+
   // All memories
   const memories = await queryMemories({ limit: 10000 });
-  
+
   // All intimacy data
   const intimacy = store.personaIntimacy;
-  
+
   // Global settings
   const settings = {
     language: store.language,
@@ -116,6 +119,8 @@ export async function exportAllData(): Promise<ExportData> {
     memories,
     intimacy,
     settings,
+    collabHistory: store.collabHistory,
+    gameSessions: store.gameSession ? [store.gameSession] : [],
   };
 }
 

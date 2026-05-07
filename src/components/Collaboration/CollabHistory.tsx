@@ -30,9 +30,12 @@ import {
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
   Stop as StopIcon,
+  FileDownload as DownloadIcon,
+  FileDownload as JSONDownloadIcon,
 } from '@mui/icons-material';
 import { useStore, type CollabHistoryEntry } from '../../store';
 import { CollabHistoryDetail } from './CollabHistoryDetail';
+import { collabHistoryToCSV, downloadCSV } from '../../services/backup/csvExport';
 
 // Role emoji mapping
 const ROLE_EMOJI: Record<string, string> = {
@@ -236,6 +239,25 @@ export const CollabHistory: React.FC<CollabHistoryProps> = ({ className, onEntry
     deleteCollabHistoryEntry(id);
   };
 
+  const handleExportJSON = () => {
+    const date = new Date();
+    const dateStr = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+    const json = JSON.stringify(collabHistory, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pixelpal_collab_${dateStr}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportCSV = () => {
+    const date = new Date();
+    const dateStr = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+    downloadCSV(collabHistoryToCSV(collabHistory), `pixelpal_collab_${dateStr}.csv`);
+  };
+
   if (collabHistory.length === 0) {
     return (
       <Box
@@ -300,19 +322,39 @@ export const CollabHistory: React.FC<CollabHistoryProps> = ({ className, onEntry
             }}
           />
         </Box>
-        <Tooltip title="清除全部历史">
-          <IconButton
-            size="small"
-            onClick={clearCollabHistory}
-            sx={{
-              p: 0.5,
-              color: 'text.disabled',
-              '&:hover': { color: '#f44336' },
-            }}
-          >
-            <DeleteIcon sx={{ fontSize: 14 }} />
-          </IconButton>
-        </Tooltip>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Tooltip title="导出 JSON">
+            <IconButton
+              size="small"
+              onClick={handleExportJSON}
+              sx={{ p: 0.5, color: 'text.disabled', '&:hover': { color: '#4caf50' } }}
+            >
+              <JSONDownloadIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="导出 CSV">
+            <IconButton
+              size="small"
+              onClick={handleExportCSV}
+              sx={{ p: 0.5, color: 'text.disabled', '&:hover': { color: '#2196f3' } }}
+            >
+              <DownloadIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="清除全部历史">
+            <IconButton
+              size="small"
+              onClick={clearCollabHistory}
+              sx={{
+                p: 0.5,
+                color: 'text.disabled',
+                '&:hover': { color: '#f44336' },
+              }}
+            >
+              <DeleteIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
 
       {/* History list */}
