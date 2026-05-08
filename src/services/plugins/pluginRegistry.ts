@@ -97,6 +97,55 @@ class PluginRegistryImpl {
       throw new Error(`[PluginRegistry] Action "${actionId}" failed: ${msg}`);
     }
   }
+
+  /**
+   * Try to match a user message against all enabled plugin actions.
+   * Returns { pluginId, actionId, params } if matched, null otherwise.
+   * Simple keyword + regex matching for preset plugins.
+   */
+  matchAction(text: string): { pluginId: string; actionId: string; params: Record<string, string> } | null {
+    const lower = text.toLowerCase();
+
+    // weather-plugin: "天气", "weather", "温度", "气温"
+    if (/天气|weather|温度|气温|下雨|晴|雨/.test(lower)) {
+      // Extract city name (simple heuristic: after keywords like "北京天气" or "weather in")
+      const cityMatch = text.match(/[:：]?\s*([^\s,，!?]{2,10})(?:\s|$|的|$)/);
+      const city = cityMatch ? cityMatch[1].replace(/[的?？!！.,]/g, '') : '北京';
+      return { pluginId: 'weather-plugin', actionId: 'getWeather', params: { city } };
+    }
+
+    // calc-plugin: contains math operators
+    if (/^\s*[\d\+\-\*\/\(\)\.\s]+$/.test(text.trim())) {
+      return { pluginId: 'calc-plugin', actionId: 'calculate', params: { expr: text.trim() } };
+    }
+
+    // translate-plugin: "翻译", "translate"
+    if (/翻译|translate|译成/.test(lower)) {
+      const fromMatch = text.match(/从\s*([\w\u4e00-\u9fa5]{2,10})/);
+      const toMatch = text.match(/(?:到|成|为)\s*([\w\u4e00-\u9fa5]{2,10})/);
+      const from = fromMatch ? fromMatch[1] : 'auto';
+      const to = toMatch ? toMatch[1] : '中文';
+      // Extract text to translate
+      const txt = text.replace(/翻译|translate|译成/g, '').replace(/从\s*[\w\u4e00-\u9fa5]+/g, '').replace(/(?:到|成|为)\s*[\w\u4e00-\u9fa5]+/g, '').trim();
+      return { pluginId: 'translate-plugin', actionId: 'translate', params: { text: txt || text, from, to } };
+    }
+
+    return null;
+  }
+
+  /** Execute a matching plugin action for the given user text. Returns result string or null. */
+  async tryExecute(text: string): Promise<string | null> {
+    const match = this.matchAction(text);
+    if (!match) return null;
+
+    try {
+      const result = await this.executeAction(match.pluginId, match.actionId, match.params);
+      return result;
+    } catch (err) {
+      console.warn('[PluginRegistry] tryExecute failed:', err);
+      return null;
+    }
+  }
 }
 
 export const pluginRegistry = new PluginRegistryImpl();

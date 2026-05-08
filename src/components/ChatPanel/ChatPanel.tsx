@@ -14,6 +14,7 @@ import { queryKnowledgeBase, buildRAGContext, isDocumentIndexed, reindexAllDocum
 import { voiceService } from '../../services/voice/voiceService';
 import { detectEmotion, type EmotionState } from '../../services/voice/emotionDetector';
 import { PluginService } from '../../plugins';
+import { pluginRegistry } from '../../services/plugins/pluginRegistry';
 import type { Message } from '../../types';
 import { useTranslation } from 'react-i18next';
 import { useSceneStore } from '../../stores/sceneStore';
@@ -843,7 +844,35 @@ export const ChatPanel: React.FC = () => {
         },
       }));
 
-      const currentMessages: Message[] = [...finalMessages];
+      // V60: Try plugin action first (keyword-triggered, no AI needed)
+      const match = pluginRegistry.matchAction(userMsg);
+      if (match !== null) {
+        const pluginResult = await pluginRegistry.executeAction(match.pluginId, match.actionId, match.params).catch(() => null);
+        if (pluginResult !== null) {
+          const toolResultMessage: Message = {
+            id: crypto.randomUUID(),
+            role: 'system',
+            content: `用户查询了插件结果：${pluginResult}`,
+            timestamp: Date.now(),
+          };
+          currentMessages.push(toolResultMessage);
+
+          // Re-generate AI response with plugin result context
+          const resultWithContext = await chatCompletionWithTools(currentMessages, undefined);
+          if (resultWithContext.success) {
+            aiContent = resultWithContext.content;
+            toolCalls = [];
+          } else {
+            aiContent = pluginResult;
+          }
+        } else {
+          // Fallback to normal chat
+          const result = await chatCompletionWithTools(currentMessages, openAITools.length > 0 ? openAITools : undefined);
+          if (!result.success) throw new Error(result.error || 'AI request failed');
+          aiContent = result.content;
+          toolCalls = result.toolCalls || [];
+        }
+      } else {
 
       const result = await chatCompletionWithTools(currentMessages, openAITools.length > 0 ? openAITools : undefined);
 
@@ -851,8 +880,8 @@ export const ChatPanel: React.FC = () => {
         throw new Error(result.error || 'AI request failed');
       }
 
-      let toolCalls = result.toolCalls;
-      let finalContent = result.content;
+      aiContent = result.content;
+      toolCalls = result.toolCalls;
 
       while (toolCalls && toolCalls.length > 0) {
         addMessage({ role: 'assistant', content: `🧩 正在调用 ${toolCalls.length} 个工具...`, personaId: activePersonaId });
