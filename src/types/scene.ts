@@ -1,3 +1,27 @@
+// V61: TriggerRule and Condition — defined BEFORE Scene to avoid forward-ref issues
+export type ConditionType = 'daysInactive' | 'messagesCount' | 'timeOfDay' | 'emotionThreshold';
+
+export interface Condition {
+  id: string;
+  type: ConditionType;
+  params: Record<string, unknown>;
+  threshold: number;
+}
+
+export type ConditionLogic = 'AND' | 'OR';
+
+export interface TriggerRule {
+  id: string;
+  name: string;
+  conditions: Condition[];
+  logic: ConditionLogic;
+  action: 'evolve' | 'remind' | 'changeMood' | 'custom';
+  actionParams: Record<string, unknown>;
+  enabled: boolean;
+  cooldownMinutes: number;
+  lastTriggered?: number;
+}
+
 export interface Scene {
   id: string;
   name: string;
@@ -156,32 +180,4 @@ export function matchKeyword(message: string, pattern: string): boolean {
   } catch {
     return message.toLowerCase().includes(pattern.toLowerCase());
   }
-}
-
-// V61: Condition types for condition chains
-export type ConditionType = 'daysInactive' | 'messagesCount' | 'timeOfDay' | 'emotionThreshold';
-
-export interface Condition {
-  id: string;
-  type: ConditionType;
-  // daysInactive: params.days
-  // messagesCount: params.count
-  // timeOfDay: params.hour (0-23)
-  // emotionThreshold: params.emotion ('happy'|'sad'|'angry'|'fear'), params.direction ('above'|'below'), params.threshold (0-1)
-  params: Record<string, any>;
-  threshold: number; // numeric threshold for comparison
-}
-
-export type ConditionLogic = 'AND' | 'OR';
-
-export interface TriggerRule {
-  id: string;
-  name: string;
-  conditions: Condition[];
-  logic: ConditionLogic;
-  action: 'evolve' | 'remind' | 'changeMood' | 'custom';
-  actionParams: Record<string, any>;
-  enabled: boolean;
-  cooldownMinutes: number;
-  lastTriggered?: number; // timestamp ms
 }
