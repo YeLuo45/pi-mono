@@ -8,6 +8,9 @@ import { getPersonaSystemPrompt } from '../services/persona/personaPrompt';
 import type { Persona, PersonaVoice } from '../services/persona/personaStorage';
 import { setVoiceConfig as setVoiceServiceConfig } from '../services/voice/voiceService';
 import type { AppThemePreset } from '../utils/appTheme';
+import { saveMessage, loadMessages, clearMessages as clearMessagesFromDB, saveMessages } from '../services/storage/messageStorage';
+import { saveTask, loadTasks, deleteTask as deleteTaskFromDB, saveTasks } from '../services/storage/taskStorage';
+import { saveEvent, loadEvents, deleteEvent as deleteEventFromDB, saveEvents } from '../services/storage/eventStorage';
 
 const LOCAL_TEMPLATES_KEY = 'pixelpal_local_templates';
 
@@ -328,17 +331,22 @@ export const useStore = create<AppState>()(
       // Chat
       messages: [],
       addMessage: (msg) =>
-        set((state) => ({
-          messages: [
-            ...state.messages,
-            {
-              ...msg,
-              id: crypto.randomUUID(),
-              timestamp: Date.now(),
-            },
-          ],
-        })),
-      clearMessages: () => set({ messages: [] }),
+        set((state) => {
+          const newMessage: Message = {
+            ...msg,
+            id: crypto.randomUUID(),
+            timestamp: Date.now(),
+          };
+          // Persist to IndexedDB asynchronously
+          saveMessage(newMessage).catch(console.warn);
+          return {
+            messages: [...state.messages, newMessage],
+          };
+        }),
+      clearMessages: () => {
+        clearMessagesFromDB().catch(console.warn);
+        set({ messages: [] });
+      },
       isAIThinking: false,
       aiThinkingContent: null,
       setAIThinking: (thinking) => set({ isAIThinking: thinking }),
@@ -346,24 +354,44 @@ export const useStore = create<AppState>()(
 
       // Events
       events: [],
-      addEvent: (event) => set((state) => ({ events: [...state.events, event] })),
-      updateEvent: (id, updates) =>
-        set((state) => ({
-          events: state.events.map((e) => (e.id === id ? { ...e, ...updates } : e)),
-        })),
-      deleteEvent: (id) => set((state) => ({ events: state.events.filter((e) => e.id !== id) })),
+      addEvent: (event) => {
+        saveEvent(event).catch(console.warn);
+        set((state) => ({ events: [...state.events, event] }));
+      },
+      updateEvent: (id, updates) => {
+        set((state) => {
+          const updated = state.events.map((e) => (e.id === id ? { ...e, ...updates } : e));
+          const updatedEvent = updated.find((e) => e.id === id);
+          if (updatedEvent) saveEvent(updatedEvent).catch(console.warn);
+          return { events: updated };
+        });
+      },
+      deleteEvent: (id) => {
+        deleteEventFromDB(id).catch(console.warn);
+        set((state) => ({ events: state.events.filter((e) => e.id !== id) }));
+      },
 
       // Tasks
       tasks: [],
-      addTask: (task) => set((state) => ({ tasks: [...state.tasks, task] })),
-      updateTask: (id, updates) =>
-        set((state) => ({
-          tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)),
-        })),
-      deleteTask: (id) => set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) })),
-      moveTask: (id: string, newStatus: TaskStatus) =>
-        set((state) => ({
-          tasks: state.tasks.map((t) =>
+      addTask: (task) => {
+        saveTask(task).catch(console.warn);
+        set((state) => ({ tasks: [...state.tasks, task] }));
+      },
+      updateTask: (id, updates) => {
+        set((state) => {
+          const updated = state.tasks.map((t) => (t.id === id ? { ...t, ...updates } : t));
+          const updatedTask = updated.find((t) => t.id === id);
+          if (updatedTask) saveTask(updatedTask).catch(console.warn);
+          return { tasks: updated };
+        });
+      },
+      deleteTask: (id) => {
+        deleteTaskFromDB(id).catch(console.warn);
+        set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) }));
+      },
+      moveTask: (id: string, newStatus: TaskStatus) => {
+        set((state) => {
+          const updated = state.tasks.map((t) =>
             t.id === id
               ? {
                   ...t,
@@ -371,8 +399,12 @@ export const useStore = create<AppState>()(
                   completedAt: newStatus === 'done' ? new Date().toISOString() : undefined,
                 }
               : t
-          ),
-        })),
+          );
+          const movedTask = updated.find((t) => t.id === id);
+          if (movedTask) saveTask(movedTask).catch(console.warn);
+          return { tasks: updated };
+        });
+      },
 
       // Documents
       documents: [],
@@ -596,11 +628,17 @@ export const useStore = create<AppState>()(
           resetPersonaTheme();
         }
       },
-      clearMessagesForPersona: (personaId) =>
+      clearMessagesForPersona: (personaId) => {
+        clearMessagesFromDB(personaId).catch(console.warn);
         set((state) => ({
           messages: state.messages.filter((m) => m.personaId !== personaId),
-        })),
-      setMessages: (messages) => set({ messages }),
+        }));
+      },
+      setMessages: (messages) => {
+        // Persist all messages to IndexedDB
+        saveMessages(messages).catch(console.warn);
+        set({ messages });
+      },
       loadMessagesForPersona: (personaId) =>
         set((state) => ({
           messages: state.messages.filter(
@@ -814,7 +852,7 @@ export const useStore = create<AppState>()(
     {
       name: 'pixelpal-storage',
       storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => async (state) => {
         // V33: Apply app theme after rehydration
         if (state) {
           const { getPresetById, getSystemTheme, applyAppTheme, resetToDefault, applyCustomTheme } = require('../utils/appTheme');
@@ -830,25 +868,55 @@ export const useStore = create<AppState>()(
             else resetToDefault();
           }
         }
-        // After rehydration, filter messages by activePersonaId
-        // This ensures only the current persona's messages are loaded
-        if (state && state.activePersonaId) {
-          state.messages = state.messages.filter(
-            (m) => !m.personaId || m.personaId === state.activePersonaId
-          );
-          // Apply initial persona theme after rehydration
-          if (state.personaFollowTheme) {
-            const currentPersona = getAllPersonas().find((p) => p.id === state.activePersonaId);
-            if (currentPersona?.theme) {
-              applyPersonaTheme(currentPersona.theme);
+        // V55: Load persisted data from IndexedDB on startup
+        if (state) {
+          try {
+            // Load messages from IndexedDB
+            const [idbMessages, idbTasks, idbEvents] = await Promise.all([
+              loadMessages(state.activePersonaId),
+              loadTasks(),
+              loadEvents(),
+            ]);
+
+            // Merge IndexedDB messages with localStorage messages (prefer IndexedDB for messages)
+            // IndexedDB is the source of truth for messages
+            if (idbMessages.length > 0) {
+              state.messages = idbMessages.filter(
+                (m) => !m.personaId || m.personaId === state.activePersonaId
+              );
             }
-          } else {
-            resetPersonaTheme();
+
+            // Load tasks and events from IndexedDB
+            if (idbTasks.length > 0) {
+              state.tasks = idbTasks;
+            }
+            if (idbEvents.length > 0) {
+              state.events = idbEvents;
+            }
+          } catch (err) {
+            console.warn('[V55] IndexedDB load on startup failed:', err);
           }
-          // V37: Apply initial persona voice after rehydration
-          const activePersona = getAllPersonas().find((p) => p.id === state.activePersonaId);
-          if (activePersona?.voice) {
-            setVoiceServiceConfig(activePersona.voice);
+
+          // After rehydration, filter messages by activePersonaId
+          // This ensures only the current persona's messages are loaded
+          if (state.activePersonaId) {
+            state.messages = state.messages.filter(
+              (m) => !m.personaId || m.personaId === state.activePersonaId
+            );
+            // Apply initial persona theme after rehydration
+            if (state.personaFollowTheme) {
+              const currentPersona = getAllPersonas().find((p) => p.id === state.activePersonaId);
+              if (currentPersona?.theme) {
+                applyPersonaTheme(currentPersona.theme);
+              }
+            } else {
+              resetPersonaTheme();
+            }
+            // V37: Apply initial persona voice after rehydration
+            const activePersona = getAllPersonas().find((p) => p.id === state.activePersonaId);
+            if (activePersona?.voice) {
+              setVoiceServiceConfig(activePersona.voice);
+            }
           }
         }
       },
