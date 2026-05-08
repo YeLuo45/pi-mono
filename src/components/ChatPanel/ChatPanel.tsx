@@ -4,7 +4,7 @@ import {
   Typography, Paper, Divider,
   Tooltip, Chip, Avatar, Menu, MenuItem, Button,
 } from '@mui/material';
-import { Send as SendIcon, Mic as MicIcon, MicOff as MicOffIcon, VolumeUp as VolumeUpIcon, VolumeOff as VolumeOffIcon, Stop as StopIcon, Close as CloseIcon } from '@mui/icons-material';
+import { Send as SendIcon, Mic as MicIcon, MicOff as MicOffIcon, VolumeUp as VolumeUpIcon, VolumeOff as VolumeOffIcon, Stop as StopIcon, Close as CloseIcon, Pause as PauseIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
 import { MemoPanel } from '../Memo/MemoPanel';
 import { CollaborationStatus } from '../Collaboration/CollaborationStatus';
@@ -26,6 +26,8 @@ import { checkAndCreateMilestones } from '../../services/milestone/milestoneTrac
 import { isGoalOriented, createTaskFromGoal, executeTask } from '../../services/agent/taskPlanner';
 import { TaskConfirmDialog } from '../Agent/TaskConfirmDialog';
 import type { Task as AgentTask } from '../../services/agent/types';
+import { SpeechButton } from '../ChatInput/SpeechButton';
+import useSpeechSynthesis from '../../hooks/useSpeechSynthesis';
 
 // Three-dot typing indicator component
 const TypingIndicator: React.FC = () => {
@@ -110,6 +112,9 @@ export const ChatPanel: React.FC = () => {
   const [goalConfirmDialogOpen, setGoalConfirmDialogOpen] = useState(false);
   const [pendingAgentTask, setPendingAgentTask] = useState<AgentTask | null>(null);
   const [pendingGoal, setPendingGoal] = useState('');
+  // V58: Per-message TTS playback state
+  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
+  const { speak, stop, isPlaying, isSupported: ttsHookSupported } = useSpeechSynthesis({});
   const setCurrentEmotion = useStore((s) => s.setCurrentEmotion);
   const addEmotionEntry = useStore((s) => s.addEmotionEntry);
   const messages = useStore((s) => s.messages);
@@ -262,6 +267,11 @@ export const ChatPanel: React.FC = () => {
     }
   };
 
+  // V58: Handle transcript from SpeechButton, update input
+  const handleSpeechTranscript = (transcript: string) => {
+    setInput(transcript);
+  };
+
   const handleTtsToggle = () => {
     const newTtsEnabled = !ttsEnabled;
     setTtsEnabled(newTtsEnabled);
@@ -308,6 +318,29 @@ export const ChatPanel: React.FC = () => {
     }
     setAIThinking(false);
     setPetStatus({ state: 'idle' });
+    // V58: Stop any per-message TTS playback
+    stop();
+    setPlayingMessageId(null);
+  };
+
+  // V58: Per-message TTS playback
+  const handlePlayMessage = async (msgId: string, content: string) => {
+    if (playingMessageId === msgId) {
+      // Stop if already playing this message
+      stop();
+      setPlayingMessageId(null);
+    } else {
+      // Stop any other playback and start this one
+      stop();
+      setPlayingMessageId(msgId);
+      try {
+        await speak(content);
+      } catch (err) {
+        console.warn('[ChatPanel] TTS error:', err);
+      } finally {
+        setPlayingMessageId(null);
+      }
+    }
   };
 
   const speakChunkImmediate = (text: string) => {
@@ -1142,6 +1175,17 @@ export const ChatPanel: React.FC = () => {
                 <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', fontSize: { xs: 14, md: 13 }, lineHeight: 1.6 }}>
                   {msg.content}
                 </Typography>
+                {msg.role === 'assistant' && (
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handlePlayMessage(msg.id, msg.content)}
+                      sx={{ p: 0.25, color: playingMessageId === msg.id ? 'primary.main' : 'text.secondary' }}
+                    >
+                      {playingMessageId === msg.id ? <PauseIcon sx={{ fontSize: 14 }} /> : <VolumeUpIcon sx={{ fontSize: 14 }} />}
+                    </IconButton>
+                  </Box>
+                )}
               </Paper>
               {/* TTS button for AI messages */}
               {msg.role === 'assistant' && ttsSupported && (
