@@ -1363,25 +1363,17 @@ export const ChatPanel: React.FC = () => {
           }}
         />
 
-        {/* Voice Input Button (Mic) */}
-        <Tooltip title={isListening ? t('chat.stopListening') : voiceSettings.sttEnabled ? t('chat.voiceInput') : t('chat.voiceDisabled')}>
-          <span>
-            <IconButton
-              color={isListening ? 'error' : 'default'}
-              onClick={handleVoiceToggle}
-              disabled={!voiceSettings.sttEnabled || isAIThinking}
-              size="small"
-              sx={{
-                alignSelf: 'flex-end',
-                flexShrink: 0,
-                bgcolor: isListening ? 'rgba(255, 80, 80, 0.15)' : 'transparent',
-                '&:hover': { bgcolor: isListening ? 'rgba(255, 80, 80, 0.25)' : 'rgba(255,255,255,0.08)' },
-              }}
-            >
-              {isListening ? <MicOffIcon sx={{ fontSize: 18 }} /> : <MicIcon sx={{ fontSize: 18 }} />}
-            </IconButton>
-          </span>
-        </Tooltip>
+        {/* Voice Input Button (Mic) - V63: Now uses SpeechButton for emotion detection */}
+        <SpeechButton
+          onTranscriptChange={handleSpeechTranscript}
+          onEmotionDetected={(result) => {
+            // V63: Update emotion state when speech is detected
+            setCurrentEmotion(result.emotion);
+            addEmotionEntry(result.emotion, result.confidence);
+          }}
+          disabled={!voiceSettings.sttEnabled || isAIThinking}
+          size="small"
+        />
 
         {/* TTS Toggle Button */}
         {ttsSupported && (

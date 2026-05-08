@@ -19,6 +19,7 @@ interface UseSpeechRecognitionReturn {
   interimTranscript: string;
   isListening: boolean;
   error: string | null;
+  durationMs: number; // V63: speech duration in milliseconds
   startListening: (lang?: string) => boolean;
   stopListening: () => void;
   resetTranscript: () => void;
@@ -29,9 +30,11 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
   const [interimTranscript, setInterimTranscript] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [durationMs, setDurationMs] = useState(0); // V63: speech duration
 
   const recognitionRef = useRef<ISpeechRecognition | null>(null);
   const isMountedRef = useRef(true);
+  const startTimeRef = useRef<number>(0); // V63: track when speech started
 
   // Check for browser support
   const isSupported = typeof window !== 'undefined' && 
@@ -55,6 +58,7 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
       if (isMountedRef.current) {
         setIsListening(true);
         setError(null);
+        startTimeRef.current = Date.now(); // V63: record start time
       }
     };
 
@@ -68,6 +72,11 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
         const result = event.results[i];
         if (result.isFinal) {
           final += result[0].transcript;
+          // V63: Calculate duration when we get final transcript
+          if (startTimeRef.current > 0) {
+            const elapsed = Date.now() - startTimeRef.current;
+            setDurationMs(elapsed);
+          }
         } else {
           interim += result[0].transcript;
         }
@@ -174,6 +183,7 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
     interimTranscript,
     isListening,
     error,
+    durationMs, // V63: speech duration
     startListening,
     stopListening,
     resetTranscript,

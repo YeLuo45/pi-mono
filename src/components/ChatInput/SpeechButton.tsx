@@ -6,21 +6,25 @@
  * - Animated pulse effect while listening
  * - Tooltip showing recognized (interim) transcript
  * - Integrates with useSpeechRecognition hook
+ * - V63: Emotion detection from speech timing
  */
 
 import React, { useState, useEffect } from 'react';
 import { IconButton, Tooltip, Box } from '@mui/material';
 import { Mic as MicIcon, MicOff as MicOffIcon } from '@mui/icons-material';
 import useSpeechRecognition from '../../hooks/useSpeechRecognition';
+import { detectEmotion, type EmotionResult } from '../../services/voice/emotionDetector';
 
 interface SpeechButtonProps {
   onTranscriptChange?: (transcript: string) => void;
+  onEmotionDetected?: (result: EmotionResult) => void; // V63: emotion detection callback
   disabled?: boolean;
   size?: 'small' | 'medium';
 }
 
 export const SpeechButton: React.FC<SpeechButtonProps> = ({
   onTranscriptChange,
+  onEmotionDetected, // V63
   disabled = false,
   size = 'small',
 }) => {
@@ -29,17 +33,27 @@ export const SpeechButton: React.FC<SpeechButtonProps> = ({
     interimTranscript,
     isListening,
     error,
+    durationMs, // V63: speech duration
     startListening,
     stopListening,
     resetTranscript,
   } = useSpeechRecognition();
 
-  // Notify parent when transcript changes
+  // Notify parent when transcript changes (V63: also detect emotion)
   useEffect(() => {
     if (transcript && onTranscriptChange) {
       onTranscriptChange(transcript);
     }
-  }, [transcript, onTranscriptChange]);
+    // V63: Detect emotion when we have a final transcript with valid duration
+    if (transcript && durationMs > 0 && onEmotionDetected) {
+      try {
+        const result = detectEmotion(transcript, durationMs);
+        onEmotionDetected(result);
+      } catch (err) {
+        console.warn('[SpeechButton] Emotion detection failed:', err);
+      }
+    }
+  }, [transcript, durationMs, onTranscriptChange, onEmotionDetected]);
 
   const handleClick = () => {
     if (isListening) {
