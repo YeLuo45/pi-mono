@@ -1,17 +1,19 @@
-// PluginStore — V59 Plugin Market UI
+// PluginStore — V62 Plugin Market UI
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Switch, Stack, Chip, Collapse, Button, Divider } from '@mui/material';
 import { ExpandMore as ExpandIcon, ExpandLess as CollapseIcon, Add as AddIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { pluginRegistry } from '../../services/plugins/pluginRegistry';
 import type { Plugin } from '../../types/plugin';
+import { PluginEditorDialog } from './PluginEditorDialog';
 
 interface PluginCardProps {
   plugin: Plugin;
   onToggle: (id: string, enabled: boolean) => void;
+  onEdit: (plugin: Plugin) => void;
 }
 
-const PluginCard: React.FC<PluginCardProps> = ({ plugin, onToggle }) => {
+const PluginCard: React.FC<PluginCardProps> = ({ plugin, onToggle, onEdit }) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -99,9 +101,19 @@ const PluginCard: React.FC<PluginCardProps> = ({ plugin, onToggle }) => {
           )}
 
           {/* Actions */}
-          <Typography variant="caption" sx={{ fontSize: 10, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            Actions
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
+            <Typography variant="caption" sx={{ fontSize: 10, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Actions
+            </Typography>
+            <Button
+              size="small"
+              variant="text"
+              onClick={(e) => { e.stopPropagation(); onEdit(plugin); }}
+              sx={{ fontSize: 10, py: 0.25, minWidth: 0, px: 1 }}
+            >
+              {t('common.edit', 'Edit')}
+            </Button>
+          </Box>
           <Stack gap={0.5} sx={{ mt: 0.75 }}>
             {plugin.actions.map((action) => (
               <Box
@@ -134,6 +146,8 @@ const PluginCard: React.FC<PluginCardProps> = ({ plugin, onToggle }) => {
 export const PluginStore: React.FC = () => {
   const { t } = useTranslation();
   const [plugins, setPlugins] = useState<Plugin[]>([]);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editingPlugin, setEditingPlugin] = useState<Plugin | null>(null);
 
   const loadPlugins = () => {
     setPlugins(pluginRegistry.getAllPlugins());
@@ -154,6 +168,20 @@ export const PluginStore: React.FC = () => {
     } catch (err) {
       console.error('[PluginStore] Toggle failed:', err);
     }
+  };
+
+  const handleEdit = (plugin: Plugin) => {
+    setEditingPlugin(plugin);
+    setEditorOpen(true);
+  };
+
+  const handleNew = () => {
+    setEditingPlugin(null);
+    setEditorOpen(true);
+  };
+
+  const handleSaved = () => {
+    loadPlugins();
   };
 
   const preset = plugins.filter((p) =>
@@ -196,7 +224,7 @@ export const PluginStore: React.FC = () => {
             </Typography>
             <Stack gap={1}>
               {preset.map((plugin) => (
-                <PluginCard key={plugin.id} plugin={plugin} onToggle={handleToggle} />
+                <PluginCard key={plugin.id} plugin={plugin} onToggle={handleToggle} onEdit={handleEdit} />
               ))}
             </Stack>
           </Box>
@@ -222,7 +250,7 @@ export const PluginStore: React.FC = () => {
             )}
             <Stack gap={1}>
               {userPlugins.map((plugin) => (
-                <PluginCard key={plugin.id} plugin={plugin} onToggle={handleToggle} />
+                <PluginCard key={plugin.id} plugin={plugin} onToggle={handleToggle} onEdit={handleEdit} />
               ))}
             </Stack>
           </Box>
@@ -237,18 +265,25 @@ export const PluginStore: React.FC = () => {
         )}
       </Box>
 
-      {/* Footer: Install button (future) */}
+      {/* Footer: Install button */}
       <Box sx={{ p: 2, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <Button
           variant="outlined"
           startIcon={<AddIcon sx={{ fontSize: 14 }} />}
-          disabled
+          onClick={handleNew}
           fullWidth
           sx={{ fontSize: 12 }}
         >
-          {t('plugin.installPlugin', 'Install Plugin')} — Coming Soon
+          {t('plugin.editor.installPlugin', 'Install Plugin')}
         </Button>
       </Box>
+
+      <PluginEditorDialog
+        open={editorOpen}
+        onClose={() => setEditorOpen(false)}
+        editingPlugin={editingPlugin}
+        onSaved={handleSaved}
+      />
     </Box>
   );
 };
