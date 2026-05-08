@@ -30,10 +30,24 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Debug environment
+        run: |
+          echo "NODE_VERSION=$(node -v)"
+          echo "NPM_VERSION=$(npm -v)"
+          echo "VITE_VERSION=$(npx vite --version)"
+          echo "--- npm ls ---"
+          npm ls --depth=0 2>&1 | head -50
+
       - name: Build
         env:
           GITHUB_PAGES: 'true'
-        run: npx vite build
+        run: |
+          echo "=== vite build start ==="
+          npx vite build 2>&1
+          EXIT=$?
+          echo "=== vite build EXIT=$EXIT ==="
+          ls -la dist/renderer/ 2>/dev/null || echo "dist/renderer NOT FOUND"
+          echo "=== EXIT=$EXIT ===" 
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
