@@ -908,6 +908,21 @@ export const Settings: React.FC = () => {
             >
               {memoryClearing ? 'Clearing...' : 'Clear All Memory'}
             </Button>
+            <Button
+              size="small"
+              variant="contained"
+              onClick={async () => {
+                try {
+                  const { generateWeeklySummary } = await import('../../services/summary/weeklySummary');
+                  await generateWeeklySummary();
+                } catch (e) {
+                  console.error('Failed to generate weekly summary', e);
+                }
+              }}
+              sx={{ fontSize: 10 }}
+            >
+              Generate Weekly Report
+            </Button>
           </Stack>
         </Paper>
 

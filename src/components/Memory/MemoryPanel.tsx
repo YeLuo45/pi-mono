@@ -61,6 +61,7 @@ import {
   CalendarMonth as CalendarIcon,
   EmojiEmotions as EmotionIcon,
   LocalOffer as TagIcon,
+  Summarize as SummarizeIcon,
 } from '@mui/icons-material';
 import {
   getMemoryStats,
@@ -69,6 +70,7 @@ import {
   deleteMemory,
   addMemory,
 } from '../../services/memory/memoryStorage';
+import { type WeeklySummary, getWeeklySummaries } from '../../services/summary/weeklySummary';
 import { type MemoryEntry, type MemoryType, type MemoryStats } from '../../services/memory/memoryTypes';
 import {
   getEntityStats,
@@ -155,6 +157,10 @@ export const MemoryPanel: React.FC = () => {
   // Emotion state
   const [emotionLogs, setEmotionLogs] = useState<EmotionLogEntry[]>([]);
   const [emotionWarning, setEmotionWarning] = useState<string | null>(null);
+
+  // Weekly Summary state (V57)
+  const [weeklySummaries, setWeeklySummaries] = useState<WeeklySummary[]>([]);
+  const [weeklySummaryLoading, setWeeklySummaryLoading] = useState(false);
 
   // Load emotion logs
   const loadEmotionLogs = useCallback(() => {
@@ -341,6 +347,18 @@ export const MemoryPanel: React.FC = () => {
     } catch (err) {
       console.error('Failed to load insights:', err);
     }
+  }, []);
+
+  // Load weekly summaries (V57)
+  const loadWeeklySummaries = useCallback(async () => {
+    setWeeklySummaryLoading(true);
+    try {
+      const summaries = await getWeeklySummaries();
+      setWeeklySummaries(summaries);
+    } catch (err) {
+      console.error('Failed to load weekly summaries:', err);
+    }
+    setWeeklySummaryLoading(false);
   }, []);
 
   // Initial load
@@ -584,6 +602,7 @@ export const MemoryPanel: React.FC = () => {
           <Tab icon={<TimelineIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.timeline')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
           <Tab icon={<InsightIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.insights')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
           <Tab icon={<EmotionIcon sx={{ fontSize: 16 }} />} label={t('emotionPanel.title')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
+          <Tab icon={<SummarizeIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.weeklyReport')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
         </Tabs>
       </Box>
 
@@ -652,6 +671,13 @@ export const MemoryPanel: React.FC = () => {
             logs={emotionLogs}
             warning={emotionWarning}
             onRefresh={loadEmotionLogs}
+          />
+        )}
+        {tab === 5 && (
+          <WeeklySummaryTab
+            summaries={weeklySummaries}
+            loading={weeklySummaryLoading}
+            onRefresh={loadWeeklySummaries}
           />
         )}
       </Box>
@@ -2073,5 +2099,71 @@ function EmotionTimelineTab({ logs, warning, onRefresh }: EmotionTimelineTabProp
     </Stack>
   );
 };
+
+interface WeeklySummaryTabProps {
+  summaries: WeeklySummary[];
+  loading: boolean;
+  onRefresh: () => void;
+}
+
+function WeeklySummaryTab({ summaries, loading, onRefresh }: WeeklySummaryTabProps) {
+  const { t } = useTranslation('translation', { keyPrefix: 'memoryPanel' });
+
+  if (loading) {
+    return <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress size={24} /></Box>;
+  }
+
+  if (summaries.length === 0) {
+    return (
+      <Box sx={{ textAlign: 'center', p: 4, color: 'text.secondary' }}>
+        <SummarizeIcon sx={{ fontSize: 48, mb: 2, opacity: 0.5 }} />
+        <Typography>{t('weeklyReportEmpty', 'No weekly reports yet. Generate one from Settings.')}</Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box>
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button size="small" onClick={onRefresh} startIcon={<RefreshIcon />}>
+          {t('refresh', 'Refresh')}
+        </Button>
+      </Box>
+      <Stack spacing={2}>
+        {summaries.map((s, i) => {
+          let parsed: { summary: string; topics: string[]; actionItems: string[] } | null = null;
+          try { parsed = JSON.parse(s.summary); } catch { parsed = { summary: s.summary, topics: [], actionItems: [] }; }
+          const weekLabel = new Date(s.weekStart).toLocaleDateString() + ' ~ ' + new Date(s.weekEnd).toLocaleDateString();
+          return (
+            <Paper key={i} sx={{ p: 2 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>{weekLabel}</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>{parsed.summary}</Typography>
+              {parsed.topics?.length > 0 && (
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="caption" color="text.secondary">{t('topics', 'Topics')}:</Typography>
+                  <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                    {parsed.topics.map((t, j) => (
+                      <Chip key={j} label={t} size="small" sx={{ mt: 0.5 }} />
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+              {parsed.actionItems?.length > 0 && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary">{t('actionItems', 'Action Items')}:</Typography>
+                  <ul style={{ margin: '4px 0', paddingLeft: 20 }}>
+                    {parsed.actionItems.map((a, k) => (
+                      <li key={k}><Typography variant="caption">{a}</Typography></li>
+                    ))}
+                  </ul>
+                </Box>
+              )}
+            </Paper>
+          );
+        })}
+      </Stack>
+    </Box>
+  );
+}
 
 export default MemoryPanel;
