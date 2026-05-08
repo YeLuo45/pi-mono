@@ -268,6 +268,12 @@ export const ChatPanel: React.FC = () => {
     useStore.getState().setVoiceSettings({ ttsEnabled: newTtsEnabled });
   };
 
+  // V58: Speak a specific message content via TTS
+  const handleMessageSpeak = (content: string) => {
+    voiceService.cancel();
+    voiceService.speak(content);
+  };
+
   // ---- Goal Confirmation Dialog handlers ----
   const handleOpenGoalConfirm = (agentTask: AgentTask, goal: string) => {
     setPendingAgentTask(agentTask);
@@ -1111,6 +1117,7 @@ export const ChatPanel: React.FC = () => {
                 display: 'flex',
                 justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
                 gap: { xs: 1, md: 1.5 },
+                alignItems: 'flex-end',
               }}
             >
               <Paper
@@ -1136,6 +1143,22 @@ export const ChatPanel: React.FC = () => {
                   {msg.content}
                 </Typography>
               </Paper>
+              {/* TTS button for AI messages */}
+              {msg.role === 'assistant' && ttsSupported && (
+                <Tooltip title={t('chat.speakMessage') || '朗读'}>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleMessageSpeak(msg.content)}
+                    disabled={isSpeaking}
+                    sx={{
+                      color: 'rgba(255,255,255,0.4)',
+                      '&:hover': { color: '#5e6ad2', bgcolor: 'rgba(94, 106, 210, 0.15)' },
+                    }}
+                  >
+                    <VolumeUpIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Tooltip>
+              )}
             </Box>
           );
         })}
