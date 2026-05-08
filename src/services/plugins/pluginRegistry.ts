@@ -99,6 +99,14 @@ class PluginRegistryImpl {
   }
 
   /**
+   * Register a user-installed plugin at runtime (after IndexedDB load).
+   * Safe to call multiple times — updates existing entry.
+   */
+  registerUserPlugin(plugin: Plugin): void {
+    this.plugins.set(plugin.id, plugin);
+  }
+
+  /**
    * Try to match a user message against all enabled plugin actions.
    * Returns { pluginId, actionId, params } if matched, null otherwise.
    * Simple keyword + regex matching for preset plugins.
