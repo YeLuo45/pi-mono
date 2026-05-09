@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import electron from 'vite-plugin-electron'
@@ -6,6 +7,11 @@ import path from 'node:path'
 const isGitHubPages = !!process.env.GITHUB_PAGES
 
 export default defineConfig({
+  test: {
+    globals: true,
+    environment: 'node',
+    include: ['src/**/*.test.ts'],
+  },
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(process.env.npm_package_version || '0.0.0'),
     'import.meta.env.VITE_BUILD_TIME': JSON.stringify(new Date().toISOString()),

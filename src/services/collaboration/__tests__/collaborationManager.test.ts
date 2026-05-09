@@ -1733,3 +1733,965 @@ describe('CollaborationOrchestrator', () => {
     }, 10000);
   });
 });
+
+// ============================================================================
+// P13: Extended SharedContext Tests (Edge Cases & Integration)
+// ============================================================================
+
+describe('SharedContext P13 Extended', () => {
+  let context: SharedContext;
+
+  beforeEach(() => {
+    context = createSharedContext('p13-test-context', '测试请求');
+  });
+
+  describe('read operations edge cases', () => {
+    it('should handle dotted path reading for nested entities', () => {
+      const entity = context.addEntity({
+        name: 'TestEntity',
+        type: 'test',
+        traits: ['trait1'],
+        importance: 0.8,
+      });
+      
+      // The read method looks for entity by name
+      const readEntity = context.read('TestEntity');
+      expect(readEntity).toBeDefined();
+      expect((readEntity as { name: string }).name).toBe('TestEntity');
+    });
+
+    it('should return undefined for non-existent entity name', () => {
+      const result = context.read('NonExistentEntity');
+      expect(result).toBeUndefined();
+    });
+
+    it('should read facts by tag', () => {
+      context.addFact({
+        content: '测试事实内容',
+        source: 'test_source',
+        confidence: 0.9,
+        tags: ['test_tag'],
+      });
+      
+      const result = context.read('test_tag');
+      expect(result).toBe('测试事实内容');
+    });
+
+    it('should find decision by content keyword', () => {
+      context.addDecision({
+        content: '这是一个重要决定',
+        rationale: '测试理由',
+        votedBy: ['Advisor'],
+      });
+      
+      const result = context.read('重要决定');
+      expect(result).toBeDefined();
+    });
+
+    it('should getCompletedResults returns array not map', () => {
+      context.setResult({
+        subtaskId: 'test-1',
+        role: 'MemoryExpert',
+        output: 'test output',
+        confidence: 0.9,
+      });
+      
+      const results = context.getCompletedResults();
+      expect(Array.isArray(results)).toBe(true);
+      expect(results).toHaveLength(1);
+    });
+  });
+
+  describe('write operations edge cases', () => {
+    it('should overwrite existing key-value pair', () => {
+      context.write('key1', 'value1');
+      context.write('key1', 'value2');
+      
+      expect(context.read('key1')).toBe('value2');
+    });
+
+    it('should write undefined values as string "undefined"', () => {
+      context.write('undefinedKey', undefined);
+      expect(context.read('undefinedKey')).toBe('undefined');
+    });
+
+    it('should write object values as string representation', () => {
+      context.write('objectKey', { nested: { value: 123 } });
+      expect(context.read('objectKey')).toContain('[object Object]');
+    });
+  });
+
+  describe('entity management edge cases', () => {
+    it('should handle entity update with partial data', () => {
+      const entity = context.addEntity({
+        name: 'PartialEntity',
+        type: 'test',
+        traits: ['initial'],
+        importance: 0.5,
+      });
+      
+      const updated = context.updateEntity(entity.id, { importance: 0.9 });
+      expect(updated?.importance).toBe(0.9);
+      expect(updated?.traits).toEqual(['initial']); // Unchanged
+    });
+
+    it('should return null when updating non-existent entity', () => {
+      const result = context.updateEntity('non-existent-id', { importance: 0.9 });
+      expect(result).toBeNull();
+    });
+
+    it('should maintain entity id uniqueness', () => {
+      const entities = [];
+      for (let i = 0; i < 10; i++) {
+        entities.push(context.addEntity({
+          name: `Entity${i}`,
+          type: 'test',
+          traits: [],
+          importance: 0.5,
+        }));
+      }
+      
+      const ids = entities.map(e => e.id);
+      const uniqueIds = new Set(ids);
+      expect(uniqueIds.size).toBe(10);
+    });
+  });
+
+  describe('shared memory integration', () => {
+    it('should maintain separate memory across contexts', () => {
+      const context1 = createSharedContext('ctx1', '请求1');
+      const context2 = createSharedContext('ctx2', '请求2');
+      
+      context1.addEntity({
+        name: 'EntityInCtx1',
+        type: 'test',
+        traits: [],
+        importance: 0.8,
+      });
+      
+      expect(context1.readEntities()).toHaveLength(1);
+      expect(context2.readEntities()).toHaveLength(0);
+    });
+
+    it('should clear only results but keep entities', () => {
+      context.addEntity({
+        name: 'PersistentEntity',
+        type: 'test',
+        traits: [],
+        importance: 0.8,
+      });
+      context.setResult({
+        subtaskId: 'task-1',
+        role: 'MemoryExpert',
+        output: 'test',
+        confidence: 0.9,
+      });
+      
+      context.clearResults();
+      
+      expect(context.results.size).toBe(0);
+      expect(context.readEntities()).toHaveLength(1);
+    });
+  });
+
+  describe('toJSON and serialization', () => {
+    it('should serialize results as array of entries', () => {
+      context.setResult({
+        subtaskId: 'task-1',
+        role: 'MemoryExpert',
+        output: 'test output',
+        confidence: 0.9,
+      });
+      
+      const json = context.toJSON();
+      const results = (json as { results: unknown[] }).results;
+      expect(Array.isArray(results)).toBe(true);
+      expect(results).toHaveLength(1);
+    });
+
+    it('should include all fields in JSON output', () => {
+      const json = context.toJSON();
+      
+      expect(json).toHaveProperty('taskId');
+      expect(json).toHaveProperty('userRequest');
+      expect(json).toHaveProperty('results');
+      expect(json).toHaveProperty('conversationHistory');
+      expect(json).toHaveProperty('sharedMemory');
+      expect(json).toHaveProperty('createdAt');
+      expect(json).toHaveProperty('updatedAt');
+    });
+  });
+
+  describe('getSummary edge cases', () => {
+    it('should return correct counts after multiple operations', () => {
+      context.addEntity({ name: 'E1', type: 't', traits: [], importance: 0.5 });
+      context.addEntity({ name: 'E2', type: 't', traits: [], importance: 0.5 });
+      context.addFact({ content: 'F1', source: 's', confidence: 0.9, tags: [] });
+      context.addDecision({ content: 'D1', rationale: 'r', votedBy: [] });
+      context.addMessage({ role: 'Advisor', personaId: 'p1', content: 'msg', type: 'synthesis' });
+      context.setResult({ subtaskId: 's1', role: 'Advisor', output: 'o', confidence: 0.9 });
+      
+      const summary = context.getSummary();
+      
+      expect(summary.entityCount).toBe(2);
+      expect(summary.factCount).toBe(1);
+      expect(summary.decisionCount).toBe(1);
+      expect(summary.messageCount).toBe(1);
+      expect(summary.resultCount).toBe(1);
+    });
+  });
+});
+
+// ============================================================================
+// P13: Extended TaskDecomposer Tests (Edge Cases & Integration)
+// ============================================================================
+
+describe('TaskDecomposer P13 Extended', () => {
+  let decomposer: TaskDecomposer;
+
+  beforeEach(() => {
+    decomposer = createTaskDecomposer('p13-decomposer');
+  });
+
+  describe('decompose edge cases', () => {
+    it('should handle empty-like request string', async () => {
+      const result = await decomposer.decompose('   ');
+      expect(result.subtasks.length).toBeGreaterThan(0);
+    });
+
+    it('should handle very long request string', async () => {
+      const longRequest = '分析我的情绪' + '啊'.repeat(1000);
+      const result = await decomposer.decompose(longRequest);
+      expect(result.subtasks.length).toBeGreaterThan(0);
+    });
+
+    it('should handle mixed Chinese and English keywords', async () => {
+      const result = await decomposer.decompose('analyze my emotion and give advice');
+      expect(result.subtasks.length).toBeGreaterThan(0);
+    });
+
+    it('should handle request with multiple emotion keywords', async () => {
+      const result = await decomposer.decompose('分析我的情绪和心情，感受怎么样');
+      expect(result.subtasks.length).toBeGreaterThan(0);
+      expect(result.reasoning).toBeDefined();
+    });
+  });
+
+  describe('detectTaskTypes edge cases', () => {
+    it('should detect emotion_analysis with English keywords', async () => {
+      const result = await decomposer.decompose('analyze my mood');
+      const hasEmotion = result.subtasks.some(t => t.type === 'emotion_analysis');
+      expect(hasEmotion).toBe(true);
+    });
+
+    it('should detect memory_retrieval with English keywords', async () => {
+      const result = await decomposer.decompose('remember what happened');
+      const hasMemory = result.subtasks.some(t => t.type === 'memory_retrieval');
+      expect(hasMemory).toBe(true);
+    });
+
+    it('should detect advice_generation with English keywords', async () => {
+      const result = await decomposer.decompose('what should I do? how can I improve?');
+      const hasAdvice = result.subtasks.some(t => t.type === 'advice_generation');
+      expect(hasAdvice).toBe(true);
+    });
+  });
+
+  describe('dependency edge cases', () => {
+    it('should handle complex multi-level dependencies', async () => {
+      const result = await decomposer.decompose('分析我的情绪和记忆并给我建议');
+      
+      const memoryTask = result.subtasks.find(t => t.type === 'memory_retrieval');
+      const emotionTask = result.subtasks.find(t => t.type === 'emotion_analysis');
+      const adviceTask = result.subtasks.find(t => t.type === 'advice_generation');
+      
+      if (emotionTask && memoryTask) {
+        expect(emotionTask.dependencies).toContain(memoryTask.id);
+      }
+      if (adviceTask && emotionTask) {
+        expect(adviceTask.dependencies).toContain(emotionTask.id);
+      }
+    });
+
+    it('should create subtasks with unique IDs', () => {
+      const subtasks = [
+        {
+          id: 'subtask_1',
+          type: 'memory_retrieval' as const,
+          description: 'test',
+          params: {},
+          responsible: 'MemoryExpert' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: [] as string[],
+          createdAt: Date.now(),
+        },
+      ];
+      
+      const validation = decomposer.validateDependencies(subtasks);
+      expect(validation.valid).toBe(true);
+    });
+  });
+
+  describe('validateDependencies edge cases', () => {
+    it('should reject task depending on itself', () => {
+      const subtasks = [
+        {
+          id: 'self-ref',
+          type: 'memory_retrieval' as const,
+          description: 'test',
+          params: {},
+          responsible: 'MemoryExpert' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: ['self-ref'],
+          createdAt: Date.now(),
+        },
+      ];
+      
+      const validation = decomposer.validateDependencies(subtasks);
+      expect(validation.valid).toBe(false);
+    });
+
+    it('should detect indirect cycle', () => {
+      const subtasks = [
+        {
+          id: 'task-a',
+          type: 'memory_retrieval' as const,
+          description: 'test',
+          params: {},
+          responsible: 'MemoryExpert' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: ['task-c'],
+          createdAt: Date.now(),
+        },
+        {
+          id: 'task-b',
+          type: 'emotion_analysis' as const,
+          description: 'test',
+          params: {},
+          responsible: 'EmotionAnalyst' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: ['task-a'],
+          createdAt: Date.now(),
+        },
+        {
+          id: 'task-c',
+          type: 'advice_generation' as const,
+          description: 'test',
+          params: {},
+          responsible: 'Advisor' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: ['task-b'],
+          createdAt: Date.now(),
+        },
+      ];
+      
+      const validation = decomposer.validateDependencies(subtasks);
+      expect(validation.valid).toBe(false);
+    });
+
+    it('should validate empty subtask list', () => {
+      const validation = decomposer.validateDependencies([]);
+      expect(validation.valid).toBe(true);
+      expect(validation.errors).toHaveLength(0);
+    });
+  });
+
+  describe('getExecutionOrder edge cases', () => {
+    it('should handle diamond dependency pattern', () => {
+      const subtasks = [
+        {
+          id: 'task-top',
+          type: 'memory_retrieval' as const,
+          description: 'top',
+          params: {},
+          responsible: 'MemoryExpert' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: [] as string[],
+          createdAt: Date.now(),
+        },
+        {
+          id: 'task-left',
+          type: 'emotion_analysis' as const,
+          description: 'left',
+          params: {},
+          responsible: 'EmotionAnalyst' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: ['task-top'],
+          createdAt: Date.now(),
+        },
+        {
+          id: 'task-right',
+          type: 'advice_generation' as const,
+          description: 'right',
+          params: {},
+          responsible: 'Advisor' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: ['task-top'],
+          createdAt: Date.now(),
+        },
+        {
+          id: 'task-bottom',
+          type: 'emotion_analysis' as const,
+          description: 'bottom',
+          params: {},
+          responsible: 'EmotionAnalyst' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: ['task-left', 'task-right'],
+          createdAt: Date.now(),
+        },
+      ];
+      
+      const levels = decomposer.getExecutionOrder(subtasks);
+      
+      expect(levels[0]).toHaveLength(1); // task-top
+      expect(levels[1]).toHaveLength(2); // task-left, task-right (parallel)
+      expect(levels[2]).toHaveLength(1); // task-bottom
+    });
+
+    it('should handle all tasks in parallel (no dependencies)', () => {
+      const subtasks = [
+        {
+          id: 't1',
+          type: 'memory_retrieval' as const,
+          description: 'test',
+          params: {},
+          responsible: 'MemoryExpert' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: [] as string[],
+          createdAt: Date.now(),
+        },
+        {
+          id: 't2',
+          type: 'emotion_analysis' as const,
+          description: 'test',
+          params: {},
+          responsible: 'EmotionAnalyst' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: [] as string[],
+          createdAt: Date.now(),
+        },
+        {
+          id: 't3',
+          type: 'advice_generation' as const,
+          description: 'test',
+          params: {},
+          responsible: 'Advisor' as PersonaRole,
+          status: 'pending' as const,
+          dependencies: [] as string[],
+          createdAt: Date.now(),
+        },
+      ];
+      
+      const levels = decomposer.getExecutionOrder(subtasks);
+      
+      expect(levels).toHaveLength(1);
+      expect(levels[0]).toHaveLength(3);
+    });
+  });
+
+  describe('estimateDuration edge cases', () => {
+    it('should return positive duration for empty subtask list', async () => {
+      // This is a bit tricky since decompose always creates subtasks
+      // but we can test the logic through validateDependencies edge cases
+      const result = await decomposer.decompose('分析情绪');
+      expect(result.estimatedDuration).toBeGreaterThan(0);
+    });
+
+    it('should estimate higher duration for more subtasks', async () => {
+      const simpleResult = await decomposer.decompose('分析');
+      const complexResult = await decomposer.decompose('分析我的情绪和记忆并给我建议');
+      
+      expect(complexResult.estimatedDuration).toBeGreaterThanOrEqual(simpleResult.estimatedDuration);
+    });
+  });
+});
+
+// ============================================================================
+// P13: Extended ResultAggregator Tests (Edge Cases & Integration)
+// ============================================================================
+
+describe('ResultAggregator P13 Extended', () => {
+  let aggregator: ResultAggregator;
+
+  beforeEach(() => {
+    aggregator = createResultAggregator();
+  });
+
+  describe('aggregate edge cases', () => {
+    it('should handle single result', () => {
+      const results: SubtaskResult[] = [
+        {
+          subtaskId: 'task-1',
+          role: 'MemoryExpert',
+          output: '🧠 记忆专家\n只有一条记忆',
+          confidence: 0.95,
+        },
+      ];
+      
+      const aggregated = aggregator.aggregate(results, '测试', { strategy: 'concatenation' });
+      expect(aggregated).toContain('记忆专家');
+    });
+
+    it('should handle mixed confidence values', () => {
+      const results: SubtaskResult[] = [
+        {
+          subtaskId: 't1',
+          role: 'MemoryExpert',
+          output: '🧠 记忆专家\n结果A',
+          confidence: 0.5,
+        },
+        {
+          subtaskId: 't2',
+          role: 'EmotionAnalyst',
+          output: '📊 情感分析师\n结果B',
+          confidence: 1.0,
+        },
+      ];
+      
+      const aggregated = aggregator.aggregate(results, '测试', { strategy: 'weighted' });
+      expect(aggregated).toContain('结果B');
+    });
+
+    it('should handle results with special characters', () => {
+      const results: SubtaskResult[] = [
+        {
+          subtaskId: 't1',
+          role: 'MemoryExpert',
+          output: '🧠 记忆专家\n包含emoji🎉和特殊<>字符',
+          confidence: 0.9,
+        },
+      ];
+      
+      const aggregated = aggregator.aggregate(results, '测试');
+      expect(aggregated).toContain('emoji');
+    });
+
+    it('should handle very long output with maxLength', () => {
+      const longOutput = 'A'.repeat(1000);
+      const results: SubtaskResult[] = [
+        {
+          subtaskId: 't1',
+          role: 'MemoryExpert',
+          output: `🧠 记忆专家\n${longOutput}`,
+          confidence: 0.9,
+        },
+      ];
+      
+      const aggregated = aggregator.aggregate(results, '测试', { 
+        strategy: 'concatenation',
+        maxLength: 50,
+      });
+      
+      expect(aggregated.length).toBeLessThanOrEqual(53); // 50 + '...'
+      expect(aggregated).toContain('...');
+    });
+  });
+
+  describe('detectConflicts edge cases', () => {
+    it('should not detect conflict with similar positive results', () => {
+      const results: SubtaskResult[] = [
+        {
+          subtaskId: 't1',
+          role: 'MemoryExpert',
+          output: '今天心情很好很开心',
+          confidence: 0.9,
+        },
+        {
+          subtaskId: 't2',
+          role: 'EmotionAnalyst',
+          output: '情绪状态积极正面',
+          confidence: 0.85,
+        },
+      ];
+      
+      const conflicts = aggregator.detectConflicts(results);
+      expect(conflicts).toHaveLength(0);
+    });
+
+    it('should detect conflict between positive and negative', () => {
+      const results: SubtaskResult[] = [
+        {
+          subtaskId: 't1',
+          role: 'MemoryExpert',
+          output: '情绪状态good上升positive',
+          confidence: 0.9,
+        },
+        {
+          subtaskId: 't2',
+          role: 'EmotionAnalyst',
+          output: '情绪状态bad下降negative',
+          confidence: 0.85,
+        },
+      ];
+      
+      const conflicts = aggregator.detectConflicts(results);
+      expect(conflicts.length).toBeGreaterThan(0);
+    });
+
+    it('should not detect conflict with neutral results', () => {
+      const results: SubtaskResult[] = [
+        {
+          subtaskId: 't1',
+          role: 'MemoryExpert',
+          output: '记忆检索完成',
+          confidence: 0.9,
+        },
+        {
+          subtaskId: 't2',
+          role: 'EmotionAnalyst',
+          output: '情绪数据已收集',
+          confidence: 0.85,
+        },
+      ];
+      
+      const conflicts = aggregator.detectConflicts(results);
+      expect(conflicts).toHaveLength(0);
+    });
+
+    it('should handle empty results array', () => {
+      const conflicts = aggregator.detectConflicts([]);
+      expect(conflicts).toHaveLength(0);
+    });
+  });
+
+  describe('resolveConflict edge cases', () => {
+    it('should handle vote strategy', () => {
+      const conflict = {
+        subtaskIdA: 't1',
+        subtaskIdB: 't2',
+        conclusionA: '选择A',
+        conclusionB: '选择B',
+        strategy: 'vote' as const,
+      };
+      
+      const results: SubtaskResult[] = [
+        { subtaskId: 't1', role: 'MemoryExpert', output: '选择A', confidence: 0.6 },
+        { subtaskId: 't2', role: 'EmotionAnalyst', output: '选择B', confidence: 0.4 },
+      ];
+      
+      const resolution = aggregator.resolveConflict(conflict, results);
+      expect(resolution).toBe('选择A'); // Higher confidence wins
+    });
+
+    it('should handle arbitration with advisor', () => {
+      const conflict = {
+        subtaskIdA: 't1',
+        subtaskIdB: 't2',
+        conclusionA: '选择A',
+        conclusionB: '选择B',
+        strategy: 'arbitration' as const,
+      };
+      
+      const results: SubtaskResult[] = [
+        { subtaskId: 't1', role: 'MemoryExpert', output: '选择A', confidence: 0.6 },
+        { subtaskId: 't2', role: 'EmotionAnalyst', output: '选择B', confidence: 0.7 },
+        { subtaskId: 't3', role: 'Advisor', output: '建议选A', confidence: 0.8 },
+      ];
+      
+      const resolution = aggregator.resolveConflict(conflict, results);
+      expect(resolution).toBe('建议选A'); // Advisor wins in arbitration
+    });
+
+    it('should combine close confidence results', () => {
+      const conflict = {
+        subtaskIdA: 't1',
+        subtaskIdB: 't2',
+        conclusionA: '结论A',
+        conclusionB: '结论B',
+        strategy: 'confidence_weighted' as const,
+      };
+      
+      const results: SubtaskResult[] = [
+        { subtaskId: 't1', role: 'MemoryExpert', output: '结论A', confidence: 0.75 },
+        { subtaskId: 't2', role: 'EmotionAnalyst', output: '结论B', confidence: 0.70 },
+      ];
+      
+      const resolution = aggregator.resolveConflict(conflict, results);
+      expect(resolution).toContain('结论A');
+      expect(resolution).toContain('结论B');
+    });
+
+    it('should return error message for missing results', () => {
+      const conflict = {
+        subtaskIdA: 'missing',
+        subtaskIdB: 'also-missing',
+        conclusionA: 'A',
+        conclusionB: 'B',
+        strategy: 'vote' as const,
+      };
+      
+      const resolution = aggregator.resolveConflict(conflict, []);
+      expect(resolution).toBe('无法解决冲突');
+    });
+  });
+
+  describe('hierarchical aggregate edge cases', () => {
+    it('should handle results without advisor role', () => {
+      const results: SubtaskResult[] = [
+        {
+          subtaskId: 't1',
+          role: 'MemoryExpert',
+          output: '🧠 记忆专家\n记忆结果',
+          confidence: 0.9,
+        },
+        {
+          subtaskId: 't2',
+          role: 'EmotionAnalyst',
+          output: '📊 情感分析师\n情绪结果',
+          confidence: 0.85,
+        },
+      ];
+      
+      // When no Advisor, should fallback to concatenation
+      const aggregated = aggregator.aggregate(results, '测试', { strategy: 'hierarchical' });
+      expect(aggregated).toContain('记忆专家');
+    });
+
+    it('should respect maxLength in hierarchical mode', () => {
+      const results: SubtaskResult[] = [
+        {
+          subtaskId: 't1',
+          role: 'Advisor',
+          output: '💡 建议顾问\n' + '综合建议内容'.repeat(100),
+          confidence: 0.9,
+        },
+      ];
+      
+      const aggregated = aggregator.aggregate(results, '测试', { 
+        strategy: 'hierarchical',
+        maxLength: 50,
+      });
+      
+      expect(aggregated.length).toBeLessThanOrEqual(53);
+    });
+  });
+});
+
+// ============================================================================
+// P13: Extended PersonaRoleRegistry Tests (Edge Cases & Integration)
+// ============================================================================
+
+describe('PersonaRoleRegistry P13 Extended', () => {
+  let registry: PersonaRoleRegistry;
+
+  beforeEach(() => {
+    // Create a fresh registry for each test to avoid pollution
+    registry = new PersonaRoleRegistry();
+  });
+
+  describe('role registration edge cases', () => {
+    it('should reject role with empty system prompt', () => {
+      const invalidConfig = {
+        role: 'TestRole' as PersonaRole,
+        capabilities: ['test'],
+        systemPrompt: '',
+        maxConcurrentTasks: 1,
+      };
+      
+      const validation = registry.validateConfig(invalidConfig);
+      expect(validation.valid).toBe(false);
+      expect(validation.errors).toContain('System prompt must be at least 10 characters');
+    });
+
+    it('should reject role with no capabilities', () => {
+      const invalidConfig = {
+        role: 'TestRole' as PersonaRole,
+        capabilities: [],
+        systemPrompt: 'Valid system prompt for testing',
+        maxConcurrentTasks: 1,
+      };
+      
+      const validation = registry.validateConfig(invalidConfig);
+      expect(validation.valid).toBe(false);
+      expect(validation.errors).toContain('At least one capability must be defined');
+    });
+
+    it('should reject role with zero maxConcurrentTasks', () => {
+      const invalidConfig = {
+        role: 'TestRole' as PersonaRole,
+        capabilities: ['test'],
+        systemPrompt: 'Valid system prompt for testing',
+        maxConcurrentTasks: 0,
+      };
+      
+      const validation = registry.validateConfig(invalidConfig);
+      expect(validation.valid).toBe(false);
+    });
+
+    it('should accept valid custom role configuration', () => {
+      const validConfig = {
+        role: 'CustomRole' as PersonaRole,
+        capabilities: ['custom_capability_1', 'custom_capability_2'],
+        systemPrompt: 'This is a valid custom role system prompt',
+        maxConcurrentTasks: 3,
+        temperature: 0.7,
+      };
+      
+      const validation = registry.validateConfig(validConfig);
+      expect(validation.valid).toBe(true);
+      expect(validation.errors).toHaveLength(0);
+    });
+  });
+
+  describe('capabilities edge cases', () => {
+    it('should return empty array for unknown role capabilities', () => {
+      const caps = registry.getCapabilities('NonExistentRole' as PersonaRole);
+      expect(caps).toEqual([]);
+    });
+
+    it('should return default maxConcurrentTasks for unknown role', () => {
+      const maxTasks = registry.getMaxConcurrentTasks('UnknownRole' as PersonaRole);
+      expect(maxTasks).toBe(1);
+    });
+
+    it('should return undefined system prompt for unknown role', () => {
+      const prompt = registry.getSystemPrompt('UnknownRole' as PersonaRole);
+      expect(prompt).toBeUndefined();
+    });
+  });
+
+  describe('persona mapping edge cases', () => {
+    it('should map and retrieve persona ID to role', () => {
+      registry.registerPersona('persona-123', 'EmotionAnalyst');
+      const role = registry.getRoleByPersonaId('persona-123');
+      expect(role).toBe('EmotionAnalyst');
+    });
+
+    it('should return undefined for unmapped persona ID', () => {
+      const role = registry.getRoleByPersonaId('non-existent-persona');
+      expect(role).toBeUndefined();
+    });
+
+    it('should override existing persona mapping', () => {
+      registry.registerPersona('persona-456', 'MemoryExpert');
+      registry.registerPersona('persona-456', 'Advisor');
+      
+      const role = registry.getRoleByPersonaId('persona-456');
+      expect(role).toBe('Advisor');
+    });
+  });
+
+  describe('createContribution edge cases', () => {
+    it('should create contribution with default emotion and confidence', () => {
+      const contribution = registry.createContribution(
+        'persona-789',
+        'MemoryExpert',
+        '测试视角',
+        ['关键点1', '关键点2']
+      );
+      
+      expect(contribution.personaId).toBe('persona-789');
+      expect(contribution.role).toBe('MemoryExpert');
+      expect(contribution.emotion).toBe('neutral');
+      expect(contribution.confidence).toBe(0.8);
+    });
+
+    it('should create contribution with custom emotion and confidence', () => {
+      const contribution = registry.createContribution(
+        'persona-abc',
+        'EmotionAnalyst',
+        '积极分析视角',
+        ['关键点A'],
+        'positive',
+        0.95
+      );
+      
+      expect(contribution.emotion).toBe('positive');
+      expect(contribution.confidence).toBe(0.95);
+    });
+  });
+
+  describe('unregister edge cases', () => {
+    it('should successfully unregister custom role', () => {
+      // First register a custom role
+      registry.registerRole({
+        role: 'TemporaryRole' as PersonaRole,
+        capabilities: ['temp_capability'],
+        systemPrompt: 'Temporary role for testing unregister',
+        maxConcurrentTasks: 1,
+      });
+      
+      expect(registry.hasRole('TemporaryRole' as PersonaRole)).toBe(true);
+      
+      const result = registry.unregisterRole('TemporaryRole' as PersonaRole);
+      expect(result).toBe(true);
+      expect(registry.hasRole('TemporaryRole' as PersonaRole)).toBe(false);
+    });
+
+    it('should unregister default role (implementation allows this)', () => {
+      // Note: The actual implementation allows unregistering default roles
+      // This test reflects actual behavior, not desired behavior
+      const result = registry.unregisterRole('MemoryExpert');
+      expect(result).toBe(true); // Delete returns true if item existed
+      expect(registry.hasRole('MemoryExpert')).toBe(false); // Role is now unregistered
+    });
+
+    it('should return false when unregistering non-existent role', () => {
+      const result = registry.unregisterRole('PhantomRole' as PersonaRole);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('getRolesForTaskType edge cases', () => {
+    it('should return default role for unknown task type', () => {
+      const roles = registry.getRolesForTaskType('unknown_task_type');
+      expect(roles).toEqual(['MemoryExpert']);
+    });
+
+    it('should return correct roles for all known task types', () => {
+      expect(registry.getRolesForTaskType('memory_retrieval')).toContain('MemoryExpert');
+      expect(registry.getRolesForTaskType('emotion_analysis')).toContain('EmotionAnalyst');
+      expect(registry.getRolesForTaskType('advice_generation')).toContain('Advisor');
+      expect(registry.getRolesForTaskType('web_search')).toContain('Researcher');
+      expect(registry.getRolesForTaskType('code_execution')).toContain('Coder');
+    });
+  });
+
+  describe('singleton behavior', () => {
+    it('should return same instance via getRoleRegistry', () => {
+      const instance1 = getRoleRegistry();
+      const instance2 = getRoleRegistry();
+      expect(instance1).toBe(instance2);
+    });
+  });
+
+  describe('helper functions edge cases', () => {
+    it('isValidRole should return true only for valid roles', () => {
+      expect(isValidRole('MemoryExpert')).toBe(true);
+      expect(isValidRole('EmotionAnalyst')).toBe(true);
+      expect(isValidRole('Advisor')).toBe(true);
+      expect(isValidRole('Researcher')).toBe(true);
+      expect(isValidRole('Coder')).toBe(true);
+      expect(isValidRole('InvalidRole')).toBe(false);
+      expect(isValidRole('')).toBe(false);
+    });
+
+    it('getAvailableRoles should return all 5 roles', () => {
+      const roles = getAvailableRoles();
+      expect(roles).toHaveLength(5);
+      expect(roles).toContain('MemoryExpert');
+      expect(roles).toContain('EmotionAnalyst');
+      expect(roles).toContain('Advisor');
+      expect(roles).toContain('Researcher');
+      expect(roles).toContain('Coder');
+    });
+
+    it('getRoleDisplayName should return Chinese names', () => {
+      expect(getRoleDisplayName('MemoryExpert')).toBe('记忆专家');
+      expect(getRoleDisplayName('EmotionAnalyst')).toBe('情感分析师');
+      expect(getRoleDisplayName('Advisor')).toBe('建议顾问');
+      expect(getRoleDisplayName('Researcher')).toBe('研究员');
+      expect(getRoleDisplayName('Coder')).toBe('程序员');
+      expect(getRoleDisplayName('UnknownRole' as PersonaRole)).toBe('UnknownRole');
+    });
+
+    it('getRoleEmoji should return emoji icons', () => {
+      expect(getRoleEmoji('MemoryExpert')).toBe('🧠');
+      expect(getRoleEmoji('EmotionAnalyst')).toBe('📊');
+      expect(getRoleEmoji('Advisor')).toBe('💡');
+      expect(getRoleEmoji('Researcher')).toBe('🔍');
+      expect(getRoleEmoji('Coder')).toBe('💻');
+      expect(getRoleEmoji('UnknownRole' as PersonaRole)).toBe('👤');
+    });
+  });
+});

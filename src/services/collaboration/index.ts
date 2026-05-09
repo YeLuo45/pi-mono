@@ -24,7 +24,13 @@ export { TaskDecomposer, createTaskDecomposer } from './taskDecomposer';
 export { ResultAggregator, createResultAggregator } from './resultAggregator';
 export { PersonaRoleRegistry, getRoleRegistry, getAvailableRoles, isValidRole, getRoleDisplayName, getRoleEmoji } from './personaRoleRegistry';
 export { CollaborationOrchestrator, createOrchestrator } from './orchestrator';
+export { TrajectoryScorer, createTrajectoryScorer } from './trajectoryScorer';
+export { StrategyLibrary, createStrategyLibrary, STRATEGY_TEMPLATES } from './strategyLibrary';
+export { FailurePatternLearner, createFailurePatternLearner, isRetryableError, getErrorTypeSeverity } from './failurePatternLearner';
 export type { OrchestratorConfig } from './types';
+export type { Trajectory, TrajectoryStep, TrajectoryScore, ScoreBreakdown, ScoringWeights } from './trajectoryScorer';
+export type { ExecutionStrategy, StrategyContext, StrategyResult, StrategyConfig, RetryPolicy, StrategyCondition } from './strategyLibrary';
+export type { FailureEvent, FailurePattern, PatternAnalysis, FailureErrorType, FailureSeverity, LearningConfig } from './failurePatternLearner';
 
 // ============================================================================
 // Quick Start Example
