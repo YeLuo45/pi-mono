@@ -9,6 +9,8 @@ export interface PlatformMessage {
   from: string
   text: string
   timestamp: number
+  platform?: 'web' | 'telegram' | 'feishu'
+  chatId?: string
 }
 
 export interface AgentState {

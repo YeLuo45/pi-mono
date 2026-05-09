@@ -1,82 +1,129 @@
 /**
  * TelegramAdapter - Telegram platform implementation
  *
- * V69: Skeleton implementation for Telegram Bot API integration
+ * V76: Real Telegram Bot API integration with long polling
  */
 
-import type { PlatformAdapter, PlatformMessage, AgentState } from './PlatformAdapter'
+import type { PlatformAdapter, PlatformMessage } from './PlatformAdapter'
 
-const TELEGRAM_API = 'https://api.telegram.org/bot' + (import.meta.env.VITE_TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '')
+const API_BASE = 'https://api.telegram.org/bot'
 
 export class TelegramAdapter implements PlatformAdapter {
   platform = 'telegram' as const
+  private token: string
   private offset = 0
   private handlers: ((msg: PlatformMessage) => void)[] = []
-  private chatId: string = 'telegram-user'
+  private polling = false
+  private chatId = ''
+
+  constructor() {
+    this.token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || ''
+  }
+
+  private get api(): string {
+    return `${API_BASE}${this.token}`
+  }
+
+  private async getUpdates(): Promise<any[]> {
+    if (!this.token) return []
+    try {
+      const resp = await fetch(`${this.api}/getUpdates?offset=${this.offset}&timeout=10&allowed_updates=message`)
+      const data = await resp.json()
+      return data.ok ? data.result : []
+    } catch (e) {
+      console.error('[Telegram] getUpdates error:', e)
+      return []
+    }
+  }
 
   async sendMessage(text: string): Promise<void> {
-    // Stub: POST to TELEGRAM_API/sendMessage
-    console.log('[Telegram] send:', text)
-    // TODO: Implement actual Telegram API call when bot token is configured
-    if (TELEGRAM_API.includes('undefined') || TELEGRAM_API.endsWith('bot')) {
-      console.log('[Telegram] Bot token not configured, message not sent')
+    if (!this.token) {
+      console.warn('[Telegram] Bot token not configured')
+      return
+    }
+    if (!this.chatId) {
+      console.warn('[Telegram] No chatId set, message not sent')
       return
     }
     try {
-      await fetch(`${TELEGRAM_API}/sendMessage`, {
+      const resp = await fetch(`${this.api}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: this.chatId,
           text,
-          parse_mode: 'MarkdownV2'
-        })
+          parse_mode: 'Markdown',
+        }),
       })
-    } catch (err) {
-      console.error('[Telegram] Failed to send message:', err)
+      const data = await resp.json()
+      if (!data.ok) {
+        console.warn('[Telegram] sendMessage failed:', data.description)
+      }
+    } catch (e) {
+      console.error('[Telegram] sendMessage error:', e)
     }
+  }
+
+  async startPolling(): Promise<void> {
+    if (this.polling) return
+    if (!this.token) {
+      console.warn('[Telegram] Bot token not configured, cannot start polling')
+      return
+    }
+    this.polling = true
+    console.log('[Telegram] Starting long polling...')
+    this.poll().catch(console.error)
+  }
+
+  private async poll(): Promise<void> {
+    while (this.polling) {
+      try {
+        const updates = await this.getUpdates()
+        for (const update of updates) {
+          this.offset = update.update_id + 1
+          if (update.message && update.message.chat) {
+            this.chatId = update.message.chat.id.toString()
+            const msg: PlatformMessage = {
+              id: update.update_id.toString(),
+              text: update.message.text || '',
+              from: update.message.from?.username || update.message.from?.first_name || 'unknown',
+              timestamp: update.message.date * 1000,
+              platform: 'telegram',
+              chatId: this.chatId,
+            }
+            this.handlers.forEach(h => {
+              try { h(msg) } catch (e) { console.error('[Telegram] handler error:', e) }
+            })
+          }
+        }
+      } catch (e) {
+        console.error('[Telegram] poll error:', e)
+      }
+      await new Promise(r => setTimeout(r, 1000))
+    }
+  }
+
+  stopPolling(): void {
+    this.polling = false
   }
 
   onMessage(handler: (msg: PlatformMessage) => void): void {
     this.handlers.push(handler)
   }
 
-  async poll(): Promise<void> {
-    // Long polling: GET TELEGRAM_API/getUpdates?offset=${this.offset}
-    if (!TELEGRAM_API.includes('undefined') && !TELEGRAM_API.endsWith('bot')) {
-      try {
-        const response = await fetch(`${TELEGRAM_API}/getUpdates?offset=${this.offset}&timeout=30`)
-        const data = await response.json() as { ok: boolean; result?: Array<{ update_id: number; message?: { message_id: number; from?: { id: number; first_name: string; username?: string }; chat: { id: number }; date: number; text?: string } }> }
-        if (data.ok && data.result) {
-          for (const update of data.result) {
-            if (update.message) {
-              const msg: PlatformMessage = {
-                id: String(update.message.message_id),
-                from: update.message.from?.first_name || 'Unknown',
-                text: update.message.text || '',
-                timestamp: update.message.date * 1000
-              }
-              this.chatId = String(update.message.chat.id)
-              this.offset = update.update_id + 1
-              this.handlers.forEach(h => h(msg))
-            }
-          }
-        }
-      } catch (err) {
-        console.error('[Telegram] Poll error:', err)
-      }
-    }
+  removeHandler(handler: (msg: PlatformMessage) => void): void {
+    this.handlers = this.handlers.filter(h => h !== handler)
   }
 
   getUserId(): string {
-    return 'telegram-user'
+    return this.chatId || 'telegram-user'
   }
 
   getUsername(): string {
     return 'TelegramUser'
   }
 
-  renderAgentState(state: AgentState): void {
+  renderAgentState(state: { taskCount: number; memoryCount: number }): void {
     this.sendMessage(`Agent状态: ${state.taskCount}任务, ${state.memoryCount}条记忆`)
   }
 }
