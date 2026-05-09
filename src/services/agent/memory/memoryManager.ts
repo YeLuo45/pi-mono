@@ -6,9 +6,10 @@
  */
 
 import type { Message } from '../../../types';
-import { createMemoryContext, type MemoryContext } from './MemoryContext';
+import { createMemoryContext, type MemoryContext, type MemoryEntry } from './MemoryContext';
 import { extractMemoriesFromMessages, extractMemoryFromTaskResult } from './messageHistoryMemory';
 import { loadMessages } from '../../storage/messageStorage';
+import { initMemoryStore, saveMemoryEntry, loadMemoryEntries, clearMemoryEntries } from '../../storage/memoryStorage';
 
 // ============================================================================
 // MemoryManager Singleton
@@ -18,6 +19,21 @@ class MemoryManagerImpl {
   private context: MemoryContext | null = null;
   private messageCount = 0;
   private extractionThreshold = 10; // Extract memories every 10 messages
+  private persistenceEnabled = false;
+
+  /**
+   * Enable cross-session persistence via IndexedDB
+   */
+  async enablePersistence(): Promise<void> {
+    await initMemoryStore();
+    const entries = await loadMemoryEntries();
+    if (this.context) {
+      for (const entry of entries) {
+        this.context.entries.push(entry);
+      }
+    }
+    this.persistenceEnabled = true;
+  }
 
   /**
    * Initialize memory manager with a session ID
@@ -68,8 +84,19 @@ class MemoryManagerImpl {
       for (const memory of memories) {
         const hash = memory.content.toLowerCase().slice(0, 50);
         if (!existingContents.has(hash)) {
-          this.context.add(memory);
+          // Create full entry with id and createdAt
+          const fullEntry: MemoryEntry = {
+            ...memory,
+            id: crypto.randomUUID(),
+            createdAt: Date.now(),
+          };
+          this.context.entries.push(fullEntry);
           existingContents.add(hash);
+          
+          // Persist if enabled
+          if (this.persistenceEnabled) {
+            await saveMemoryEntry(fullEntry);
+          }
         }
       }
     } catch (err) {
@@ -125,6 +152,23 @@ class MemoryManagerImpl {
   clear(): void {
     this.context?.clear();
     this.messageCount = 0;
+  }
+
+  /**
+   * Clear all memories and persistent storage
+   */
+  async clearPersistence(): Promise<void> {
+    this.clear();
+    if (this.persistenceEnabled) {
+      await clearMemoryEntries();
+    }
+  }
+
+  /**
+   * Check if persistence is enabled
+   */
+  isPersistenceEnabled(): boolean {
+    return this.persistenceEnabled;
   }
 }
 
