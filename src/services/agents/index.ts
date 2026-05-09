@@ -1,4 +1,7 @@
 export { agentRegistry } from './agentRegistry'
 export { agentBus } from './agentBus'
+export { orchestratorAgent } from './orchestratorAgent'
+export { executorAgent } from './executorAgent'
+export { reviewerAgent } from './reviewerAgent'
 export type { AgentConfig, AgentMessage, Task } from './types'
 export { AgentType } from './types'
