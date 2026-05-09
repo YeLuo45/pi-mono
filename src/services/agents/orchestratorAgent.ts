@@ -1,5 +1,6 @@
 import { agentRegistry } from './agentRegistry'
 import { agentBus } from './agentBus'
+import { multiAgentStore } from './multiAgentStore'
 import type { AgentMessage, Task, AgentConfig } from './types'
 import { AgentType } from './types'
 
@@ -8,6 +9,7 @@ let taskCounter = 0
 export class OrchestratorAgent {
   private id = 'orchestrator'
   private pendingTasks = new Map<string, Task>()
+  private currentTraceId: string | null = null
 
   constructor() {
     agentBus.subscribe(this.id, this.handleMessage.bind(this))
@@ -29,9 +31,16 @@ export class OrchestratorAgent {
 
   async processUserRequest(input: { message: string }): Promise<void> {
     const parentId = `task-${++taskCounter}`
+    this.currentTraceId = parentId
     const subTasks = this.decomposeTask(parentId, input.message)
 
     subTasks.forEach(t => this.pendingTasks.set(t.id, t))
+
+    // 同步到sessionStorage
+    multiAgentStore.save({
+      traceId: parentId,
+      tasks: Array.from(this.pendingTasks.values()),
+    })
 
     for (const task of subTasks) {
       const executor = this.selectExecutor(task)
@@ -106,8 +115,14 @@ export class OrchestratorAgent {
     task.completedAt = Date.now()
     this.pendingTasks.delete(payload.taskId)
 
+    multiAgentStore.save({
+      traceId: this.currentTraceId || '',
+      tasks: Array.from(this.pendingTasks.values()),
+    })
+
     if (this.pendingTasks.size === 0) {
       console.log('[Orchestrator] All tasks completed')
+      setTimeout(() => multiAgentStore.clear(), 3000)
     }
   }
 
@@ -116,6 +131,10 @@ export class OrchestratorAgent {
     if (task) {
       task.status = 'failed'
       this.pendingTasks.delete(payload.taskId)
+      multiAgentStore.save({
+        traceId: this.currentTraceId || '',
+        tasks: Array.from(this.pendingTasks.values()),
+      })
     }
     console.warn(`[Orchestrator] Task failed: ${payload.error}`)
   }
