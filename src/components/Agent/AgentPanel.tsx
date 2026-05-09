@@ -3,7 +3,7 @@
  * Displayed as a tab in the Sidebar. Shows agent task queue, stats, and controls.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box, Typography, IconButton, Chip, Divider,
@@ -13,10 +13,12 @@ import {
   Add as AddIcon,
   FlashOn as FlashIcon,
   Settings as SettingsIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { TaskQueue } from './TaskQueue';
 import { taskQueue } from '../../services/agent/taskQueue';
 import { agentExecutor } from '../../services/agent/agentExecutor';
+import { memoryManager } from '../../services/agent/memory/memoryManager';
 import { saveTaskQueue } from '../../services/storage/taskStorage';
 import type { Task, TaskPriority } from '../../services/agent/types';
 
@@ -25,6 +27,7 @@ export const AgentPanel: React.FC = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [newGoal, setNewGoal] = useState('');
   const [newPriority, setNewPriority] = useState<TaskPriority>('normal');
+  const [memoryStats, setMemoryStats] = useState({ count: 0, preview: null as string | null });
 
   const handleCreateTask = () => {
     if (!newGoal.trim()) return;
@@ -66,6 +69,21 @@ export const AgentPanel: React.FC = () => {
 
   const stats = taskQueue.getStats();
   const isRunning = taskQueue.isRunning();
+
+  // Update memory stats periodically
+  useEffect(() => {
+    const updateMemoryStats = () => {
+      setMemoryStats(memoryManager.getStats());
+    };
+    updateMemoryStats();
+    const interval = setInterval(updateMemoryStats, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleClearMemory = () => {
+    memoryManager.clear();
+    setMemoryStats({ count: 0, preview: null });
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -218,6 +236,39 @@ export const AgentPanel: React.FC = () => {
             </Typography>
           </Box>
         ))}
+      </Box>
+
+      {/* Memory status bar */}
+      <Box
+        sx={{
+          px: 2,
+          py: 0.75,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          bgcolor: 'rgba(255,255,255,0.02)',
+        }}
+      >
+        <Typography variant="caption" sx={{ fontSize: 10, color: 'text.disabled' }}>
+          {t('agent.memory', '记忆')}: {memoryStats.count}
+        </Typography>
+        {memoryStats.preview && (
+          <Typography
+            variant="caption"
+            sx={{ fontSize: 9, color: 'text.secondary', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
+            {memoryStats.preview}
+          </Typography>
+        )}
+        <IconButton
+          size="small"
+          onClick={handleClearMemory}
+          sx={{ p: 0.25, opacity: memoryStats.count > 0 ? 1 : 0.3 }}
+          disabled={memoryStats.count === 0}
+        >
+          <DeleteIcon sx={{ fontSize: 12 }} />
+        </IconButton>
       </Box>
 
       {/* Task queue */}

@@ -12,6 +12,7 @@ import type { Task, TaskStep } from './types';
 import { taskQueue } from './taskQueue';
 import { chatCompletionWithTools } from '../ai/model-registry-adapter';
 import { pluginRegistry } from '../plugins/pluginRegistry';
+import { memoryManager } from './memory/memoryManager';
 
 // ============================================================================
 // Types
@@ -91,6 +92,12 @@ class AgentExecutorImpl {
         task.status = 'completed';
         task.completedAt = Date.now();
         const summary = this.summarizeTask(task);
+        
+        // Extract memory from completed task
+        memoryManager.extractFromTaskResult(task.id, summary);
+        // Also extract from messages periodically
+        void memoryManager.extractFromMessages();
+        
         this.onTaskComplete?.(task, summary);
       }
     } catch (err) {
@@ -110,10 +117,14 @@ class AgentExecutorImpl {
     goal: string,
     context: Record<string, unknown>
   ): Promise<TaskStep[]> {
+    // Get relevant memories for this goal
+    const memoryContext = memoryManager.getMemoryContextForPrompt(goal, 5);
+    const memorySection = memoryContext ? `\n${memoryContext}\n` : '';
+
     const messages = [
       {
         role: 'user' as const,
-        content: `分解以下目标为具体执行步骤。返回JSON数组，每步包含 description 和 toolName（如需要）:\n\n目标: ${goal}\n上下文: ${JSON.stringify(context)}`,
+        content: `分解以下目标为具体执行步骤。返回JSON数组，每步包含 description 和 toolName（如需要）:${memorySection}\n\n目标: ${goal}\n上下文: ${JSON.stringify(context)}`,
       },
     ];
 
@@ -159,19 +170,27 @@ class AgentExecutorImpl {
     step: TaskStep,
     context: Record<string, unknown>
   ): Promise<string> {
+    // Get relevant memories for this step
+    const memoryContext = memoryManager.getMemoryContextForPrompt(step.description, 3);
+    const memorySection = memoryContext ? `\n${memoryContext}\n` : '';
+
     if (step.toolName) {
       const pluginResult = await pluginRegistry.tryExecute(
         step.toolName,
         step.toolArgs || {}
       );
-      if (pluginResult) return pluginResult;
+      if (pluginResult) {
+        // Extract memory from task result after tool execution
+        memoryManager.extractFromTaskResult(step.id, pluginResult);
+        return pluginResult;
+      }
     }
 
     // Fallback: LLM reasoning step
     const messages = [
       {
         role: 'user' as const,
-        content: `执行步骤: ${step.description}\n上下文: ${JSON.stringify(context)}\n请执行并返回结果简述。`,
+        content: `执行步骤: ${step.description}${memorySection}\n上下文: ${JSON.stringify(context)}\n请执行并返回结果简述。`,
       },
     ];
 
