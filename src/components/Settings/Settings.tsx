@@ -38,6 +38,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   zhipu: 'Zhipu (GLM)',
   qwen: 'Qwen (Alibaba)',
   gemini: 'Google Gemini',
+  feishu: 'Feishu (Lark)',
   'azure-openai': 'Azure OpenAI',
   custom: 'Custom Endpoint',
 };
@@ -1635,6 +1636,7 @@ export const Settings: React.FC = () => {
                   <MenuItem value="xiaomi">{PROVIDER_LABELS.xiaomi}</MenuItem>
                   <MenuItem value="zhipu">{PROVIDER_LABELS.zhipu}</MenuItem>
                   <MenuItem value="qwen">{PROVIDER_LABELS.qwen}</MenuItem>
+                  <MenuItem value="feishu">{PROVIDER_LABELS.feishu}</MenuItem>
                 </Select>
               </FormControl>
 

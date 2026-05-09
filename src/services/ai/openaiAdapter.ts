@@ -140,6 +140,7 @@ export const PROVIDER_BASE_URLS: Record<string, string> = {
   xiaomi: 'https://api.mimi.io/v1',
   zhipu: 'https://open.bigmodel.cn/api/paas/v4',
   qwen: 'https://dashscope.aliyuncs.com/api/v1',
+  feishu: 'https://open.feishu.cn/open-apis',
   'azure-openai': '',
   custom: '',
 };

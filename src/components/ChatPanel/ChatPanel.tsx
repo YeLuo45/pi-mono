@@ -28,7 +28,7 @@ import { getIntimacyLevel } from '../../store';
 import { checkAndTagImportantMessage } from '../../services/summary/dailySummary';
 import { checkAndCreateMilestones } from '../../services/milestone/milestoneTracker';
 import { isGoalOriented, createTaskFromGoal, executeTask } from '../../services/agent/taskPlanner';
-import { shouldUsePlanningMode, estimateStepCount } from '../../services/agent/planningUtils';
+import { shouldUsePlanningMode } from '../../services/agent/planningUtils';
 import { TaskConfirmDialog } from '../Agent/TaskConfirmDialog';
 import type { Task as AgentTask } from '../../services/agent/types';
 import { SpeechButton } from '../ChatInput/SpeechButton';
@@ -782,18 +782,15 @@ export const ChatPanel: React.FC = () => {
     if (isGoalOriented(userMsg)) {
       console.log('[AgentChat] Goal-oriented intent detected:', userMsg);
       
-      // Estimate steps first
-      const estimatedSteps = estimateStepCount(userMsg);
-      
-      // Determine if planning mode should be used
-      const planningDecision = shouldUsePlanningMode(userMsg, estimatedSteps);
-      
       try {
         // Create task from the goal
         const agentTask: AgentTask = await createTaskFromGoal(userMsg, { personaId: activePersonaId });
         
+        // Determine if planning mode should be used
+        const shouldUsePlanning = shouldUsePlanningMode(userMsg) || agentTask.steps.length > 3;
+        
         // Check if this is a long task that should use planning mode
-        if (planningDecision.usePlanningMode || agentTask.steps.length > 3) {
+        if (shouldUsePlanning) {
           console.log('[AgentChat] Using planning mode for task with', agentTask.steps.length, 'steps');
           
           // Add a system message showing agent is activated

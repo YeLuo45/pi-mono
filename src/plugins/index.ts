@@ -5,6 +5,7 @@ import { calendarPlugin } from '../services/plugin/CalendarPlugin';
 import { emailPlugin } from '../services/plugin/EmailPlugin';
 import { WeatherPlugin } from '../services/plugin/WeatherPlugin';
 import { NewsPlugin } from '../services/plugin/NewsPlugin';
+import { telegramPlugin } from '../services/plugin/TelegramPlugin';
 import { WebhookService } from '../services/webhook/WebhookService';
 
 // All available plugins (built-in + optional)
@@ -14,15 +15,17 @@ export const ALL_PLUGINS = [
   emailPlugin,
   WeatherPlugin,
   NewsPlugin,
+  telegramPlugin,
 ];
 
 // Plugin IDs that are pre-installed (always registered)
-export const BUILTIN_PLUGIN_IDS = ['todo', 'calendar', 'email'];
+export const BUILTIN_PLUGIN_IDS = ['todo', 'calendar', 'email', 'telegram'];
 
 export function registerBuiltinPlugins(): void {
   PluginService.register(todoPlugin);
   PluginService.register(calendarPlugin);
   PluginService.register(emailPlugin);
+  PluginService.register(telegramPlugin);
 }
 
 export async function registerOptionalPlugins(): Promise<void> {

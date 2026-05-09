@@ -81,6 +81,7 @@ export const PROVIDER_BASE_URLS: Record<string, string> = {
   zhipu: 'https://open.bigmodel.cn/api/paas/v4',
   qwen: 'https://dashscope.aliyuncs.com/api/v1',
   gemini: 'https://generativelanguage.googleapis.com/v1beta',
+  feishu: 'https://open.feishu.cn/open-apis',
   'azure-openai': '',
 };
 
@@ -93,6 +94,7 @@ export const PROVIDER_LABELS: Record<string, string> = {
   zhipu: 'Zhipu (GLM)',
   qwen: 'Qwen (Alibaba)',
   gemini: 'Google Gemini',
+  feishu: 'Feishu (Lark)',
   'azure-openai': 'Azure OpenAI',
   custom: 'Custom Endpoint',
 };
@@ -383,6 +385,7 @@ async function callModel(
     case 'zhipu':
     case 'xiaomi':
     case 'qwen':
+    case 'feishu':
     case 'azure-openai':
       return callOpenAICompatible(config, messages, options);
     case 'gemini':

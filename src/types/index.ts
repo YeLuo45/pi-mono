@@ -8,7 +8,7 @@ export type PersonaRole =
   | 'Coder';
 
 export interface AIConfig {
-  provider: 'openai' | 'anthropic' | 'azure-openai' | 'custom' | 'minimax' | 'xiaomi' | 'zhipu' | 'qwen';
+  provider: 'openai' | 'anthropic' | 'azure-openai' | 'custom' | 'minimax' | 'xiaomi' | 'zhipu' | 'qwen' | 'feishu';
   apiKey: string;
   baseURL?: string;
   model: string;
