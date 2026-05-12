@@ -1,6 +1,6 @@
 /**
- * V78: SkillStorePage
- * Main Skill Marketplace page at /skill-store route.
+ * V85: SkillStorePage
+ * Main Skill Marketplace page with enhanced rating, version, and dependency features.
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -21,6 +21,7 @@ import {
   sortCommunitySkills,
   addSkillRating,
 } from '../services/marketplace/marketplaceService';
+import { getAverageRating, getRatingsCount, getCallCount, incrementCallCount } from '../services/marketplace/SkillRatingService';
 import { useStore } from '../store';
 
 export const SkillStorePage: React.FC = () => {
@@ -32,12 +33,12 @@ export const SkillStorePage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<SkillCategory | 'all'>('all');
   const [sortBy, setSortBy] = useState<'popular' | 'rating' | 'newest'>('popular');
   const [installedSkillIds, setInstalledSkillIds] = useState<Set<string>>(new Set());
-  
+
   // Dialogs
   const [selectedSkill, setSelectedSkill] = useState<MarketplaceSkill | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-  
+
   // Toast
   const [toast, setToast] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
@@ -52,7 +53,7 @@ export const SkillStorePage: React.FC = () => {
       try {
         const communitySkills = getCommunitySkills();
         setSkills(communitySkills);
-        
+
         // Check which skills are installed
         const installed = new Set<string>();
         for (const skill of communitySkills) {
@@ -123,6 +124,29 @@ export const SkillStorePage: React.FC = () => {
     setSortBy(sort);
   }, []);
 
+  // Reload skills after version change (rollback, etc.)
+  const handleVersionChange = useCallback(() => {
+    // Force refresh the installed skill states
+    const loadData = async () => {
+      const communitySkills = getCommunitySkills();
+      setSkills(communitySkills);
+      const installed = new Set<string>();
+      for (const skill of communitySkills) {
+        if (await isSkillInstalled(skill.id)) {
+          installed.add(skill.id);
+        }
+      }
+      setInstalledSkillIds(installed);
+    };
+    void loadData();
+  }, []);
+
+  // Get enhanced stats for display
+  const getSkillDisplayRating = (skillId: string, avgRating: number) => {
+    const userRating = getAverageRating(skillId);
+    return userRating > 0 ? userRating : avgRating;
+  };
+
   return (
     <Box
       sx={{
@@ -139,14 +163,14 @@ export const SkillStorePage: React.FC = () => {
           onSearchChange={setSearchQuery}
           skillCount={filteredSkills.length}
         />
-        
+
         {/* Sort Tabs */}
         <Box sx={{ px: 3, py: 1, bgcolor: '#FFFFFF', borderBottom: '1px solid #F1F5F9' }}>
           <Stack direction="row" spacing={2}>
             {[
-              { key: 'popular', label: '最热门' },
-              { key: 'rating', label: '评分最高' },
-              { key: 'newest', label: '最新' },
+              { key: 'popular', label: '最热门', icon: '🔥' },
+              { key: 'rating', label: '评分最高', icon: '⭐' },
+              { key: 'newest', label: '最新', icon: '✨' },
             ].map((sort) => (
               <Box
                 key={sort.key}
@@ -166,7 +190,7 @@ export const SkillStorePage: React.FC = () => {
                     color: sortBy === sort.key ? '#6366F1' : '#64748B',
                   }}
                 >
-                  {sort.label}
+                  {sort.icon} {sort.label}
                 </Typography>
               </Box>
             ))}
@@ -239,6 +263,7 @@ export const SkillStorePage: React.FC = () => {
         isInstalled={selectedSkill ? installedSkillIds.has(selectedSkill.id) : false}
         onInstall={handleInstall}
         onReview={handleReviewClick}
+        onVersionChange={handleVersionChange}
       />
 
       {/* Review Dialog */}

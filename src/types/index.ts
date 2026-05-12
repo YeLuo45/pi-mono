@@ -1,5 +1,6 @@
 // Core types for PixelPal
 
+export * from './skill';
 export type PersonaRole =
   | 'MemoryExpert'
   | 'EmotionAnalyst'

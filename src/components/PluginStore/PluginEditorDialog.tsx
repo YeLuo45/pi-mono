@@ -1,9 +1,9 @@
 /**
- * PluginEditorDialog — V62 Plugin Market Editor
+ * V85: PluginEditorDialog
+ * Enhanced modal for creating and editing plugins/skills with version history and dependencies.
  *
- * Modal dialog for creating and editing user-installed plugins.
- * Allows setting manifest fields (name, icon, description, author, permissions)
- * and managing actions (id, name, params).
+ * V62: Original plugin editing with manifest and actions.
+ * V85: Added version bumping, version history, and dependency management.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -22,22 +22,45 @@ import {
   Divider,
   useMediaQuery,
   Alert,
+  Collapse,
+  List,
+  ListItem,
+  ListItemText,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Tooltip,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
   Close as CloseIcon,
+  History as HistoryIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+  Warning as WarningIcon,
+  CallSplit as DepsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import type { Plugin, PluginAction } from '../../types/plugin';
 import { pluginRegistry } from '../../services/plugins/pluginRegistry';
 import * as pluginStorage from '../../services/storage/pluginStorage';
+import { recordInitialVersion, getVersionHistory, bumpSkillVersion, updateSkillVersion } from '../../services/marketplace/SkillVersionManager';
+import { getSkillDependencies, addSkillDependency, removeSkillDependency, validateNewDependency, detectCircularDependencies } from '../../services/marketplace/SkillDependencyResolver';
+import type { SkillDependency } from '../../types/skill';
+import { skillRegistry } from '../../services/skills/skillRegistry';
 
 interface ActionInput {
   id: string;
   name: string;
   params: string;
+}
+
+interface DependencyInput {
+  skillId: string;
+  versionRange: string;
 }
 
 interface PluginEditorDialogProps {
@@ -70,21 +93,45 @@ export const PluginEditorDialog: React.FC<PluginEditorDialogProps> = ({
   // Actions
   const [actions, setActions] = useState<ActionInput[]>([]);
 
+  // V85: Version & Dependencies
+  const [version, setVersion] = useState('1.0.0');
+  const [changelog, setChangelog] = useState('');
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [versionHistory, setVersionHistory] = useState<Array<{ version: string; changelog: string; createdAt: number }>>([]);
+  const [dependencies, setDependencies] = useState<DependencyInput[]>([]);
+  const [showDependencies, setShowDependencies] = useState(false);
+  const [depInputSkillId, setDepInputSkillId] = useState('');
+  const [depInputRange, setDepInputRange] = useState('^1.0.0');
+  const [depError, setDepError] = useState('');
+
   // Error / saving state
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // All available skills for dependency dropdown
+  const [availableSkills, setAvailableSkills] = useState<Array<{ id: string; name: string; version: string }>>([]);
 
   // Reset form when dialog opens with a plugin (or for new)
   useEffect(() => {
     if (open) {
       setError('');
       setSaving(false);
+      setChangelog('');
+      setShowVersionHistory(false);
+      setShowDependencies(false);
+      setDepError('');
+
+      // Get all available skills for dependency selection
+      const allSkills = skillRegistry.getAllSkills();
+      setAvailableSkills(allSkills.map((s) => ({ id: s.id, name: s.name, version: s.version })));
+
       if (editingPlugin) {
         setName(editingPlugin.name);
         setIcon(editingPlugin.icon);
         setDescription(editingPlugin.description);
         setAuthor(editingPlugin.author);
         setPermissions([...editingPlugin.permissions]);
+        setVersion(editingPlugin.version);
         setActions(
           editingPlugin.actions.map((a) => ({
             id: a.id,
@@ -92,15 +139,28 @@ export const PluginEditorDialog: React.FC<PluginEditorDialogProps> = ({
             params: a.params.join(', '),
           }))
         );
+
+        // Load version history
+        const history = getVersionHistory(editingPlugin.id);
+        setVersionHistory(history);
+
+        // Load dependencies
+        const deps = getSkillDependencies(editingPlugin.id);
+        setDependencies(deps.map((d) => ({ skillId: d.skillId, versionRange: d.versionRange })));
       } else {
         setName('');
         setIcon('🧩');
         setDescription('');
         setAuthor('');
         setPermissions([]);
+        setVersion('1.0.0');
         setActions([{ ...DEFAULT_ACTION }]);
+        setVersionHistory([]);
+        setDependencies([]);
       }
       setPermInput('');
+      setDepInputSkillId('');
+      setDepInputRange('^1.0.0');
     }
   }, [open, editingPlugin]);
 
@@ -130,6 +190,36 @@ export const PluginEditorDialog: React.FC<PluginEditorDialogProps> = ({
     setActions(
       actions.map((a, i) => (i === index ? { ...a, [field]: value } : a))
     );
+  };
+
+  // --- V85: Dependencies ---
+  const addDependency = () => {
+    if (!depInputSkillId.trim()) {
+      setDepError('请选择依赖的技能');
+      return;
+    }
+
+    // Check for circular dependency
+    const validation = validateNewDependency(editingPlugin?.id ?? `temp-${Date.now()}`, depInputSkillId);
+    if (!validation.valid) {
+      setDepError(`循环依赖检测: ${validation.circularPath?.join(' → ')}`);
+      return;
+    }
+
+    // Check if already added
+    if (dependencies.some((d) => d.skillId === depInputSkillId)) {
+      setDepError('该依赖已添加');
+      return;
+    }
+
+    setDependencies([...dependencies, { skillId: depInputSkillId, versionRange: depInputRange }]);
+    setDepInputSkillId('');
+    setDepInputRange('^1.0.0');
+    setDepError('');
+  };
+
+  const removeDependency = (skillId: string) => {
+    setDependencies(dependencies.filter((d) => d.skillId !== skillId));
   };
 
   // --- Validation ---
@@ -165,7 +255,7 @@ export const PluginEditorDialog: React.FC<PluginEditorDialogProps> = ({
         id: editingPlugin?.id ?? `user-plugin-${Date.now()}`,
         name: name.trim(),
         icon: icon.trim(),
-        version: editingPlugin?.version ?? '1.0.0',
+        version: version,
         author: author.trim() || 'User',
         description: description.trim(),
         enabled: editingPlugin?.enabled ?? true,
@@ -176,8 +266,33 @@ export const PluginEditorDialog: React.FC<PluginEditorDialogProps> = ({
       // Save to IndexedDB
       await pluginStorage.savePlugin(plugin);
 
-      // Register in memory (if not already from loadPlugins)
+      // Register in memory
       pluginRegistry.registerUserPlugin(plugin);
+
+      // V85: Record version and save dependencies
+      const isNew = !editingPlugin;
+      if (isNew) {
+        await recordInitialVersion({
+          ...plugin,
+          systemPrompt: '',
+          examplePrompts: [],
+          requiredContext: [],
+          optionalContext: [],
+          maxSteps: 5,
+          showSteps: false,
+          chatTriggerable: false,
+          chatKeywords: [],
+          order: 999,
+        } as any);
+      } else if (changelog.trim()) {
+        // Record version bump/update
+        await updateSkillVersion(plugin.id, version, changelog.trim());
+      }
+
+      // Save dependencies
+      for (const dep of dependencies) {
+        addSkillDependency(plugin.id, dep);
+      }
 
       onSaved?.(plugin);
       onClose();
@@ -186,6 +301,26 @@ export const PluginEditorDialog: React.FC<PluginEditorDialogProps> = ({
     } finally {
       setSaving(false);
     }
+  };
+
+  // --- Version Bump ---
+  const handleVersionBump = (type: 'major' | 'minor' | 'patch') => {
+    const parts = version.split('.').map(Number);
+    const [maj, min, pat] = [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0];
+    let newVersion = version;
+    switch (type) {
+      case 'major':
+        newVersion = `${maj + 1}.0.0`;
+        break;
+      case 'minor':
+        newVersion = `${maj}.${min + 1}.0`;
+        break;
+      case 'patch':
+        newVersion = `${maj}.${min}.${pat + 1}`;
+        break;
+    }
+    setVersion(newVersion);
+    setChangelog(`${type === 'major' ? 'Breaking changes' : type === 'minor' ? 'New features' : 'Bug fixes'}`);
   };
 
   return (
@@ -228,6 +363,12 @@ export const PluginEditorDialog: React.FC<PluginEditorDialogProps> = ({
         {error && (
           <Alert severity="error" onClose={() => setError('')}>
             {error}
+          </Alert>
+        )}
+
+        {depError && (
+          <Alert severity="warning" onClose={() => setDepError('')}>
+            {depError}
           </Alert>
         )}
 
@@ -279,6 +420,122 @@ export const PluginEditorDialog: React.FC<PluginEditorDialogProps> = ({
 
         <Divider />
 
+        {/* V85: Version Management */}
+        {editingPlugin && (
+          <>
+            <Box>
+              <Box
+                onClick={() => setShowVersionHistory(!showVersionHistory)}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  cursor: 'pointer',
+                  py: 0.5,
+                  '&:hover': { bgcolor: 'rgba(0,0,0,0.02)' },
+                  borderRadius: 1,
+                  px: 1,
+                }}
+              >
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <HistoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                  <Typography variant="caption" sx={{ fontSize: 12, fontWeight: 600, color: 'text.primary' }}>
+                    版本管理
+                  </Typography>
+                  <Chip label={`v${version}`} size="small" sx={{ height: 18, fontSize: 10, bgcolor: 'rgba(99,102,241,0.1)', color: '#6366F1' }} />
+                </Stack>
+                {showVersionHistory ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
+              </Box>
+
+              <Collapse in={showVersionHistory}>
+                <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  {/* Version bump buttons */}
+                  <Stack direction="row" spacing={1}>
+                    {(['patch', 'minor', 'major'] as const).map((type) => (
+                      <Button
+                        key={type}
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleVersionBump(type)}
+                        sx={{
+                          flex: 1,
+                          height: 28,
+                          fontSize: 10,
+                          borderColor: '#E5E7EB',
+                          color: '#64748B',
+                          textTransform: 'none',
+                          '&:hover': { borderColor: '#CBD5E1' },
+                        }}
+                      >
+                        +{type === 'major' ? '1.0.0' : type === 'minor' ? '0.1.0' : '0.0.1'}
+                      </Button>
+                    ))}
+                  </Stack>
+
+                  {/* Current version display */}
+                  <TextField
+                    label="版本号"
+                    value={version}
+                    onChange={(e) => setVersion(e.target.value)}
+                    size="small"
+                    fullWidth
+                    inputProps={{ maxLength: 20 }}
+                    helperText="语义化版本号，如 1.0.0"
+                    sx={{ '& .MuiInputBase-input': { fontFamily: 'monospace' } }}
+                  />
+
+                  {/* Changelog */}
+                  <TextField
+                    label="更新日志"
+                    value={changelog}
+                    onChange={(e) => setChangelog(e.target.value)}
+                    size="small"
+                    fullWidth
+                    multiline
+                    minRows={2}
+                    maxRows={4}
+                    placeholder="描述此版本的更新内容..."
+                    inputProps={{ maxLength: 500 }}
+                  />
+
+                  {/* Version history list */}
+                  {versionHistory.length > 0 && (
+                    <Box>
+                      <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', display: 'block', mb: 0.5 }}>
+                        历史版本
+                      </Typography>
+                      <Stack spacing={0.5}>
+                        {[...versionHistory].reverse().slice(0, 5).map((v) => (
+                          <Box
+                            key={v.version}
+                            sx={{
+                              px: 1,
+                              py: 0.5,
+                              bgcolor: 'rgba(0,0,0,0.02)',
+                              borderRadius: 1,
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <Typography variant="caption" sx={{ fontSize: 11, fontFamily: 'monospace' }}>
+                              v{v.version}
+                            </Typography>
+                            <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary' }}>
+                              {new Date(v.createdAt).toLocaleDateString('zh-CN')}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Stack>
+                    </Box>
+                  )}
+                </Box>
+              </Collapse>
+            </Box>
+
+            <Divider />
+          </>
+        )}
+
         {/* Permissions */}
         <Box>
           <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>
@@ -313,6 +570,123 @@ export const PluginEditorDialog: React.FC<PluginEditorDialogProps> = ({
               />
             ))}
           </Box>
+        </Box>
+
+        <Divider />
+
+        {/* V85: Dependencies */}
+        <Box>
+          <Box
+            onClick={() => setShowDependencies(!showDependencies)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              py: 0.5,
+              '&:hover': { bgcolor: 'rgba(0,0,0,0.02)' },
+              borderRadius: 1,
+              px: 1,
+            }}
+          >
+            <Stack direction="row" spacing={1} alignItems="center">
+              <DepsIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+              <Typography variant="caption" sx={{ fontSize: 12, fontWeight: 600, color: 'text.primary' }}>
+                技能依赖
+              </Typography>
+              {dependencies.length > 0 && (
+                <Chip label={`${dependencies.length}`} size="small" sx={{ height: 16, fontSize: 9, bgcolor: 'rgba(99,102,241,0.1)', color: '#6366F1' }} />
+              )}
+            </Stack>
+            {showDependencies ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
+          </Box>
+
+          <Collapse in={showDependencies}>
+            <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {/* Add dependency row */}
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <FormControl size="small" sx={{ flex: 2 }}>
+                  <InputLabel>技能</InputLabel>
+                  <Select
+                    value={depInputSkillId}
+                    onChange={(e) => setDepInputSkillId(e.target.value)}
+                    label="技能"
+                  >
+                    {availableSkills.map((s) => (
+                      <MenuItem key={s.id} value={s.id} dense>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontSize: 12 }}>{s.name}</Typography>
+                          <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary' }}>v{s.version}</Typography>
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  size="small"
+                  label="版本范围"
+                  value={depInputRange}
+                  onChange={(e) => setDepInputRange(e.target.value)}
+                  sx={{ flex: 1 }}
+                  inputProps={{ maxLength: 20 }}
+                  placeholder="^1.0.0"
+                />
+                <Button size="small" variant="outlined" onClick={addDependency} sx={{ alignSelf: 'center' }}>
+                  添加
+                </Button>
+              </Box>
+
+              {/* Circular dependency warning */}
+              {dependencies.length > 0 && editingPlugin && (
+                (() => {
+                  const circular = detectCircularDependencies(editingPlugin.id);
+                  if (circular.length === 0) return null;
+                  return (
+                    <Alert severity="error" sx={{ py: 0.5 }}>
+                      <Typography variant="caption" sx={{ fontSize: 11 }}>
+                        循环依赖: {circular.join(' → ')}
+                      </Typography>
+                    </Alert>
+                  );
+                })()
+              )}
+
+              {/* Dependency list */}
+              {dependencies.length > 0 && (
+                <Stack spacing={0.5}>
+                  {dependencies.map((dep) => (
+                    <Box
+                      key={dep.skillId}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        px: 1.5,
+                        py: 0.75,
+                        bgcolor: 'rgba(0,0,0,0.02)',
+                        borderRadius: 1,
+                        border: '1px solid rgba(0,0,0,0.06)',
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ fontSize: 11, fontWeight: 600, flex: 1 }}>
+                        {dep.skillId}
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', fontFamily: 'monospace' }}>
+                        {dep.versionRange}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={() => removeDependency(dep.skillId)}
+                        sx={{ color: 'error.main', p: 0.25 }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  ))}
+                </Stack>
+              )}
+            </Box>
+          </Collapse>
         </Box>
 
         <Divider />
