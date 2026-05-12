@@ -1,11 +1,12 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Typography, Tooltip, Divider } from '@mui/material';
-import { Chat as ChatIcon, CalendarMonth as CalendarIcon, CheckBox as TaskIcon, Description as DocIcon, Email as EmailIcon, Edit as WriteIcon, Settings as SettingsIcon, Group as GroupIcon, Psychology as KnowledgeIcon, Extension as PluginIcon, Memory as MemoryIcon, BarChart as AnalyticsIcon, Hub as GraphIcon, AutoAwesome as ScenesIcon, FlashOn as AgentIcon } from '@mui/icons-material';
+import { Chat as ChatIcon, CalendarMonth as CalendarIcon, CheckBox as TaskIcon, Description as DocIcon, Email as EmailIcon, Edit as WriteIcon, Settings as SettingsIcon, Group as GroupIcon, Psychology as KnowledgeIcon, Extension as PluginIcon, Memory as MemoryIcon, BarChart as AnalyticsIcon, Hub as GraphIcon, AutoAwesome as ScenesIcon, FlashOn as AgentIcon, PsychologyAlt as MultiAgentIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
 import { PluginService } from '../../services/plugin/PluginService';
 import { useTranslation } from 'react-i18next';
 import { PersonaSelector } from '../Persona/PersonaSelector';
+import { MultiAgentPanel } from '../Agent/MultiAgentPanel';
 
 const NAV_ITEMS = [
   { id: 'chat', labelKey: 'nav.chat', icon: ChatIcon },
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { id: 'graph', labelKey: 'nav.graph', icon: GraphIcon },
   { id: 'scenes', labelKey: 'nav.scenes', icon: ScenesIcon },
   { id: 'agent', labelKey: 'nav.agent', icon: AgentIcon },
+  { id: 'multiagent', labelKey: 'nav.multiAgent', icon: MultiAgentIcon },
   { id: 'settings', labelKey: 'nav.settings', icon: SettingsIcon },
 ] as const;
 
@@ -37,6 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const setActivePluginId = useStore((s) => s.setActivePluginId);
 
   const isKnowledgeRoute = location.pathname === '/knowledge';
+  const [multiAgentOpen, setMultiAgentOpen] = React.useState(false);
 
   const handleNavClick = (panelId: typeof activePanel) => {
     if (panelId === 'knowledge') {
@@ -49,6 +52,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
     } else if ((panelId as string) === 'graph') {
       // RelationGraph is a dialog, not a panel — fire event to open it
       window.dispatchEvent(new CustomEvent('pixelpal:openRelationGraph'));
+    } else if ((panelId as string) === 'multiagent') {
+      // Open multi-agent panel
+      setMultiAgentOpen(true);
     } else {
       setActivePanel(panelId);
     }
@@ -214,6 +220,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
           </Box>
         </Tooltip>
       </Box>
+
+      {/* Multi-Agent Panel */}
+      <MultiAgentPanel />
     </Box>
   );
 };

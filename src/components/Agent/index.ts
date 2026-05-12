@@ -1,3 +1,4 @@
-export { TaskCard } from './TaskCard';
-export { TaskQueue } from './TaskQueue';
-export { AgentPanel } from './AgentPanel';
+// V83 Agent Components Index
+export { MultiAgentPanel } from './MultiAgentPanel'
+export { TaskBoardModal } from './TaskBoardModal'
+export { AgentThoughtBubble } from './AgentThoughtBubble'

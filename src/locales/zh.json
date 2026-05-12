@@ -21,6 +21,7 @@
     "analytics": "数据分析",
     "scenes": "场景",
     "agent": "Agent",
+    "multiAgent": "多Agent",
     "graph": "关系图谱",
     "relationGraph": "关系图谱",
     "graphTitle": "关系图谱",

@@ -21,6 +21,7 @@
     "analytics": "Analytics",
     "scenes": "Scenes",
     "agent": "Agent",
+    "multiAgent": "Multi-Agent",
     "graph": "Relation Graph",
     "relationGraph": "Relation Graph",
     "graphTitle": "Relation Graph",
