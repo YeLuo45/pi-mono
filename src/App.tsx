@@ -5,6 +5,7 @@ import { MainPage } from './pages/MainPage';
 import { SkillStorePage } from './pages/SkillStorePage';
 import { SkillDevPage } from './pages/SkillDevPage';
 import { ProvidersPage } from './pages/ProvidersPage';
+import { KnowledgePage } from './pages/KnowledgePage';
 import { useStore } from './store';
 import { initCompanion } from './services/companion';
 import { compactMemory } from './services/memory';
@@ -1101,6 +1102,7 @@ function App() {
             <Route path="/skill-store/:category" element={<SkillStorePage />} />
             <Route path="/skill-dev" element={<SkillDevPage />} />
             <Route path="/settings/providers" element={<ProvidersPage />} />
+            <Route path="/knowledge" element={<KnowledgePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Box>

@@ -11,6 +11,7 @@ import { CollaborationStatus } from '../Collaboration/CollaborationStatus';
 import { chatCompletion, chatCompletionWithTools, initModelRegistry, getDefaultModel } from '../../services/ai/model-registry-adapter';
 import { injectCompanionContext, autoSummarizeChat, adjustMoodForInteraction } from '../../services/companion';
 import { queryKnowledgeBase, buildRAGContext, isDocumentIndexed, reindexAllDocuments } from '../../services/rag';
+import { buildRAGContext as buildKnowledgeRAGContext, retrieve as retrieveFromKnowledge } from '../../services/rag/knowledgeBase';
 import { voiceService } from '../../services/voice/voiceService';
 import { detectEmotion, type EmotionState } from '../../services/voice/emotionDetector';
 import { addVoiceEmotionLog } from '../../services/emotion/emotionStorage';
@@ -1000,9 +1001,10 @@ export const ChatPanel: React.FC = () => {
 
       const messagesWithContext = await injectCompanionContext(apiMessages, { emotionContext, personaSystemPrompt: personaSystemPrompt + intimacyPrompt });
 
-      // RAG Enhancement
+      // RAG Enhancement (V82: Knowledge Base RAG)
       let ragContext = '';
       try {
+        // 1. Existing document RAG
         const docs = useStore.getState().documents;
         if (docs.length > 0) {
           const needsReindex = docs.some(doc => !isDocumentIndexed(doc.id));
@@ -1011,8 +1013,22 @@ export const ChatPanel: React.FC = () => {
           }
           const ragResults = queryKnowledgeBase({ query: userMsg, topK: 3, minScore: 0.5 });
           if (ragResults.chunks.length > 0) {
-            ragContext = buildRAGContext(ragResults, 2000);
+            ragContext += buildRAGContext(ragResults, 1000);
           }
+        }
+        
+        // 2. New Knowledge Base RAG (V82)
+        try {
+          const knowledgeResults = await retrieveFromKnowledge(userMsg, 3);
+          if (knowledgeResults.length > 0) {
+            const knowledgeContext = await buildKnowledgeRAGContext(userMsg, messages.map(m => ({ role: m.role, content: m.content })));
+            if (knowledgeContext) {
+              if (ragContext) ragContext += '\n\n';
+              ragContext += knowledgeContext;
+            }
+          }
+        } catch (kbErr) {
+          console.warn('[KnowledgeBase] RAG query failed:', kbErr);
         }
       } catch (ragErr) {
         console.warn('[RAG] Knowledge base query failed:', ragErr);

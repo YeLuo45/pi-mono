@@ -150,7 +150,7 @@ export function queryKnowledgeBase(options: RAGQueryOptions): RAGQueryResult {
 /**
  * Build a RAG-enhanced context string from query results
  */
-export function buildRAGContext(queryResults: RAGQueryResult, maxContextLength = 3000): string {
+export function buildLegacyRAGContext(queryResults: RAGQueryResult, maxContextLength = 3000): string {
   const { chunks } = queryResults;
 
   if (chunks.length === 0) {

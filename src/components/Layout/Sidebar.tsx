@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Typography, Tooltip, Divider } from '@mui/material';
 import { Chat as ChatIcon, CalendarMonth as CalendarIcon, CheckBox as TaskIcon, Description as DocIcon, Email as EmailIcon, Edit as WriteIcon, Settings as SettingsIcon, Group as GroupIcon, Psychology as KnowledgeIcon, Extension as PluginIcon, Memory as MemoryIcon, BarChart as AnalyticsIcon, Hub as GraphIcon, AutoAwesome as ScenesIcon, FlashOn as AgentIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
@@ -29,12 +30,20 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const activePanel = useStore((s) => s.activePanel);
   const setActivePanel = useStore((s) => s.setActivePanel);
   const setActivePluginId = useStore((s) => s.setActivePluginId);
 
+  const isKnowledgeRoute = location.pathname === '/knowledge';
+
   const handleNavClick = (panelId: typeof activePanel) => {
-    if (panelId === 'plugin') {
+    if (panelId === 'knowledge') {
+      // Navigate to the dedicated knowledge page route
+      navigate('/knowledge');
+      setActivePanel('knowledge');
+    } else if (panelId === 'plugin') {
       setActivePanel(panelId);
       setActivePluginId(null);
     } else if ((panelId as string) === 'graph') {
@@ -85,7 +94,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 0.5, px: 1 }}>
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
-          const isActive = (activePanel as string) === item.id;
+          const isActive = item.id === 'knowledge' 
+            ? isKnowledgeRoute 
+            : (activePanel as string) === item.id;
           return (
             <Tooltip key={item.id} title="" placement="right">
               <Box
