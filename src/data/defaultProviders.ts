@@ -53,6 +53,15 @@ export const DEFAULT_PROVIDERS: ProviderDefinition[] = [
     supportsEmbeddings: true,
   },
   {
+    id: 'minimax',
+    name: 'MiniMax',
+    icon: '🔮',
+    description: 'MiniMax - Chinese AI startup with abstr5 model',
+    models: ['abstr5', 'chatany'],
+    defaultModel: 'abstr5',
+    supportsEmbeddings: true,
+  },
+  {
     id: 'custom',
     name: 'Custom',
     icon: '🔧',
@@ -69,6 +78,7 @@ export const PROVIDER_BASE_URLS: Record<string, string> = {
   gemini: 'https://generativelanguage.googleapis.com/v1beta',
   siliconflow: 'https://api.siliconflow.cn/v1',
   ollama: 'http://localhost:11434/v1',
+  minimax: 'https://api.minimax.io/v1',
   custom: '',
 };
 
