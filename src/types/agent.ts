@@ -1,7 +1,8 @@
-// V83 Multi-Agent Collaboration System Types
+// V84 Multi-Agent Collaboration System Types
 
 export type AgentRole = 'orchestrator' | 'planner' | 'executor' | 'critic' | 'creative';
 export type AgentStatus = 'idle' | 'running' | 'thinking' | 'waiting';
+export type TaskPriority = 'high' | 'medium' | 'low';
 
 export interface Agent {
   id: string;
@@ -30,6 +31,55 @@ export interface Task {
   assignedAgent?: string;
   parentTaskId?: string;
   children: string[];
+  dependencies?: string[];
+}
+
+// V84: Extended Task with decomposition metadata
+export interface DecomposedTask extends Task {
+  estimatedDuration?: number;
+  priority: TaskPriority;
+  requiredCapabilities: string[];
+  suggestedAgent?: AgentRole;
+  input?: string;
+  output?: string;
+  retryCount?: number;
+}
+
+// V84: Critic Review Result
+export interface CriticReview {
+  taskId: string;
+  score: number; // 0-10
+  issues: string[];
+  suggestions: string[];
+  approved: boolean;
+  timestamp: number;
+}
+
+// V84: Execution Result with Critic feedback
+export interface ExecutionResult {
+  taskId: string;
+  output: string;
+  criticReview?: CriticReview;
+  retryCount: number;
+  timestamp: number;
+}
+
+// V84: Task Template for common scenarios
+export interface TaskTemplate {
+  id: string;
+  name: string;
+  description: string;
+  keywords: string[];
+  tasks: Omit<DecomposedTask, 'id'>[];
+}
+
+// V84: Demo Scenarios
+export interface DemoScenario {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  userRequest: string;
 }
 
 // Event types for EventBus

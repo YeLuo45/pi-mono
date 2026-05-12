@@ -25,3 +25,6 @@ class AgentRegistry {
 }
 
 export const agentRegistry = new AgentRegistry()
+
+// Re-export agentBus so other modules can import both from here
+export { agentBus } from './agentBus'

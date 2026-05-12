@@ -1,13 +1,15 @@
-// V83 TaskScheduler Service
-// 任务调度（并行/串行/依赖）
+// V84 TaskScheduler Service
+// Enhanced with dynamic task support and dependency tracking
 
-import type { Task, ScheduleMode } from '../../types/agent';
+import type { Task, ScheduleMode, DecomposedTask } from '../../types/agent';
 import { eventBus } from './EventBus';
 
 interface ScheduledTask extends Task {
   execute: () => Promise<void>;
   resolve?: (value: void) => void;
   reject?: (error: Error) => void;
+  priority?: 'high' | 'medium' | 'low';
+  retryCount?: number;
 }
 
 type TaskExecuteFn = () => Promise<void>;

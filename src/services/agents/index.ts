@@ -6,3 +6,10 @@ export { reviewerAgent } from './reviewerAgent'
 export { multiAgentStore } from './multiAgentStore'
 export type { AgentConfig, AgentMessage, Task } from './types'
 export { AgentType } from './types'
+
+// V84 New Services
+export { agentTaskDecomposer } from './TaskDecomposer'
+export { criticEngine } from './CriticEngine'
+export { orchestratorService } from './Orchestrator'
+export { DEMO_SCENARIOS } from './Orchestrator'
+export type { OrchestratorState } from './Orchestrator'

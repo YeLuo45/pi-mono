@@ -18,6 +18,7 @@ import {
   ListItemText,
   Collapse,
   Paper,
+  Button,
 } from '@mui/material';
 import {
   ExpandLess,
@@ -26,10 +27,12 @@ import {
   Refresh as RefreshIcon,
   PlayArrow as PlayIcon,
   Psychology as AgentIcon,
+  Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import { eventBus } from '../../services/agents/EventBus';
 import { agentManager } from '../../services/agents/AgentManager';
 import { TaskBoardModal } from './TaskBoardModal';
+import { OrchestratorPanel } from './OrchestratorPanel';
 import type { Agent, AgentEvent } from '../../types/agent';
 
 const STATUS_COLORS: Record<Agent['status'], string> = {
@@ -50,6 +53,7 @@ export const MultiAgentPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [taskBoardOpen, setTaskBoardOpen] = useState(false);
+  const [orchestratorOpen, setOrchestratorOpen] = useState(false);
   const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
 
   useEffect(() => {
@@ -162,6 +166,16 @@ export const MultiAgentPanel: React.FC = () => {
               <IconButton size="small" onClick={() => setTaskBoardOpen(true)}>
                 <PlayIcon fontSize="small" />
               </IconButton>
+            </Tooltip>
+            <Tooltip title="Orchestrator">
+              <Button
+                size="small"
+                startIcon={<DashboardIcon />}
+                onClick={() => setOrchestratorOpen(true)}
+                sx={{ minWidth: 'auto', px: 1 }}
+              >
+                分解
+              </Button>
             </Tooltip>
             <Tooltip title="关闭">
               <IconButton size="small" onClick={() => setIsOpen(false)}>
@@ -294,6 +308,9 @@ export const MultiAgentPanel: React.FC = () => {
 
       {/* Task Board Modal */}
       <TaskBoardModal open={taskBoardOpen} onClose={() => setTaskBoardOpen(false)} />
+
+      {/* Orchestrator Panel */}
+      <OrchestratorPanel open={orchestratorOpen} onClose={() => setOrchestratorOpen(false)} />
     </>
   );
 };

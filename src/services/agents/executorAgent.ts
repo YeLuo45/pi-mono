@@ -1,4 +1,5 @@
-import { agentBus, agentRegistry } from './agentRegistry'
+import { agentBus } from './agentBus'
+import { agentRegistry } from './agentRegistry'
 import type { AgentMessage, Task } from './types'
 import { AgentType } from './types'
 import { agentExecutor } from '../agent/agentExecutor'
