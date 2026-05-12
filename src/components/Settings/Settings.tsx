@@ -31,6 +31,7 @@ import type { ModelConfig } from '../../services/ai/model-registry';
 import type { PersonaId, PersonaRole } from '../../types';
 import { APP_THEME_PRESETS, createCustomPreset, applyAppTheme, applyCustomTheme, getPresetById, getSystemTheme, resetToDefault } from '../../utils/appTheme';
 import { AnalyticsDashboard } from '../Analytics/AnalyticsDashboard';
+import { PerformanceDashboard, OptimizationPanel, AgentLeaderboard } from '../AgentOptimizer';
 
 const PROVIDER_LABELS: Record<string, string> = {
   openai: 'OpenAI',
@@ -105,7 +106,7 @@ export const Settings: React.FC = () => {
   });
 
   // V94: Desktop settings tab
-  const [activeSettingsTab, setActiveSettingsTab] = useState<'general' | 'desktop' | 'analytics'>('general');
+  const [activeSettingsTab, setActiveSettingsTab] = useState<'general' | 'desktop' | 'analytics' | 'agentOptimizer'>('general');
 
   // V94: Update status state
   const [updateStatus, setUpdateStatus] = useState<{
@@ -504,6 +505,14 @@ export const Settings: React.FC = () => {
             sx={{ fontSize: 12, textTransform: 'none' }}
           >
             Analytics
+          </Button>
+          <Button
+            size="small"
+            variant={activeSettingsTab === 'agentOptimizer' ? 'contained' : 'outlined'}
+            onClick={() => setActiveSettingsTab('agentOptimizer')}
+            sx={{ fontSize: 12, textTransform: 'none' }}
+          >
+            Agent Optimizer
           </Button>
         </Box>
       )}
