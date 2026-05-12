@@ -29,8 +29,10 @@ import {
   Close as CloseIcon,
   Settings as SettingsIcon,
   AutoAwesome as AutoAwesomeIcon,
+  Share as ShareIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { skillRunner } from '../../services/skills/skillRunner';
 import { skillRegistry } from '../../services/skills/skillRegistry';
 import type { SkillDefinition, SkillCategory, SkillExecutionResult } from '../../services/skills/types';
@@ -262,6 +264,7 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({ visible, onClose, messag
   const [skills, setSkills] = useState<SkillDefinition[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<Set<SkillCategory>>(new Set());
   const { getCurrentPersonaId } = useStore();
+  const navigate = useNavigate();
 
   // Load skills on mount
   useEffect(() => {
@@ -360,6 +363,11 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({ visible, onClose, messag
         <Typography variant="subtitle1" sx={{ fontSize: 14, fontWeight: 700, flex: 1 }}>
           {t('skill.title') || 'Skills'}
         </Typography>
+        <Tooltip title={t('skill.shareMarketplace') || 'Share to Marketplace'}>
+          <IconButton size="small" onClick={() => navigate('/skill-store')} sx={{ color: 'text.secondary' }}>
+            <ShareIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
         <IconButton size="small" onClick={onClose} sx={{ color: 'text.secondary' }}>
           <CloseIcon fontSize="small" />
         </IconButton>

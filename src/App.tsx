@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MainPage } from './pages/MainPage';
+import { SkillStorePage } from './pages/SkillStorePage';
 import { useStore } from './store';
 import { initCompanion } from './services/companion';
 import { compactMemory } from './services/memory';
@@ -1087,12 +1089,19 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider theme={currentTheme}>
-      <CssBaseline />
-      <Box sx={{ height: '100vh', overflow: 'hidden' }}>
-        <MainPage />
-      </Box>
-    </ThemeProvider>
+    <BrowserRouter>
+      <ThemeProvider theme={currentTheme}>
+        <CssBaseline />
+        <Box sx={{ height: '100vh', overflow: 'hidden' }}>
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/skill-store" element={<SkillStorePage />} />
+            <Route path="/skill-store/:category" element={<SkillStorePage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Box>
+      </ThemeProvider>
+    </BrowserRouter>
   );
 }
 
