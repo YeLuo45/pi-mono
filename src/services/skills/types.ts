@@ -124,3 +124,47 @@ export interface ChatSkillInvocation {
   userMessage: string;
   context: SkillExecutionContext;
 }
+
+// =============================================================================
+// Skill Chaining (V79)
+// =============================================================================
+
+export interface ChainStep {
+  id: string;
+  skillId: string;
+  /** Condition to execute this step: 'always' | 'if:{expr}' */
+  condition: string;
+  /** JSON template for skill input, supports {{variable}} interpolation */
+  inputTemplate: Record<string, string>;
+  /** Key to store this step's result */
+  outputKey: string;
+}
+
+export interface ChainDefinition {
+  id: string;
+  name: string;
+  description: string;
+  /** Keywords that trigger this chain in chat (lowercase) */
+  triggerKeywords: string[];
+  steps: ChainStep[];
+  /** Whether this chain is currently enabled */
+  enabled: boolean;
+}
+
+export interface ChainExecutionResult {
+  chainId: string;
+  success: boolean;
+  steps: ChainStepResult[];
+  finalResult: string;
+  error?: string;
+  durationMs: number;
+}
+
+export interface ChainStepResult {
+  stepId: string;
+  skillId: string;
+  status: 'completed' | 'skipped' | 'failed';
+  input: Record<string, string>;
+  output: string;
+  error?: string;
+}

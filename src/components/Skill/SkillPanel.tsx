@@ -30,12 +30,18 @@ import {
   Settings as SettingsIcon,
   AutoAwesome as AutoAwesomeIcon,
   Share as ShareIcon,
+  Add as AddIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { skillRunner } from '../../services/skills/skillRunner';
 import { skillRegistry } from '../../services/skills/skillRegistry';
-import type { SkillDefinition, SkillCategory, SkillExecutionResult } from '../../services/skills/types';
+import type { SkillDefinition, SkillCategory, SkillExecutionResult, ChainDefinition } from '../../services/skills/types';
+import { ChainListItem } from '../Chains/ChainListItem';
+import { ChainEditorDialog } from '../Chains/ChainEditorDialog';
+import { getAllChains, saveChain, deleteChain, setChainEnabled } from '../../services/chains/chainStorage';
+import { executeChain } from '../../services/chains/chainEngine';
+import { seedSampleChains } from '../../data/sampleChains';
 import type { Message } from '../../types';
 import { useStore } from '../../store';
 
@@ -265,6 +271,12 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({ visible, onClose, messag
   const [expandedCategories, setExpandedCategories] = useState<Set<SkillCategory>>(new Set());
   const { getCurrentPersonaId } = useStore();
   const navigate = useNavigate();
+  // Chain state (V79)
+  const [chainsTab, setChainsTab] = useState(false);
+  const [chains, setChains] = useState<ChainDefinition[]>([]);
+  const [chainEditorOpen, setChainEditorOpen] = useState(false);
+  const [editingChain, setEditingChain] = useState<ChainDefinition | null>(null);
+  const [runningChainId, setRunningChainId] = useState<string | null>(null);
 
   // Load skills on mount
   useEffect(() => {
@@ -282,6 +294,15 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({ visible, onClose, messag
     }
   }, [visible]);
 
+  // Load chains on mount and when visible (V79)
+  useEffect(() => {
+    const loadChains = async () => {
+      await seedSampleChains();
+      const allChains = await getAllChains();
+      setChains(allChains);
+    };
+    void loadChains();
+  }, [visible]);
   const handleToggle = useCallback(async (id: string, enabled: boolean) => {
     if (enabled) {
       await skillRegistry.enableSkill(id);
@@ -329,6 +350,47 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({ visible, onClose, messag
     list.push(skill);
     grouped.set(skill.category, list);
   }
+
+  // Chain handlers (V79)
+  const handleChainToggle = useCallback(async (id: string, enabled: boolean) => {
+    await setChainEnabled(id, enabled);
+    const allChains = await getAllChains();
+    setChains(allChains);
+  }, []);
+
+  const handleChainEdit = useCallback((chain: ChainDefinition) => {
+    setEditingChain(chain);
+    setChainEditorOpen(true);
+  }, []);
+
+  const handleChainDelete = useCallback(async (id: string) => {
+    await deleteChain(id);
+    const allChains = await getAllChains();
+    setChains(allChains);
+  }, []);
+
+  const handleChainSave = useCallback(async (chain: ChainDefinition) => {
+    await saveChain(chain);
+    const allChains = await getAllChains();
+    setChains(allChains);
+    setChainEditorOpen(false);
+    setEditingChain(null);
+  }, []);
+
+  const handleChainRun = useCallback(async (chain: ChainDefinition) => {
+    setRunningChainId(chain.id);
+    try {
+      const result = await executeChain(chain, {
+        triggerMessage: `Run chain: ${chain.name}`,
+        metadata: { triggeredFrom: 'panel' },
+        recentMessages: messages,
+        personaId: getCurrentPersonaId(),
+      });
+      onResult({ skillId: 'chain', success: result.success, response: result.finalResult, durationMs: result.durationMs } as any);
+    } finally {
+      setRunningChainId(null);
+    }
+  }, [messages, getCurrentPersonaId, onResult]);
 
   if (!visible) return null;
 
@@ -392,7 +454,42 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({ visible, onClose, messag
         />
       </Box>
 
-      {/* Skill list */}
+      {/* Tab switcher: Skills / Chains (V79) */}
+      <Box sx={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <Button
+          size="small"
+          onClick={() => setChainsTab(false)}
+          sx={{
+            flex: 1,
+            borderRadius: 0,
+            fontSize: 12,
+            fontWeight: 600,
+            color: !chainsTab ? 'rgba(94,106,210,0.9)' : 'text.secondary',
+            borderBottom: !chainsTab ? '2px solid rgba(94,106,210,0.9)' : '2px solid transparent',
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.03)' },
+          }}
+        >
+          Skills
+        </Button>
+        <Button
+          size="small"
+          onClick={() => setChainsTab(true)}
+          sx={{
+            flex: 1,
+            borderRadius: 0,
+            fontSize: 12,
+            fontWeight: 600,
+            color: chainsTab ? 'rgba(94,106,210,0.9)' : 'text.secondary',
+            borderBottom: chainsTab ? '2px solid rgba(94,106,210,0.9)' : '2px solid transparent',
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.03)' },
+          }}
+        >
+          Chains
+        </Button>
+      </Box>
+
+      {/* Skills list */}
+      {!chainsTab && (
       <Box sx={{ flex: 1, overflowY: 'auto', px: 1.5, py: 1 }}>
         {Array.from(grouped.entries()).map(([category, categorySkills]) => {
           const label = CATEGORY_LABELS[category]?.[i18n.language === 'zh' ? 'zh' : 'en'] || category;
@@ -491,6 +588,52 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({ visible, onClose, messag
           </Box>
         )}
       </Box>
+      )}
+
+      {/* Chains list (V79) */}
+      {chainsTab && (
+        <Box sx={{ flex: 1, overflowY: 'auto', px: 1.5, py: 1 }}>
+          {/* Add chain button */}
+          <Button
+            fullWidth
+            startIcon={<AddIcon />}
+            onClick={() => { setEditingChain(null); setChainEditorOpen(true); }}
+            sx={{
+              mb: 1.5,
+              bgcolor: 'rgba(156,39,176,0.15)',
+              color: '#9c27b0',
+              border: '1px dashed rgba(156,39,176,0.3)',
+              borderRadius: 2,
+              '&:hover': { bgcolor: 'rgba(156,39,176,0.25)' },
+              fontSize: 12,
+              fontWeight: 600,
+            }}
+          >
+            New Chain
+          </Button>
+
+          {chains.length === 0 ? (
+            <Box sx={{ py: 4, textAlign: 'center' }}>
+              <Typography variant="body2" sx={{ fontSize: 13, color: 'text.secondary' }}>
+                No chains yet. Create one to get started!
+              </Typography>
+            </Box>
+          ) : (
+            <Stack spacing={0.75}>
+              {chains.map((chain) => (
+                <ChainListItem
+                  key={chain.id}
+                  chain={chain}
+                  onToggle={handleChainToggle}
+                  onEdit={handleChainEdit}
+                  onDelete={handleChainDelete}
+                  onRun={handleChainRun}
+                />
+              ))}
+            </Stack>
+          )}
+        </Box>
+      )}
 
       {/* Footer */}
       <Box
@@ -507,9 +650,17 @@ export const SkillPanel: React.FC<SkillPanelProps> = ({ visible, onClose, messag
           {skills.length} {t('skill.available') || 'skills available'}
         </Typography>
         <Typography variant="caption" sx={{ fontSize: 10, color: 'text.disabled' }}>
-          v77
+          v79
         </Typography>
       </Box>
+
+      {/* Chain editor dialog (V79) */}
+      <ChainEditorDialog
+        open={chainEditorOpen}
+        chain={editingChain}
+        onClose={() => { setChainEditorOpen(false); setEditingChain(null); }}
+        onSave={handleChainSave}
+      />
     </Paper>
   );
 };
