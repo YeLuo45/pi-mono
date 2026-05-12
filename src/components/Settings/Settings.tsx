@@ -30,6 +30,7 @@ import { createPersona, type PersonaVoice, type PersonaAppearance } from '../../
 import type { ModelConfig } from '../../services/ai/model-registry';
 import type { PersonaId, PersonaRole } from '../../types';
 import { APP_THEME_PRESETS, createCustomPreset, applyAppTheme, applyCustomTheme, getPresetById, getSystemTheme, resetToDefault } from '../../utils/appTheme';
+import { AnalyticsDashboard } from '../Analytics/AnalyticsDashboard';
 
 const PROVIDER_LABELS: Record<string, string> = {
   openai: 'OpenAI',
@@ -104,7 +105,7 @@ export const Settings: React.FC = () => {
   });
 
   // V94: Desktop settings tab
-  const [activeSettingsTab, setActiveSettingsTab] = useState<'general' | 'desktop'>('general');
+  const [activeSettingsTab, setActiveSettingsTab] = useState<'general' | 'desktop' | 'analytics'>('general');
 
   // V94: Update status state
   const [updateStatus, setUpdateStatus] = useState<{
@@ -496,6 +497,14 @@ export const Settings: React.FC = () => {
           >
             Desktop
           </Button>
+          <Button
+            size="small"
+            variant={activeSettingsTab === 'analytics' ? 'contained' : 'outlined'}
+            onClick={() => setActiveSettingsTab('analytics')}
+            sx={{ fontSize: 12, textTransform: 'none' }}
+          >
+            Analytics
+          </Button>
         </Box>
       )}
 
@@ -710,8 +719,15 @@ export const Settings: React.FC = () => {
           </>
         )}
 
-        {/* Only show general settings when not on desktop tab */}
-        {(!isElectron || activeSettingsTab === 'general') && (
+        {/* V97: Analytics Tab */}
+        {activeSettingsTab === 'analytics' && (
+          <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
+            <AnalyticsDashboard />
+          </Box>
+        )}
+
+        {/* Only show general settings when on general tab */}
+        {activeSettingsTab === 'general' && (
           <>
         {/* V81: AI Providers Card */}
         <Paper
