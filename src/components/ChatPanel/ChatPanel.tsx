@@ -47,6 +47,7 @@ import { skillRunner } from '../../services/skills/skillRunner';
 import type { SkillExecutionResult } from '../../services/skills/types';
 import { matchChainTrigger, executeChain } from '../../services/chains/chainEngine';
 import { getAllChains } from '../../services/chains/chainStorage';
+import { AgentCreationWizard } from '../AgentBuilder';
 
 // Three-dot typing indicator component
 const TypingIndicator: React.FC = () => {
@@ -171,6 +172,7 @@ export const ChatPanel: React.FC = () => {
   const setChatInputMention = useStore((s) => s.setChatInputMention);
   const [memoOpen, setMemoOpen] = useState(false);
   const [skillPanelOpen, setSkillPanelOpen] = useState(false);
+  const [agentBuilderOpen, setAgentBuilderOpen] = useState(false);
   const [recommendations, setRecommendations] = useState<any[]>([]);
 
   // Plan mode state
@@ -1250,6 +1252,15 @@ export const ChatPanel: React.FC = () => {
               <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
                 {displayModel}
               </Typography>
+              <Tooltip title={t('agent.createAgent') || '创建Agent'}>
+                <IconButton
+                  size="small"
+                  onClick={() => setAgentBuilderOpen(true)}
+                  sx={{ color: 'rgba(139,92,246,0.8)', '&:hover': { color: 'rgba(139,92,246,1)' } }}
+                >
+                  <AutoAwesomeIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </Tooltip>
               <Tooltip title={t('skill.title') || 'Skills'}>
                 <IconButton
                   size="small"
@@ -1784,6 +1795,23 @@ export const ChatPanel: React.FC = () => {
         }}
       />
     )}
+
+    <AgentCreationWizard
+      open={agentBuilderOpen}
+      onClose={() => setAgentBuilderOpen(false)}
+      onComplete={(agent) => {
+        // Register the new agent
+        // For now, just close the wizard
+        setAgentBuilderOpen(false);
+        addMessage({
+          id: crypto.randomUUID(),
+          role: 'system',
+          content: `✅ Agent "${agent.name}" created successfully!`,
+          timestamp: Date.now(),
+          personaId: activePersonaId,
+        });
+      }}
+    />
     </>
   );
 };
