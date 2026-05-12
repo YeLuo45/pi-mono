@@ -45,6 +45,16 @@ export interface AIProvider {
    * Check if the provider is reachable
    */
   ping?(): Promise<boolean>;
+  
+  /**
+   * Estimate token count for a message array (for cost estimation)
+   */
+  estimateTokens?(messages: Message[]): number;
+  
+  /**
+   * Get cost per 1K tokens for this provider
+   */
+  getCost?(): { prompt: number; completion: number };
 }
 
 export interface ProviderConfig {

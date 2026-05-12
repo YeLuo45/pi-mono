@@ -447,6 +447,34 @@ export const Settings: React.FC = () => {
           </Stack>
         </Paper>
 
+        {/* V88: Usage Statistics Card */}
+        <Paper
+          sx={{
+            p: 2,
+            bgcolor: 'rgba(34, 197, 94, 0.1)',
+            borderRadius: 2,
+            border: '1px solid rgba(34, 197, 94, 0.3)',
+            cursor: 'pointer',
+            '&:hover': { bgcolor: 'rgba(34, 197, 94, 0.15)' },
+          }}
+          onClick={() => navigate('/settings/usage')}
+        >
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Stack direction="row" alignItems="center" gap={2}>
+              <Typography variant="h6" sx={{ fontSize: 24 }}>📊</Typography>
+              <Box>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  Usage Statistics
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
+                  Token usage, cost tracking, and budget management
+                </Typography>
+              </Box>
+            </Stack>
+            <OpenInNewIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+          </Stack>
+        </Paper>
+
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* Pet Interaction Settings */}

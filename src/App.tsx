@@ -5,6 +5,7 @@ import { MainPage } from './pages/MainPage';
 import { SkillStorePage } from './pages/SkillStorePage';
 import { SkillDevPage } from './pages/SkillDevPage';
 import { ProvidersPage } from './pages/ProvidersPage';
+import { UsageStatsPage } from './pages/UsageStatsPage';
 import { KnowledgePage } from './pages/KnowledgePage';
 import { useStore } from './store';
 import { initCompanion } from './services/companion';
@@ -17,6 +18,7 @@ import { checkAndCreateMilestones } from './services/milestone/milestoneTracker'
 import { pluginRegistry } from './services/plugins/pluginRegistry';
 import { applyAppTheme, getPresetById, getSystemTheme, resetToDefault, applyCustomTheme } from './utils/appTheme';
 import { useHotkeys } from './hooks/useHotkeys';
+import { CostAlertToast } from './components/Usage/CostAlertToast';
 import './services/i18n';
 import './styles/mobile.css';
 
@@ -1103,9 +1105,11 @@ function App() {
             <Route path="/skill-store/:category" element={<SkillStorePage />} />
             <Route path="/skill-dev" element={<SkillDevPage />} />
             <Route path="/settings/providers" element={<ProvidersPage />} />
+            <Route path="/settings/usage" element={<UsageStatsPage />} />
             <Route path="/knowledge" element={<KnowledgePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <CostAlertToast />
         </Box>
       </ThemeProvider>
     </BrowserRouter>
