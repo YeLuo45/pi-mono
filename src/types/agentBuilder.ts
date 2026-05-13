@@ -109,7 +109,7 @@ export interface ParsingProgress {
 /**
  * Wizard step
  */
-export type WizardStep = 'describe' | 'confirm' | 'preview' | 'test';
+export type WizardStep = 'describe' | 'confirm' | 'files' | 'preview' | 'test';
 
 export interface WizardState {
   currentStep: WizardStep;

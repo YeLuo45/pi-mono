@@ -1799,17 +1799,54 @@ export const ChatPanel: React.FC = () => {
     <AgentCreationWizard
       open={agentBuilderOpen}
       onClose={() => setAgentBuilderOpen(false)}
-      onComplete={(agent) => {
-        // Register the new agent
-        // For now, just close the wizard
+      onComplete={async (agent, soul, userProfile, memory) => {
+        // V101: Create persona from agent with soul/userProfile/memory
+        try {
+          const { createPersona } = await import('../../services/persona/personaStorage');
+          const { PersonaVoice, PersonaAppearance } = await import('../../services/persona/personaStorage');
+
+          // Map agent to persona fields
+          const voiceTypeMap: Record<string, 'warm' | 'rational' | 'humorous' | 'serious'> = {
+            planner: 'rational',
+            executor: 'warm',
+            critic: 'serious',
+            creative: 'humorous',
+            general: 'warm',
+          };
+
+          const newPersona = createPersona({
+            name: agent.name,
+            avatar: agent.icon,
+            bio: agent.description,
+            voice: { rate: 1.0, pitch: 1.0, volume: 1.0 } as PersonaVoice,
+            voiceType: voiceTypeMap[agent.role] || 'warm',
+            appearance: { expression: '😊', accessory: '🤍', outfit: '👕' } as PersonaAppearance,
+            soul: soul || `You are ${agent.name}. ${agent.description}`,
+            userProfile: userProfile || '',
+            memory: memory || '',
+          });
+
+          // Set as active persona
+          setActivePersonaId(newPersona.id);
+
+          addMessage({
+            id: crypto.randomUUID(),
+            role: 'system',
+            content: `✅ Agent "${agent.name}" created and saved as persona!`,
+            timestamp: Date.now(),
+            personaId: activePersonaId,
+          });
+        } catch (err) {
+          console.error('Failed to create persona:', err);
+          addMessage({
+            id: crypto.randomUUID(),
+            role: 'system',
+            content: `✅ Agent "${agent.name}" created (failed to save as persona)`,
+            timestamp: Date.now(),
+            personaId: activePersonaId,
+          });
+        }
         setAgentBuilderOpen(false);
-        addMessage({
-          id: crypto.randomUUID(),
-          role: 'system',
-          content: `✅ Agent "${agent.name}" created successfully!`,
-          timestamp: Date.now(),
-          personaId: activePersonaId,
-        });
       }}
     />
     </>

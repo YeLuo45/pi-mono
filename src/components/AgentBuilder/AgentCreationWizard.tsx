@@ -39,12 +39,13 @@ import { generateWorkflow } from '../../services/agentBuilder/agentGenerator';
 interface AgentCreationWizardProps {
   open: boolean;
   onClose: () => void;
-  onComplete: (agent: GeneratedAgent) => void;
+  onComplete: (agent: GeneratedAgent, soul: string, userProfile: string, memory: string) => void;
 }
 
 const STEPS = [
   { key: 'describe', label: 'Describe' },
   { key: 'confirm', label: 'Confirm' },
+  { key: 'files', label: 'Files' },
   { key: 'preview', label: 'Preview' },
   { key: 'test', label: 'Test' },
 ];
@@ -61,6 +62,10 @@ export const AgentCreationWizard: React.FC<AgentCreationWizardProps> = ({
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // V101: Persona files
+  const [soul, setSoul] = useState('');
+  const [userProfile, setUserProfile] = useState('');
+  const [memory, setMemory] = useState('');
 
   const currentStepIndex = STEPS.findIndex((s) => s.key === currentStep);
 
@@ -115,12 +120,12 @@ export const AgentCreationWizard: React.FC<AgentCreationWizardProps> = ({
 
   const handleTest = async () => {
     if (!generatedAgent) return;
-    
+
     setIsProcessing(true);
     try {
       // In a real implementation, we would run a test conversation
       // For now, we just complete the wizard
-      onComplete(generatedAgent);
+      onComplete(generatedAgent, soul, userProfile, memory);
     } catch (err) {
       setError('Test failed. Please try again.');
       console.error(err);
@@ -135,6 +140,8 @@ export const AgentCreationWizard: React.FC<AgentCreationWizardProps> = ({
         return userInput.trim().length > 10;
       case 'confirm':
         return parsedConfig !== null;
+      case 'files':
+        return true; // Files step is optional
       case 'preview':
         return generatedAgent !== null;
       case 'test':
@@ -205,6 +212,56 @@ export const AgentCreationWizard: React.FC<AgentCreationWizardProps> = ({
                 onCancel={handleBack}
               />
             )}
+          </Stack>
+        );
+
+      case 'files':
+        return (
+          <Stack spacing={3}>
+            <Box>
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Persona Files
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Define the Agent's soul, user profile, and memory. These files shape the Agent's personality and memory.
+              </Typography>
+            </Box>
+
+            {/* Soul */}
+            <TextField
+              label="Soul (人格设定)"
+              value={soul}
+              onChange={(e) => setSoul(e.target.value)}
+              multiline
+              rows={4}
+              fullWidth
+              size="small"
+              placeholder="You are a warm and supportive friend who is empathetic, good at listening..."
+            />
+
+            {/* User Profile */}
+            <TextField
+              label="User Profile (用户偏好)"
+              value={userProfile}
+              onChange={(e) => setUserProfile(e.target.value)}
+              multiline
+              rows={3}
+              fullWidth
+              size="small"
+              placeholder="User appreciates deep conversations. They prefer emotional support over practical advice when stressed..."
+            />
+
+            {/* Memory */}
+            <TextField
+              label="Memory (对话记忆)"
+              value={memory}
+              onChange={(e) => setMemory(e.target.value)}
+              multiline
+              rows={3}
+              fullWidth
+              size="small"
+              placeholder="First met on a stressful day. User opened up about work challenges. We had meaningful conversations about life goals..."
+            />
           </Stack>
         );
 
@@ -383,12 +440,22 @@ export const AgentCreationWizard: React.FC<AgentCreationWizardProps> = ({
           {currentStep === 'describe' ? 'Cancel' : 'Back'}
         </Button>
 
-        {currentStep !== 'describe' && currentStep !== 'test' && (
+        {currentStep !== 'describe' && currentStep !== 'files' && currentStep !== 'test' && (
           <Button
             endIcon={<NextIcon />}
             onClick={handleNext}
             variant="contained"
             disabled={!canProceed()}
+          >
+            Next
+          </Button>
+        )}
+
+        {currentStep === 'files' && (
+          <Button
+            endIcon={<NextIcon />}
+            onClick={handleNext}
+            variant="contained"
           >
             Next
           </Button>

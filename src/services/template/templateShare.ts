@@ -12,6 +12,10 @@ export interface TemplatePayload {
   b: string;  // bio
   v2: PersonaVoiceType;  // voice personality type (warm/rational/humorous/serious)
   t?: [string, string, string];  // theme: [primaryColor, secondaryColor, accentColor]
+  // V101: Persona files
+  soul?: string;
+  userProfile?: string;
+  memory?: string;
 }
 
 /**
@@ -27,6 +31,9 @@ export function encodeTemplate(persona: Persona): string {
     t: persona.theme
       ? [persona.theme.primaryColor, persona.theme.secondaryColor, persona.theme.accentColor]
       : undefined,
+    soul: persona.soul || undefined,
+    userProfile: persona.userProfile || undefined,
+    memory: persona.memory || undefined,
   };
   const json = JSON.stringify(payload);
   // Use btoa with Unicode-safe encoding
@@ -52,7 +59,7 @@ export function decodeTemplate(code: string): TemplatePayload | null {
 /**
  * Convert TemplatePayload to partial Persona fields (for creating a new persona)
  */
-export function templateToPersonaData(payload: TemplatePayload): Pick<Persona, 'name' | 'avatar' | 'bio' | 'voice' | 'voiceType' | 'theme' | 'appearance'> {
+export function templateToPersonaData(payload: TemplatePayload): Pick<Persona, 'name' | 'avatar' | 'bio' | 'voice' | 'voiceType' | 'theme' | 'appearance' | 'soul' | 'userProfile' | 'memory'> {
   const theme: PersonaTheme | undefined = payload.t
     ? {
         primaryColor: payload.t[0],
@@ -80,6 +87,9 @@ export function templateToPersonaData(payload: TemplatePayload): Pick<Persona, '
     voiceType,
     appearance,
     ...(theme ? { theme } : {}),
+    soul: payload.soul || '',
+    userProfile: payload.userProfile || '',
+    memory: payload.memory || '',
   };
 }
 

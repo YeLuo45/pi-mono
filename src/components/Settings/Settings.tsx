@@ -282,6 +282,9 @@ export const Settings: React.FC = () => {
         voiceType: template.voice,
         appearance: { expression: '😊', accessory: '🤍', outfit: '👕' } as PersonaAppearance,
         theme: template.theme,
+        soul: template.soul || '',
+        userProfile: template.userProfile || '',
+        memory: template.memory || '',
       };
       const newPersona = createPersona(personaData);
       setActivePersonaId(newPersona.id);

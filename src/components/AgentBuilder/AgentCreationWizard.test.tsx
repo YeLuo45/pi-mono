@@ -12,6 +12,7 @@ import type { ParsedAgentConfig, GeneratedAgent, WizardStep } from '../../types/
 const STEPS = [
   { key: 'describe', label: 'Describe' },
   { key: 'confirm', label: 'Confirm' },
+  { key: 'files', label: 'Files' },
   { key: 'preview', label: 'Preview' },
   { key: 'test', label: 'Test' },
 ];
@@ -31,6 +32,8 @@ function canProceed(
       return userInput.trim().length > 10;
     case 'confirm':
       return parsedConfig !== null;
+    case 'files':
+      return true; // Files step is optional
     case 'preview':
       return generatedAgent !== null;
     case 'test':
@@ -165,8 +168,8 @@ describe('AgentCreationWizard - handleNext logic', () => {
     expect(getNextStep('describe')).toBe('confirm');
   });
 
-  it('should move from confirm to preview', () => {
-    expect(getNextStep('confirm')).toBe('preview');
+  it('should move from confirm to files', () => {
+    expect(getNextStep('confirm')).toBe('files');
   });
 
   it('should move from preview to test', () => {
@@ -187,8 +190,8 @@ describe('AgentCreationWizard - handleBack logic', () => {
     expect(getPrevStep('confirm')).toBe('describe');
   });
 
-  it('should move from preview to confirm', () => {
-    expect(getPrevStep('preview')).toBe('confirm');
+  it('should move from preview to files', () => {
+    expect(getPrevStep('preview')).toBe('files');
   });
 
   it('should move from test to preview', () => {
@@ -251,23 +254,28 @@ describe('AgentCreationWizard - handleParsingComplete logic simulation', () => {
     expect(canProceed('preview', '', parsedConfig, generatedAgent)).toBe(true);
   });
 
-  it('should advance to preview step after parsing complete', () => {
+  it('should advance to files step after parsing complete', () => {
     // The handleNext is called after handleParsingComplete
-    // So after parsing on 'confirm' step, we should move to 'preview'
+    // So after parsing on 'confirm' step, we should move to 'files'
     const nextStepAfterConfirm = getNextStep('confirm');
-    expect(nextStepAfterConfirm).toBe('preview');
+    expect(nextStepAfterConfirm).toBe('files');
   });
 });
 
 describe('AgentCreationWizard - step flow integration', () => {
-  it('should allow full forward navigation: describe -> confirm -> preview -> test', () => {
+  it('should allow full forward navigation: describe -> confirm -> files -> preview -> test', () => {
     // Start at describe
     let currentStep: WizardStep = 'describe';
     expect(currentStep).toBe('describe');
 
     // Move to confirm
+    const next0 = getNextStep(currentStep);
+    expect(next0).toBe('confirm');
+    currentStep = next0!;
+
+    // Move to files
     const next1 = getNextStep(currentStep);
-    expect(next1).toBe('confirm');
+    expect(next1).toBe('files');
     currentStep = next1!;
 
     // Move to preview
@@ -284,7 +292,7 @@ describe('AgentCreationWizard - step flow integration', () => {
     expect(getNextStep(currentStep)).toBeNull();
   });
 
-  it('should allow full backward navigation: test -> preview -> confirm -> describe', () => {
+  it('should allow full backward navigation: test -> preview -> files -> confirm -> describe', () => {
     // Start at test
     let currentStep: WizardStep = 'test';
     expect(currentStep).toBe('test');
@@ -294,17 +302,22 @@ describe('AgentCreationWizard - step flow integration', () => {
     expect(prev1).toBe('preview');
     currentStep = prev1!;
 
-    // Move to confirm
+    // Move to files
     const prev2 = getPrevStep(currentStep);
-    expect(prev2).toBe('confirm');
+    expect(prev2).toBe('files');
     currentStep = prev2!;
 
-    // Move to describe
+    // Move to confirm
     const prev3 = getPrevStep(currentStep);
-    expect(prev3).toBe('describe');
+    expect(prev3).toBe('confirm');
     currentStep = prev3!;
 
-    // No more steps back
+    // Move to describe
+    const prev4 = getPrevStep(currentStep);
+    expect(prev4).toBe('describe');
+    currentStep = prev4!;
+
+    // No more steps
     expect(getPrevStep(currentStep)).toBeNull();
   });
 

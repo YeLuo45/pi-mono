@@ -20,6 +20,10 @@ export interface OnlineTemplate {
   };
   tags: string[];
   description: string;
+  // V101: Persona files
+  soul?: string;
+  userProfile?: string;
+  memory?: string;
 }
 
 export const ONLINE_TEMPLATES: OnlineTemplate[] = [
