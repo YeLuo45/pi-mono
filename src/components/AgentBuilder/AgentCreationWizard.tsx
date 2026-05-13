@@ -35,6 +35,7 @@ import type { ParsedAgentConfig, GeneratedAgent, WizardStep, WorkflowTemplate } 
 import { generateWorkflow } from '../../services/agentBuilder/agentGenerator';
 
 interface AgentCreationWizardProps {
+  open: boolean;
   onClose: () => void;
   onComplete: (agent: GeneratedAgent) => void;
 }
@@ -47,6 +48,7 @@ const STEPS = [
 ];
 
 export const AgentCreationWizard: React.FC<AgentCreationWizardProps> = ({
+  open,
   onClose,
   onComplete,
 }) => {
@@ -286,6 +288,8 @@ export const AgentCreationWizard: React.FC<AgentCreationWizardProps> = ({
         return null;
     }
   };
+
+  if (!open) return null;
 
   return (
     <Paper
