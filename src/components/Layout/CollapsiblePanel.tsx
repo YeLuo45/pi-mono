@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { IconButton, Collapse, Typography } from '@mui/material';
 import { Box } from '../ui/Box';
 import { ExpandMore as ExpandIcon, ExpandLess as CollapseIcon } from '@mui/icons-material';
 
@@ -61,8 +60,8 @@ export const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({
             {icon}
           </Box>
         )}
-        <Typography
-          variant="subtitle2"
+        <Box
+          component="span"
           sx={{
             flex: 1,
             textAlign: 'left',
@@ -71,23 +70,35 @@ export const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({
           }}
         >
           {title}
-        </Typography>
-        <IconButton
-          size="small"
+        </Box>
+        <Box
+          component="span"
           sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 28,
+            height: 28,
             color: 'var(--color-text-secondary, #d0d6e0)',
             transition: 'transform 0.2s ease',
             transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
           }}
         >
           {expanded ? <CollapseIcon sx={{ fontSize: 18 }} /> : <ExpandIcon sx={{ fontSize: 18 }} />}
-        </IconButton>
+        </Box>
       </Box>
 
-      {/* Content */}
-      <Collapse in={expanded}>
+      {/* Content - CSS transition with conditional render */}
+      <Box
+        sx={{
+          overflow: 'hidden',
+          maxHeight: expanded ? '1000px' : '0',
+          opacity: expanded ? 1 : 0,
+          transition: 'max-height 0.2s ease-in-out, opacity 0.15s ease',
+        }}
+      >
         <Box sx={{ px: 2, pb: 2 }}>{children}</Box>
-      </Collapse>
+      </Box>
     </Box>
   );
 };

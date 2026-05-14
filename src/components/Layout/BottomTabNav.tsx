@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, IconButton, Tooltip } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import { Box } from '../ui/Box';
 import { Chat as ChatIcon, Psychology as PersonaIcon, SmartToy as AgentIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -91,8 +91,8 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
               }}
             >
               <Icon sx={{ fontSize: 24 }} />
-              <Typography
-                variant="caption"
+              <Box
+                component="span"
                 sx={{
                   fontSize: 10,
                   fontWeight: isActive ? 600 : 400,
@@ -100,7 +100,7 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
                 }}
               >
                 {tab.label}
-              </Typography>
+              </Box>
             </Box>
           </Tooltip>
         );
