@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tooltip } from '@mui/material';
 import { Box } from '../ui/Box';
+import { useTheme } from '../ui/ThemeProvider';
 import { Chat as ChatIcon, Psychology as PersonaIcon, SmartToy as AgentIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../../store';
@@ -20,6 +21,9 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
   const location = useLocation();
   const activePanel = useStore((s) => s.activePanel);
   const setActivePanel = useStore((s) => s.setActivePanel);
+  const theme = useTheme();
+  const spacing = theme.spacing;
+  const borderRadius = theme.borderRadius;
 
   const getActiveTab = () => {
     const path = location.pathname;
@@ -52,7 +56,7 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
         bottom: 0,
         left: 0,
         right: 0,
-        height: 64,
+        height: spacing ? spacing[8] : 64,
         bgcolor: 'var(--color-bg-primary, #0f1011)',
         borderTop: '1px solid var(--color-border, rgba(255,255,255,0.05))',
         display: 'flex',
@@ -77,16 +81,16 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 1,
-                minWidth: 64,
-                height: 56,
+                gap: spacing ? spacing[1] : 8,
+                minWidth: spacing ? spacing[8] : 64,
+                height: spacing ? spacing[7] : 56,
                 border: 'none',
                 background: 'none',
                 cursor: 'pointer',
                 color: isActive ? 'primary.main' : 'var(--color-text-secondary, #d0d6e0)',
                 transform: isActive ? 'scale(1.05)' : 'scale(1)',
                 transition: 'all 0.2s ease',
-                borderRadius: 2,
+                borderRadius: borderRadius ? borderRadius.sm : 4,
                 '&:hover': {
                   color: isActive ? 'primary.main' : 'var(--color-text-primary, #f7f8f8)',
                   bgcolor: isActive ? 'rgba(94, 106, 210, 0.08)' : 'transparent',
