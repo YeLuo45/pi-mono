@@ -160,6 +160,8 @@ const darkMuiTheme = createTheme({
     overline: { fontWeight: 510, letterSpacing: '0.08em' },
   },
   shape: { borderRadius: borderRadius.md },
+  spacing: 8,
+  tokens: { spacing, borderRadius, shadows: shadows.dark },
 });
 
 export const darkTheme: Theme = darkMuiTheme as unknown as Theme;
@@ -214,6 +216,8 @@ const lightMuiTheme = createTheme({
     overline: { fontWeight: 510, letterSpacing: '0.08em' },
   },
   shape: { borderRadius: borderRadius.md },
+  spacing: 8,
+  tokens: { spacing, borderRadius, shadows: shadows.light },
 });
 
 export const lightTheme: Theme = lightMuiTheme as unknown as Theme;
@@ -299,6 +303,10 @@ export const ThemeProvider = ({ children, theme }: AppThemeProviderProps) => {
     typography: activeTheme.typography,
     shape: activeTheme.shape,
     components: activeTheme.components,
+    tokens: activeTheme.tokens,
+    spacing: activeTheme.spacing,
+    borderRadius: activeTheme.borderRadius,
+    shadows: activeTheme.shadows,
   });
 
   return (
