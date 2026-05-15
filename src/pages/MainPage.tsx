@@ -95,7 +95,7 @@ export const MainPage: React.FC = () => {
   const ActivePanelComponent = resolvePanelComponent() as React.FC<Record<string, unknown>>;
 
   return (
-    <Box css={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: theme.palette.background.default }}>
+    <Box css={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: '#08090a' }}>
       {/* Mobile Drawer - Left side swipe accessible */}
       <MobileDrawer
         open={mobileDrawerOpen}
