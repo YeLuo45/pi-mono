@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Typography, Stack, Grid, Chip, Snackbar, Alert, CircularProgress } from '@mui/material';
 import { Box } from '../components/ui/Box';
+import { useTheme } from '../components/ui/ThemeProvider';
 import { useNavigate } from 'react-router-dom';
 import { SkillStoreHeader } from '../components/SkillStore/SkillStoreHeader';
 import { CategoryTabs } from '../components/SkillStore/CategoryTabs';
@@ -148,17 +149,20 @@ export const SkillStorePage: React.FC = () => {
     return userRating > 0 ? userRating : avgRating;
   };
 
+  const theme = useTheme();
+  const shop = theme.palette.shop || {};
+
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: '#F8FAFC',
+        bgcolor: shop.bgPage || '#F8FAFC',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
       {/* Header */}
-      <Box sx={{ bgcolor: '#FFFFFF', borderBottom: '1px solid #E5E7EB' }}>
+      <Box sx={{ bgcolor: '#FFFFFF', borderBottom: `1px solid ${shop.border || '#E5E7EB'}` }}>
         <SkillStoreHeader
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -166,7 +170,7 @@ export const SkillStorePage: React.FC = () => {
         />
 
         {/* Sort Tabs */}
-        <Box sx={{ px: 3, py: 1, bgcolor: '#FFFFFF', borderBottom: '1px solid #F1F5F9' }}>
+        <Box sx={{ px: 3, py: 1, bgcolor: '#FFFFFF', borderBottom: `1px solid ${shop.borderLight || '#F1F5F9'}` }}>
           <Stack direction="row" spacing={2}>
             {[
               { key: 'popular', label: '最热门', icon: '🔥' },
@@ -179,7 +183,7 @@ export const SkillStorePage: React.FC = () => {
                 sx={{
                   cursor: 'pointer',
                   pb: 0.75,
-                  borderBottom: sortBy === sort.key ? '2px solid #6366F1' : '2px solid transparent',
+                  borderBottom: sortBy === sort.key ? `2px solid ${shop.accent || '#6366F1'}` : '2px solid transparent',
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -188,7 +192,7 @@ export const SkillStorePage: React.FC = () => {
                   sx={{
                     fontSize: 12,
                     fontWeight: sortBy === sort.key ? 600 : 500,
-                    color: sortBy === sort.key ? '#6366F1' : '#64748B',
+                    color: sortBy === sort.key ? (shop.accent || '#6366F1') : (shop.textMuted || '#64748B'),
                   }}
                 >
                   {sort.icon} {sort.label}
@@ -206,14 +210,14 @@ export const SkillStorePage: React.FC = () => {
       <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-            <CircularProgress sx={{ color: '#6366F1' }} />
+            <CircularProgress sx={{ color: shop.accent || '#6366F1' }} />
           </Box>
         ) : filteredSkills.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h6" sx={{ fontSize: 16, color: '#64748B', mb: 1 }}>
+            <Typography variant="h6" sx={{ fontSize: 16, color: shop.textMuted || '#64748B', mb: 1 }}>
               没有找到匹配的技能
             </Typography>
-            <Typography variant="body2" sx={{ fontSize: 13, color: '#94A3B8' }}>
+            <Typography variant="body2" sx={{ fontSize: 13, color: shop.textLight || '#94A3B8' }}>
               尝试调整搜索条件或浏览其他分类
             </Typography>
           </Box>
@@ -237,7 +241,7 @@ export const SkillStorePage: React.FC = () => {
       {/* Featured Section (if showing all and not filtered) */}
       {!searchQuery && activeCategory === 'all' && filteredSkills.length > 0 && (
         <Box sx={{ px: 3, pb: 3 }}>
-          <Typography variant="subtitle1" sx={{ fontSize: 14, fontWeight: 700, color: '#1E293B', mb: 2 }}>
+          <Typography variant="subtitle1" sx={{ fontSize: 14, fontWeight: 700, color: shop.textDark || '#1E293B', mb: 2 }}>
             ⭐ 热门推荐
           </Typography>
           <Grid container spacing={2}>

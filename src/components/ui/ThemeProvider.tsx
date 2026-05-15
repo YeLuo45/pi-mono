@@ -25,6 +25,18 @@ export interface Palette {
   success?: { main: string };
   info?: { main: string };
   mode?: 'light' | 'dark';
+  shop?: {
+    bgPage: string;
+    border: string;
+    borderLight: string;
+    textMuted: string;
+    textLight: string;
+    textDark: string;
+    accent: string;
+    accentHover: string;
+    star: string;
+    success: string;
+  };
 }
 
 export interface Typography {
@@ -197,6 +209,19 @@ const lightMuiTheme = createTheme({
     warning: { main: '#d97706' },
     success: { main: '#16a34a' },
     info: { main: '#1456f0' },
+    // Extended light theme palette
+    shop: {
+      bgPage: '#F8FAFC',
+      border: '#E5E7EB',
+      borderLight: '#F1F5F9',
+      textMuted: '#64748B',
+      textLight: '#94A3B8',
+      textDark: '#1E293B',
+      accent: '#6366F1',
+      accentHover: '#4F46E5',
+      star: '#F59E0B',
+      success: '#10B981',
+    },
   },
   typography: {
     fontFamily: '"DM Sans", "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif',
