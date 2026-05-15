@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Box } from '../ui/Box';
 import { ChatIcon, CalendarMonthIcon, CheckBoxIcon, DescriptionIcon, EmailIcon, EditIcon, SettingsIcon, GroupIcon, PsychologyIcon, ExtensionIcon, MemoryIcon, BarChartIcon, HubIcon, ScenesIcon, FlashOnIcon, MultiAgentIcon } from '../ui/muiIconMap';
+const CalendarIcon = CalendarMonthIcon;
 import { useStore } from '../../store';
 import { PluginService } from '../../services/plugin/PluginService';
 import { useTranslation } from 'react-i18next';
