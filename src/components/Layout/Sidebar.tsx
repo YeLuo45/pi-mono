@@ -2,7 +2,8 @@ import { css } from '@emotion/react';
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Box } from '../ui/Box';
-import { ChatIcon, CalendarMonthIcon, CheckBoxIcon, DescriptionIcon, EmailIcon, EditIcon, SettingsIcon, GroupIcon, PsychologyIcon, ExtensionIcon, MemoryIcon, BarChartIcon, HubIcon, ScenesIcon, FlashOnIcon, MultiAgentIcon } from '../ui/muiIconMap';
+import { IconButton, Tooltip } from '@mui/material';
+import { ChatIcon, CalendarMonthIcon, CheckBoxIcon, DescriptionIcon, EmailIcon, EditIcon, SettingsIcon, GroupIcon, PsychologyIcon, ExtensionIcon, MemoryIcon, BarChartIcon, HubIcon, ScenesIcon, FlashOnIcon, MultiAgentIcon, ChevronLeftIcon, ChevronRightIcon } from '../ui/muiIconMap';
 const CalendarIcon = CalendarMonthIcon;
 import { useStore } from '../../store';
 import { PluginService } from '../../services/plugin/PluginService';
@@ -39,6 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const activePanel = useStore((s) => s.activePanel);
   const setActivePanel = useStore((s) => s.setActivePanel);
   const setActivePluginId = useStore((s) => s.setActivePluginId);
+  const [collapsed, setCollapsed] = React.useState(false);
 
   const isKnowledgeRoute = location.pathname === '/knowledge';
   const [multiAgentOpen, setMultiAgentOpen] = React.useState(false);
@@ -71,7 +73,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   return (
     <Box
       css={css`
-        width: 160px;
+        width: ${collapsed ? 60 : 160}px;
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -79,63 +81,84 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         border-right: 1px solid var(--color-border, rgba(255,255,255,0.05));
         flex-shrink: 0;
         overflow: hidden;
+        transition: width 0.2s ease;
       `}
     >
       {/* Logo / Title */}
-      <Box css={css`padding: 16px; padding-bottom: 8px;`}>
-        <Box css={css`font-size: 13px; font-weight: 700; color: #9b7fd4; margin-bottom: 2px;`}>
-          PixelPal
-        </Box>
-        <Box css={css`font-size: 10px; color: rgba(255,255,255,0.5);`}>
-          AI Companion
-        </Box>
+      <Box css={css`padding: 16px; padding-bottom: 8px; display: flex; align-items: center; justify-content: ${collapsed ? 'center' : 'flex-start'};`}>
+        {!collapsed && (
+          <Box css={css`flex: 1; min-width: 0;`}>
+            <Box css={css`font-size: 13px; font-weight: 700; color: #9b7fd4; margin-bottom: 2px;`}>
+              PixelPal
+            </Box>
+            <Box css={css`font-size: 10px; color: rgba(255,255,255,0.5);`}>
+              AI Companion
+            </Box>
+          </Box>
+        )}
+        <Tooltip title={collapsed ? '展开侧边栏' : '收起侧边栏'} placement="right">
+          <IconButton
+            size="small"
+            onClick={() => setCollapsed(!collapsed)}
+            css={css`
+              color: rgba(255,255,255,0.4);
+              &:hover { color: rgba(255,255,255,0.7); }
+            `}
+          >
+            {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+          </IconButton>
+        </Tooltip>
       </Box>
 
-      <Box css={css`opacity: 0.15; margin-left: 8px; margin-right: 8px; margin-bottom: 8px; height: 1px; background: rgba(255,255,255,0.1);`} />
+      {!collapsed && <Box css={css`opacity: 0.15; margin-left: 8px; margin-right: 8px; margin-bottom: 8px; height: 1px; background: rgba(255,255,255,0.1);`} />}
 
       {/* Persona Selector */}
-      <Box css={css`padding-left: 8px; padding-bottom: 8px;`}>
-        <PersonaSelector collapsed={false} />
+      <Box css={css`padding-left: ${collapsed ? 4 : 8}px; padding-bottom: 8px; display: flex; justify-content: center;`}>
+        <PersonaSelector collapsed={collapsed} />
       </Box>
 
       {/* Navigation items */}
-      <Box css={css`flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 4px; padding-left: 8px; padding-right: 8px;`}>
+      <Box css={css`flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 4px; padding-left: ${collapsed ? 4 : 8}px; padding-right: ${collapsed ? 4 : 8}px;`}>
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
-          const isActive = item.id === 'knowledge' 
-            ? isKnowledgeRoute 
+          const isActive = item.id === 'knowledge'
+            ? isKnowledgeRoute
             : (activePanel as string) === item.id;
           return (
-            <Box
-              key={item.id}
-              component="button"
-              onClick={() => handleNavClick(item.id as typeof activePanel)}
-              title=""
-              css={css`
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 8px 12px;
-                min-height: 44px;
-                border-radius: 12px;
-                border: none;
-                cursor: pointer;
-                background: ${isActive ? 'var(--persona-bg, rgba(94, 106, 210, 0.15))' : 'transparent'};
-                color: ${isActive ? 'var(--persona-text, #f7f8f8)' : 'var(--color-text-secondary, #d0d6e0)'};
-                transition: all 0.15s ease;
-                width: 100%;
-                text-align: left;
-                &:hover {
-                  background: var(--color-button-hover, rgba(255,255,255,0.05));
-                  transform: scale(1.05);
-                }
-              `}
-            >
-              <Icon size={18} style={{ flexShrink: 0 }} />
-              <Box css={css`font-size: 12px; font-weight: ${isActive ? 600 : 400};`}>
-                {t(item.labelKey)}
+            <Tooltip key={item.id} title={collapsed ? t(item.labelKey) : ''} placement="right">
+              <Box
+                component="button"
+                onClick={() => handleNavClick(item.id as typeof activePanel)}
+                title=""
+                css={css`
+                  display: flex;
+                  align-items: center;
+                  justify-content: ${collapsed ? 'center' : 'flex-start'};
+                  gap: ${collapsed ? 0 : 12}px;
+                  padding: ${collapsed ? '8px' : '8px 12px'};
+                  min-height: 44px;
+                  border-radius: 12px;
+                  border: none;
+                  cursor: pointer;
+                  background: ${isActive ? 'var(--persona-bg, rgba(94, 106, 210, 0.15))' : 'transparent'};
+                  color: ${isActive ? 'var(--persona-text, #f7f8f8)' : 'var(--color-text-secondary, #d0d6e0)'};
+                  transition: all 0.15s ease;
+                  width: 100%;
+                  text-align: left;
+                  &:hover {
+                    background: var(--color-button-hover, rgba(255,255,255,0.05));
+                    transform: scale(1.05);
+                  }
+                `}
+              >
+                <Icon size={18} style={{ flexShrink: 0 }} />
+                {!collapsed && (
+                  <Box css={css`font-size: 12px; font-weight: ${isActive ? 600 : 400};`}>
+                    {t(item.labelKey)}
+                  </Box>
+                )}
               </Box>
-            </Box>
+            </Tooltip>
           );
         })}
 
@@ -187,36 +210,41 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       </Box>
 
       {/* Settings at bottom */}
-      <Box css={css`padding-left: 8px; margin-top: auto;`}>
-        <Box
-          component="button"
-          onClick={() => handleNavClick('settings')}
-          title=""
-          css={css`
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 12px;
-            min-height: 44px;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            background: ${activePanel === 'settings' ? 'rgba(94, 106, 210, 0.15)' : 'transparent'};
-            color: ${activePanel === 'settings' ? '#f7f8f8' : '#d0d6e0'};
-            transition: all 0.15s ease;
-            width: 100%;
-            text-align: left;
-            &:hover {
-              background: rgba(255,255,255,0.05);
-              transform: scale(1.05);
-            }
-          `}
-        >
-          <SettingsIcon size={18} style={{ flexShrink: 0 }} />
-          <Box css={css`font-size: 12px; font-weight: ${activePanel === 'settings' ? 600 : 400};`}>
-            {t('nav.settings')}
+      <Box css={css`padding-left: ${collapsed ? 4 : 8}px; margin-top: auto; display: flex; justify-content: ${collapsed ? 'center' : 'flex-start'};`}>
+        <Tooltip title={collapsed ? t('nav.settings') : ''} placement="right">
+          <Box
+            component="button"
+            onClick={() => handleNavClick('settings')}
+            title=""
+            css={css`
+              display: flex;
+              align-items: center;
+              justify-content: ${collapsed ? 'center' : 'flex-start'};
+              gap: ${collapsed ? 0 : 12}px;
+              padding: ${collapsed ? '8px' : '8px 12px'};
+              min-height: 44px;
+              border-radius: 12px;
+              border: none;
+              cursor: pointer;
+              background: ${activePanel === 'settings' ? 'rgba(94, 106, 210, 0.15)' : 'transparent'};
+              color: ${activePanel === 'settings' ? '#f7f8f8' : '#d0d6e0'};
+              transition: all 0.15s ease;
+              width: 100%;
+              text-align: left;
+              &:hover {
+                background: rgba(255,255,255,0.05);
+                transform: scale(1.05);
+              }
+            `}
+          >
+            <SettingsIcon size={18} style={{ flexShrink: 0 }} />
+            {!collapsed && (
+              <Box css={css`font-size: 12px; font-weight: ${activePanel === 'settings' ? 600 : 400};`}>
+                {t('nav.settings')}
+              </Box>
+            )}
           </Box>
-        </Box>
+        </Tooltip>
       </Box>
 
       {/* Multi-Agent Panel */}

@@ -21,6 +21,8 @@ import {
   Mail as EmailIcon,
   ChevronUp as ExpandLessIcon,
   ChevronDown as ExpandMoreIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
   Puzzle as ExtensionIcon,
   Heart as FavoriteIcon,
   Heart as FavoriteBorderIcon, // FavoriteBorder uses same filled heart
@@ -76,6 +78,8 @@ export {
   EmailIcon,
   ExpandLessIcon,
   ExpandMoreIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   ExtensionIcon,
   FavoriteIcon,
   FavoriteBorderIcon,
