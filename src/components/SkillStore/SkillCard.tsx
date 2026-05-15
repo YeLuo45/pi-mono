@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Typography, Chip, Button, Stack, alpha } from '@mui/material';
+import { Typography, Chip, Button, Stack, alpha, useTheme } from '@mui/material';
 import { Box } from '../ui/Box';
 import { Star as StarIcon, Download as DownloadIcon, Check as CheckIcon } from '@mui/icons-material';
 import type { MarketplaceSkill } from '../../data/sampleMarketplaceSkills';
@@ -45,6 +45,8 @@ export const SkillCard: React.FC<SkillCardProps> = ({
   onInstall,
   onClick,
 }) => {
+  const theme = useTheme();
+  const shop = theme.palette.shop || {};
   const categoryColor = CATEGORY_COLORS[skill.category] || '#607d8b';
 
   const handleInstall = (e: React.MouseEvent) => {
@@ -58,11 +60,11 @@ export const SkillCard: React.FC<SkillCardProps> = ({
     <Box
       onClick={() => onClick?.(skill)}
       sx={{
-        bgcolor: '#FFFFFF',
+        bgcolor: '#ffffff',
         borderRadius: 3,
         overflow: 'hidden',
         boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
-        border: '1px solid #E5E7EB',
+        border: `1px solid ${shop.border || '#e5e7eb'}`,
         cursor: 'pointer',
         transition: 'all 0.2s ease',
         '&:hover': {
@@ -92,7 +94,7 @@ export const SkillCard: React.FC<SkillCardProps> = ({
             sx={{
               fontSize: 14,
               fontWeight: 700,
-              color: '#1E293B',
+              color: shop.textDark || '#1E293B',
               lineHeight: 1.3,
               mb: 0.5,
             }}
@@ -101,7 +103,7 @@ export const SkillCard: React.FC<SkillCardProps> = ({
           </Typography>
           <Typography
             variant="caption"
-            sx={{ fontSize: 11, color: '#64748B' }}
+            sx={{ fontSize: 11, color: shop.textMuted || '#64748B' }}
           >
             by {skill.author}
           </Typography>
@@ -115,7 +117,7 @@ export const SkillCard: React.FC<SkillCardProps> = ({
           variant="body2"
           sx={{
             fontSize: 12,
-            color: '#64748B',
+            color: shop.textMuted || '#64748B',
             lineHeight: 1.5,
             mb: 1.5,
             height: 36,
@@ -150,21 +152,21 @@ export const SkillCard: React.FC<SkillCardProps> = ({
         {/* Rating & Install Count */}
         <Stack direction="row" spacing={1} alignItems="center" mb={1.5}>
           <Stack direction="row" spacing={0.3} alignItems="center">
-            <StarIcon sx={{ fontSize: 14, color: '#F59E0B' }} />
-            <Typography variant="caption" sx={{ fontSize: 11, fontWeight: 600, color: '#1E293B' }}>
+            <StarIcon sx={{ fontSize: 14, color: shop.star || '#F59E0B' }} />
+            <Typography variant="caption" sx={{ fontSize: 11, fontWeight: 600, color: shop.textDark || '#1E293B' }}>
               {skill.avgRating > 0 ? skill.avgRating.toFixed(1) : 'New'}
             </Typography>
           </Stack>
-          <Typography variant="caption" sx={{ fontSize: 10, color: '#94A3B8' }}>
+          <Typography variant="caption" sx={{ fontSize: 10, color: shop.textLight || '#94A3B8' }}>
             •
           </Typography>
           <Stack direction="row" spacing={0.3} alignItems="center">
-            <DownloadIcon sx={{ fontSize: 12, color: '#94A3B8' }} />
-            <Typography variant="caption" sx={{ fontSize: 11, color: '#64748B' }}>
+            <DownloadIcon sx={{ fontSize: 12, color: shop.textLight || '#94A3B8' }} />
+            <Typography variant="caption" sx={{ fontSize: 11, color: shop.textMuted || '#64748B' }}>
               {skill.installCount.toLocaleString()}
             </Typography>
           </Stack>
-          <Typography variant="caption" sx={{ fontSize: 10, color: '#94A3B8' }}>
+          <Typography variant="caption" sx={{ fontSize: 10, color: shop.textLight || '#94A3B8' }}>
             •
           </Typography>
           <Chip
@@ -197,19 +199,19 @@ export const SkillCard: React.FC<SkillCardProps> = ({
             textTransform: 'none',
             ...(isInstalled
               ? {
-                  borderColor: '#10B981',
-                  color: '#10B981',
-                  bgcolor: alpha('#10B981', 0.05),
+                  borderColor: shop.success || '#10B981',
+                  color: shop.success || '#10B981',
+                  bgcolor: alpha(shop.success || '#10B981', 0.05),
                   '&:hover': {
-                    bgcolor: alpha('#10B981', 0.1),
-                    borderColor: '#10B981',
+                    bgcolor: alpha(shop.success || '#10B981', 0.1),
+                    borderColor: shop.success || '#10B981',
                   },
                 }
               : {
-                  bgcolor: '#6366F1',
-                  color: '#FFFFFF',
+                  bgcolor: shop.accent || '#6366F1',
+                  color: '#ffffff',
                   '&:hover': {
-                    bgcolor: '#4F46E5',
+                    bgcolor: shop.accentHover || '#4F46E5',
                   },
                 }),
           }}
