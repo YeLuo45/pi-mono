@@ -77,16 +77,22 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 0.5,
+                gap: 1,
                 minWidth: 64,
                 height: 56,
                 border: 'none',
                 background: 'none',
                 cursor: 'pointer',
                 color: isActive ? 'primary.main' : 'var(--color-text-secondary, #d0d6e0)',
-                transition: 'all 0.15s ease',
+                transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                transition: 'all 0.2s ease',
+                borderRadius: 2,
                 '&:hover': {
                   color: isActive ? 'primary.main' : 'var(--color-text-primary, #f7f8f8)',
+                  bgcolor: isActive ? 'rgba(94, 106, 210, 0.08)' : 'transparent',
+                },
+                '&:active': {
+                  transform: 'scale(0.95)',
                 },
               }}
             >
@@ -97,6 +103,7 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
                   fontSize: 10,
                   fontWeight: isActive ? 600 : 400,
                   lineHeight: 1,
+                  color: isActive ? 'primary.main' : 'inherit',
                 }}
               >
                 {tab.label}

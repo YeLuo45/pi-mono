@@ -47,11 +47,61 @@ export interface Shape {
   borderRadius?: number;
 }
 
+export interface Spacing {
+  0: 0;
+  0.5: 4;
+  1: 8;
+  1.5: 12;
+  2: 16;
+  2.5: 20;
+  3: 24;
+  3.5: 28;
+  4: 32;
+  5: 40;
+  6: 48;
+  7: 56;
+  8: 64;
+  9: 72;
+  10: 80;
+}
+
+export interface BorderRadius {
+  none: 0;
+  xs: 2;
+  sm: 4;
+  md: 8;
+  lg: 12;
+  xl: 16;
+  '2xl': 24;
+  full: 9999;
+}
+
+export interface Shadows {
+  none: string;
+  xs: string;
+  sm: string;
+  md: string;
+  lg: string;
+  xl: string;
+  '2xl': string;
+  inner: string;
+}
+
+export interface DesignTokens {
+  spacing: Spacing;
+  borderRadius: BorderRadius;
+  shadows: Shadows;
+}
+
 export interface Theme {
   palette: Palette;
   typography: Typography;
   shape: Shape;
   components?: Record<string, { styleOverrides?: Record<string, unknown> }>;
+  tokens?: DesignTokens;
+  spacing?: Spacing;
+  borderRadius?: BorderRadius;
+  shadows?: Shadows;
 }
 
 // ============================================================================
@@ -107,6 +157,18 @@ export const darkTheme: Theme = {
   palette: darkPalette,
   typography: darkTypography,
   shape: { borderRadius: 8 },
+  spacing: { 0: 0, 0.5: 4, 1: 8, 1.5: 12, 2: 16, 2.5: 20, 3: 24, 3.5: 28, 4: 32, 5: 40, 6: 48, 7: 56, 8: 64, 9: 72, 10: 80 },
+  borderRadius: { none: 0, xs: 2, sm: 4, md: 8, lg: 12, xl: 16, '2xl': 24, full: 9999 },
+  shadows: {
+    none: 'none',
+    xs: '0 1px 2px rgba(0, 0, 0, 0.3)',
+    sm: '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.24)',
+    md: '0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.24)',
+    lg: '0 10px 15px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.24)',
+    xl: '0 20px 25px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.24)',
+    '2xl': '0 25px 50px rgba(0, 0, 0, 0.4)',
+    inner: 'inset 0 2px 4px rgba(0, 0, 0, 0.2)',
+  },
 };
 
 // ============================================================================
@@ -162,6 +224,18 @@ export const lightTheme: Theme = {
   palette: lightPalette,
   typography: lightTypography,
   shape: { borderRadius: 8 },
+  spacing: { 0: 0, 0.5: 4, 1: 8, 1.5: 12, 2: 16, 2.5: 20, 3: 24, 3.5: 28, 4: 32, 5: 40, 6: 48, 7: 56, 8: 64, 9: 72, 10: 80 },
+  borderRadius: { none: 0, xs: 2, sm: 4, md: 8, lg: 12, xl: 16, '2xl': 24, full: 9999 },
+  shadows: {
+    none: 'none',
+    xs: '0 1px 2px rgba(0, 0, 0, 0.05)',
+    sm: '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06)',
+    md: '0 4px 6px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.06)',
+    lg: '0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.08)',
+    xl: '0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.08)',
+    '2xl': '0 25px 50px rgba(0, 0, 0, 0.15)',
+    inner: 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
+  },
 };
 
 // ============================================================================
