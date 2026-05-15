@@ -1,12 +1,12 @@
 /**
- * ThemeProvider.tsx — MUI ThemeProvider + CssBaseline replacement using Emotion
+ * ThemeProvider.tsx — MUI ThemeProvider with CssBaseline
  *
- * Replaces @mui/material ThemeProvider, createTheme, CssBaseline
- * with Emotion's ThemeProvider + Global components
+ * Uses @mui/material/styles ThemeProvider so MUI components receive the theme properly.
+ * CssBaseline styles are applied via Global from @emotion/react (for custom scrollbar styling).
  */
 
-import { ThemeProvider as EmotionThemeProvider, Global, css } from '@emotion/react';
-import { createTheme } from '@mui/material';
+import { Global, css } from '@emotion/react';
+import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { ReactNode, createContext, useContext } from 'react';
 
 // ============================================================================
@@ -292,11 +292,19 @@ export const ThemeProvider = ({ children, theme }: AppThemeProviderProps) => {
   const activeTheme = theme || darkTheme;
   const globalCss = activeTheme.palette.mode === 'light' ? lightCssBaseline : darkCssBaseline;
 
+  // Create MUI-compatible theme using createTheme to ensure full compatibility
+  const muiTheme = createTheme({
+    palette: activeTheme.palette,
+    typography: activeTheme.typography,
+    shape: activeTheme.shape,
+    components: activeTheme.components,
+  });
+
   return (
-    <EmotionThemeProvider theme={activeTheme}>
+    <MuiThemeProvider theme={muiTheme}>
       <Global styles={globalCss} />
       {children}
-    </EmotionThemeProvider>
+    </MuiThemeProvider>
   );
 };
 
