@@ -1,11 +1,12 @@
 /**
  * ThemeProvider.tsx — MUI ThemeProvider + CssBaseline replacement using Emotion
- * 
+ *
  * Replaces @mui/material ThemeProvider, createTheme, CssBaseline
  * with Emotion's ThemeProvider + Global components
  */
 
 import { ThemeProvider as EmotionThemeProvider, Global, css } from '@emotion/react';
+import { createTheme } from '@mui/material';
 import { ReactNode, createContext, useContext } from 'react';
 
 // ============================================================================
@@ -22,6 +23,7 @@ export interface Palette {
   warning?: { main: string };
   success?: { main: string };
   info?: { main: string };
+  mode?: 'light' | 'dark';
 }
 
 export interface Typography {
@@ -40,6 +42,7 @@ export interface Typography {
   button?: { fontWeight?: number | string; textTransform?: string; letterSpacing?: number | string };
   caption?: { fontWeight?: number | string };
   overline?: { fontWeight?: number | string; letterSpacing?: string };
+  pxToRem?: (px: number) => string;
   [key: string]: unknown;
 }
 
@@ -48,6 +51,7 @@ export interface Shape {
 }
 
 export interface Spacing {
+  (value: number): string;
   0: 0;
   0.5: 4;
   1: 8;
@@ -102,141 +106,116 @@ export interface Theme {
   spacing?: Spacing;
   borderRadius?: BorderRadius;
   shadows?: Shadows;
+  mode?: 'light' | 'dark';
 }
 
 // ============================================================================
-// Default Dark Theme (linearDarkTheme)
+// Default Dark Theme (linearDarkTheme) — uses MUI createTheme for full compatibility
 // ============================================================================
 
-const darkPalette: Palette = {
-  primary: {
-    main: '#5e6ad2',
-    light: '#7170ff',
-    dark: '#4a52b8',
-    contrastText: '#ffffff',
+const darkMuiTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#5e6ad2',
+      light: '#7170ff',
+      dark: '#4a52b8',
+      contrastText: '#ffffff',
+    },
+    secondary: {
+      main: '#7170ff',
+      contrastText: '#ffffff',
+    },
+    background: {
+      default: '#08090a',
+      paper: '#0f1011',
+    },
+    text: {
+      primary: '#f7f8f8',
+      secondary: '#d0d6e0',
+      disabled: '#62666d',
+    },
+    divider: 'rgba(255, 255, 255, 0.05)',
+    error: { main: '#f26875' },
+    warning: { main: '#f5c542' },
+    success: { main: '#52c775' },
+    info: { main: '#5e6ad2' },
   },
-  secondary: {
-    main: '#7170ff',
-    contrastText: '#ffffff',
+  typography: {
+    fontFamily: '"Inter", "Segoe UI", system-ui, sans-serif',
+    fontSize: 14,
+    h1: { fontWeight: 590, letterSpacing: '-0.056em' },
+    h2: { fontWeight: 590, letterSpacing: '-0.048em' },
+    h3: { fontWeight: 590, letterSpacing: '-0.04em' },
+    h4: { fontWeight: 510, letterSpacing: '-0.032em' },
+    h5: { fontWeight: 510, letterSpacing: '-0.024em' },
+    h6: { fontWeight: 510, letterSpacing: '-0.016em' },
+    subtitle1: { fontWeight: 510 },
+    subtitle2: { fontWeight: 510 },
+    body1: { fontWeight: 400 },
+    body2: { fontWeight: 400 },
+    button: { fontWeight: 510, textTransform: 'none', letterSpacing: 0 },
+    caption: { fontWeight: 400 },
+    overline: { fontWeight: 510, letterSpacing: '0.08em' },
   },
-  background: {
-    default: '#08090a',
-    paper: '#0f1011',
-  },
-  text: {
-    primary: '#f7f8f8',
-    secondary: '#d0d6e0',
-    disabled: '#62666d',
-  },
-  divider: 'rgba(255, 255, 255, 0.05)',
-  error: { main: '#f26875' },
-  warning: { main: '#f5c542' },
-  success: { main: '#52c775' },
-  info: { main: '#5e6ad2' },
-};
-
-const darkTypography: Typography = {
-  fontFamily: '"Inter", "Segoe UI", system-ui, sans-serif',
-  fontSize: 14,
-  h1: { fontWeight: 590, letterSpacing: '-0.056em' },
-  h2: { fontWeight: 590, letterSpacing: '-0.048em' },
-  h3: { fontWeight: 590, letterSpacing: '-0.04em' },
-  h4: { fontWeight: 510, letterSpacing: '-0.032em' },
-  h5: { fontWeight: 510, letterSpacing: '-0.024em' },
-  h6: { fontWeight: 510, letterSpacing: '-0.016em' },
-  subtitle1: { fontWeight: 510 },
-  subtitle2: { fontWeight: 510 },
-  body1: { fontWeight: 400 },
-  body2: { fontWeight: 400 },
-  button: { fontWeight: 510, textTransform: 'none', letterSpacing: 0 },
-  caption: { fontWeight: 400 },
-  overline: { fontWeight: 510, letterSpacing: '0.08em' },
-};
-
-export const darkTheme: Theme = {
-  palette: darkPalette,
-  typography: darkTypography,
   shape: { borderRadius: 8 },
-  spacing: { 0: 0, 0.5: 4, 1: 8, 1.5: 12, 2: 16, 2.5: 20, 3: 24, 3.5: 28, 4: 32, 5: 40, 6: 48, 7: 56, 8: 64, 9: 72, 10: 80 },
-  borderRadius: { none: 0, xs: 2, sm: 4, md: 8, lg: 12, xl: 16, '2xl': 24, full: 9999 },
-  shadows: {
-    none: 'none',
-    xs: '0 1px 2px rgba(0, 0, 0, 0.3)',
-    sm: '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.24)',
-    md: '0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.24)',
-    lg: '0 10px 15px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.24)',
-    xl: '0 20px 25px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.24)',
-    '2xl': '0 25px 50px rgba(0, 0, 0, 0.4)',
-    inner: 'inset 0 2px 4px rgba(0, 0, 0, 0.2)',
-  },
-};
+});
+
+export const darkTheme: Theme = darkMuiTheme as unknown as Theme;
 
 // ============================================================================
-// Default Light Theme (minimaxLightTheme)
+// Default Light Theme (minimaxLightTheme) — uses MUI createTheme for full compatibility
 // ============================================================================
 
-const lightPalette: Palette = {
-  primary: {
-    main: '#1456f0',
-    light: '#3daeff',
-    dark: '#0d44c7',
-    contrastText: '#ffffff',
+const lightMuiTheme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#1456f0',
+      light: '#3daeff',
+      dark: '#0d44c7',
+      contrastText: '#ffffff',
+    },
+    secondary: {
+      main: '#ea5ec1',
+      contrastText: '#ffffff',
+    },
+    background: {
+      default: '#ffffff',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#222222',
+      secondary: '#45515e',
+      disabled: '#b8b8b8',
+    },
+    divider: '#e5e7eb',
+    error: { main: '#dc2626' },
+    warning: { main: '#d97706' },
+    success: { main: '#16a34a' },
+    info: { main: '#1456f0' },
   },
-  secondary: {
-    main: '#ea5ec1',
-    contrastText: '#ffffff',
+  typography: {
+    fontFamily: '"DM Sans", "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif',
+    fontSize: 14,
+    h1: { fontWeight: 590, letterSpacing: '-0.056em' },
+    h2: { fontWeight: 590, letterSpacing: '-0.048em' },
+    h3: { fontWeight: 590, letterSpacing: '-0.04em' },
+    h4: { fontWeight: 510, letterSpacing: '-0.032em' },
+    h5: { fontWeight: 510, letterSpacing: '-0.024em' },
+    h6: { fontWeight: 510, letterSpacing: '-0.016em' },
+    subtitle1: { fontWeight: 510 },
+    subtitle2: { fontWeight: 510 },
+    body1: { fontWeight: 400 },
+    body2: { fontWeight: 400 },
+    button: { fontWeight: 510, textTransform: 'none', letterSpacing: 0 },
+    caption: { fontWeight: 400 },
+    overline: { fontWeight: 510, letterSpacing: '0.08em' },
   },
-  background: {
-    default: '#ffffff',
-    paper: '#ffffff',
-  },
-  text: {
-    primary: '#222222',
-    secondary: '#45515e',
-    disabled: '#b8b8b8',
-  },
-  divider: '#e5e7eb',
-  error: { main: '#dc2626' },
-  warning: { main: '#d97706' },
-  success: { main: '#16a34a' },
-  info: { main: '#1456f0' },
-};
-
-const lightTypography: Typography = {
-  fontFamily: '"DM Sans", "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif',
-  fontSize: 14,
-  h1: { fontWeight: 590, letterSpacing: '-0.056em' },
-  h2: { fontWeight: 590, letterSpacing: '-0.048em' },
-  h3: { fontWeight: 590, letterSpacing: '-0.04em' },
-  h4: { fontWeight: 510, letterSpacing: '-0.032em' },
-  h5: { fontWeight: 510, letterSpacing: '-0.024em' },
-  h6: { fontWeight: 510, letterSpacing: '-0.016em' },
-  subtitle1: { fontWeight: 510 },
-  subtitle2: { fontWeight: 510 },
-  body1: { fontWeight: 400 },
-  body2: { fontWeight: 400 },
-  button: { fontWeight: 510, textTransform: 'none', letterSpacing: 0 },
-  caption: { fontWeight: 400 },
-  overline: { fontWeight: 510, letterSpacing: '0.08em' },
-};
-
-export const lightTheme: Theme = {
-  palette: lightPalette,
-  typography: lightTypography,
   shape: { borderRadius: 8 },
-  spacing: { 0: 0, 0.5: 4, 1: 8, 1.5: 12, 2: 16, 2.5: 20, 3: 24, 3.5: 28, 4: 32, 5: 40, 6: 48, 7: 56, 8: 64, 9: 72, 10: 80 },
-  borderRadius: { none: 0, xs: 2, sm: 4, md: 8, lg: 12, xl: 16, '2xl': 24, full: 9999 },
-  shadows: {
-    none: 'none',
-    xs: '0 1px 2px rgba(0, 0, 0, 0.05)',
-    sm: '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06)',
-    md: '0 4px 6px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.06)',
-    lg: '0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.08)',
-    xl: '0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.08)',
-    '2xl': '0 25px 50px rgba(0, 0, 0, 0.15)',
-    inner: 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
-  },
-};
+});
+
+export const lightTheme: Theme = lightMuiTheme as unknown as Theme;
 
 // ============================================================================
 // CssBaseline Global Styles
