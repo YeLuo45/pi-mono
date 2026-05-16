@@ -1,4 +1,6 @@
 import type { AgentMessage } from './types'
+import { planReviewGate } from '../bus/plan-review';
+import type { ReviewConfig, PlanReviewResult } from '../bus/plan-review/types';
 
 type MessageHandler = (msg: AgentMessage) => void | Promise<void>
 
@@ -14,6 +16,52 @@ class AgentExecutionBus {
     this.handlers.get(agentId)!.add(handler)
     return () => {
       this.handlers.get(agentId)?.delete(handler)
+    }
+  }
+
+  /**
+   * Execute a task with plan review gate pre-check
+   * V103: Integrates PlanReviewGate before task execution
+   */
+  async execute(task: { type: string; description: string; inputs: Record<string, unknown> }, config: ReviewConfig): Promise<{ approved: boolean; result?: PlanReviewResult }> {
+    const result = await planReviewGate.review(task.description, config);
+
+    if (result.isApproved) {
+      // Broadcast approval event
+      this.broadcast({
+        from: 'system',
+        type: 'status',
+        payload: {
+          event: 'plan_review:approved',
+          score: result.score,
+          feedback: result.feedback,
+          retryCount: result.retryCount,
+        },
+        timestamp: Date.now(),
+      });
+      // Execute the task
+      await this.send({
+        from: 'plan-review-gate',
+        to: 'orchestrator',
+        type: 'task',
+        payload: task,
+        timestamp: Date.now(),
+      });
+      return { approved: true, result };
+    } else {
+      // Broadcast rejection event
+      this.broadcast({
+        from: 'system',
+        type: 'status',
+        payload: {
+          event: 'plan_review:rejected',
+          score: result.score,
+          feedback: result.feedback,
+          retryCount: result.retryCount,
+        },
+        timestamp: Date.now(),
+      });
+      return { approved: false, result };
     }
   }
 

@@ -146,6 +146,12 @@ export const Settings: React.FC = () => {
   const hotkeySettings = useStore((s) => s.hotkeySettings);
   const toggleHotkey = useStore((s) => s.toggleHotkey);
 
+  // V103: Plan Review settings state
+  const [planReviewEnabled, setPlanReviewEnabled] = useState(false);
+  const [reviewModel, setReviewModel] = useState(
+    models.length > 0 ? models[0].modelName : ''
+  );
+
   const handleSaveCustomTheme = () => {
     const theme = createCustomPreset(customColors);
     setAppThemePreset('custom');
@@ -1315,6 +1321,38 @@ export const Settings: React.FC = () => {
 
         {/* V102: Bot Channels Settings */}
         <BotChannelsSettings />
+
+        <Divider sx={{ opacity: 0.1 }} />
+
+        {/* V103: Plan Review Settings */}
+        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600 }}>
+              🔍 Plan Review
+            </Typography>
+            <Switch
+              size="small"
+              checked={planReviewEnabled}
+              onChange={(e) => setPlanReviewEnabled(e.target.checked)}
+            />
+          </Stack>
+          {planReviewEnabled && (
+            <Box sx={{ mt: 2 }}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Review Model</InputLabel>
+                <Select
+                  value={reviewModel}
+                  label="Review Model"
+                  onChange={(e) => setReviewModel(e.target.value)}
+                >
+                  {models.filter(m => m.isEnabled).map(m => (
+                    <MenuItem key={m.id} value={m.modelName}>{m.name} ({m.modelName})</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          )}
+        </Paper>
 
         <Divider sx={{ opacity: 0.1 }} />
 

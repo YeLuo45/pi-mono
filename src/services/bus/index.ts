@@ -15,3 +15,7 @@ export type { ChannelAdapter } from './ChannelAdapter';
 
 // Re-export AgentExecutionBus (renamed from agentBus)
 export { agentExecutionBus } from '../agents/AgentExecutionBus';
+
+// V103: Plan Review Gate exports
+export { planReviewGate, PlanReviewGate } from './plan-review';
+export type { PlanReviewResult, ReviewConfig } from './plan-review';
