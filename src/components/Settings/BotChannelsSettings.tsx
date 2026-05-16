@@ -20,7 +20,7 @@ import { botConfigManager, type BotChannelConfig } from '../../services/bus/BotC
 
 /** Individual channel config row */
 const ChannelConfigRow: React.FC<{
-  channel: 'telegram' | 'discord';
+  channel: 'telegram' | 'discord' | 'whatsapp' | 'feishu' | 'slack';
   icon: React.ReactNode;
   label: string;
   config: BotChannelConfig;
@@ -85,7 +85,7 @@ const ChannelConfigRow: React.FC<{
               <TextField
                 size="small"
                 type={showToken ? 'text' : 'password'}
-                placeholder={channel === 'telegram' ? '123456789:ABCdefGHI...' : 'MTIz...'}
+                placeholder={channel === 'telegram' ? '123456789:ABCdefGHI...' : channel === 'discord' ? 'MTIz...' : channel === 'whatsapp' ? 'whatsapp-token...' : channel === 'feishu' ? 'feishu-app-id:secret' : 'xoxb-xxx...'}
                 value={localToken}
                 onChange={(e) => setLocalToken(e.target.value)}
                 sx={{
@@ -118,7 +118,13 @@ const ChannelConfigRow: React.FC<{
           <Typography variant="caption" sx={{ fontSize: 9, color: 'text.disabled', display: 'block', mt: 1 }}>
             {channel === 'telegram'
               ? 'Get token from @BotFather'
-              : 'Get token from Discord Developer Portal'}
+              : channel === 'discord'
+              ? 'Get token from Discord Developer Portal'
+              : channel === 'whatsapp'
+              ? 'Get token from WhatsApp Business API'
+              : channel === 'feishu'
+              ? 'Get token from Feishu Open Platform'
+              : 'Get token from Slack App Credentials'}
           </Typography>
         </Box>
       </Collapse>
@@ -137,7 +143,7 @@ export const BotChannelsSettings: React.FC = () => {
     });
   }, []);
 
-  const handleUpdate = (channel: 'telegram' | 'discord', updates: Partial<BotChannelConfig>) => {
+  const handleUpdate = (channel: 'telegram' | 'discord' | 'whatsapp' | 'feishu' | 'slack', updates: Partial<BotChannelConfig>) => {
     botConfigManager.updateChannel(channel, updates);
   };
 
@@ -164,6 +170,27 @@ export const BotChannelsSettings: React.FC = () => {
           label="Discord Bot"
           config={config.discord}
           onUpdate={(u) => handleUpdate('discord', u)}
+        />
+        <ChannelConfigRow
+          channel="whatsapp"
+          icon={<Box sx={{ fontSize: 18 }}>📱</Box>}
+          label="WhatsApp Bot"
+          config={config.whatsapp}
+          onUpdate={(u) => handleUpdate('whatsapp', u)}
+        />
+        <ChannelConfigRow
+          channel="feishu"
+          icon={<Box sx={{ fontSize: 18 }}>✈️</Box>}
+          label="Feishu Bot"
+          config={config.feishu}
+          onUpdate={(u) => handleUpdate('feishu', u)}
+        />
+        <ChannelConfigRow
+          channel="slack"
+          icon={<Box sx={{ fontSize: 18 }}>⚡</Box>}
+          label="Slack Bot"
+          config={config.slack}
+          onUpdate={(u) => handleUpdate('slack', u)}
         />
       </Stack>
 
