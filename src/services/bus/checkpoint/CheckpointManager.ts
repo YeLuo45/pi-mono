@@ -12,11 +12,13 @@ const CHECKPOINT_PREFIX = 'checkpoint:';
 export class CheckpointManager {
   /**
    * Save checkpoint data to localStorage
+   * V107: Also stub call to MemoryStore.saveSession for future persistence
    */
   save(sessionId: string, data: CheckpointData): void {
     try {
       const key = `${CHECKPOINT_PREFIX}${sessionId}`;
       localStorage.setItem(key, JSON.stringify(data));
+      // TODO: V107 - MemoryStore.saveSession({ id: sessionId, checkpointData: data, ... })
     } catch (error) {
       console.error(`[CheckpointManager] Failed to save checkpoint for session ${sessionId}:`, error);
     }
