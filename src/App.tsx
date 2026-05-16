@@ -21,7 +21,7 @@ import { pluginRegistry } from './services/plugins/pluginRegistry';
 import { applyAppTheme, getPresetById, getSystemTheme, resetToDefault, applyCustomTheme } from './utils/appTheme';
 import { useHotkeys } from './hooks/useHotkeys';
 import { CostAlertToast } from './components/Usage/CostAlertToast';
-import { unifiedMessageBus, webChannelAdapter } from './services/bus';
+import { unifiedMessageBus, webChannelAdapter, botConfigManager } from './services/bus';
 import './services/i18n';
 import './styles/mobile.css';
 
@@ -1047,6 +1047,25 @@ function App() {
     const init = async () => {
       // V101: Initialize UnifiedMessageBus with WebChannelAdapter
       unifiedMessageBus.registerAdapter(webChannelAdapter);
+
+      // V102: Conditionally register bot channel adapters based on user config
+      const config = botConfigManager.getConfig();
+      if (config.telegram.enabled && config.telegram.token) {
+        // Dynamic import to avoid bundling node-telegram-bot-api in GitHub Pages
+        import('./services/bus/adapters/TelegramChannelAdapter').then(({ telegramChannelAdapter }) => {
+          telegramChannelAdapter.initialize(config.telegram.token);
+          unifiedMessageBus.registerAdapter(telegramChannelAdapter);
+          console.log('[App] Telegram channel adapter registered');
+        }).catch((e) => console.warn('[App] Failed to load Telegram adapter:', e));
+      }
+      if (config.discord.enabled && config.discord.token) {
+        // Dynamic import to avoid bundling discord.js in GitHub Pages
+        import('./services/bus/adapters/DiscordChannelAdapter').then(({ discordChannelAdapter }) => {
+          discordChannelAdapter.initialize(config.discord.token);
+          unifiedMessageBus.registerAdapter(discordChannelAdapter);
+          console.log('[App] Discord channel adapter registered');
+        }).catch((e) => console.warn('[App] Failed to load Discord adapter:', e));
+      }
 
       await initCompanion(companion.personaId, companion.moodId, companion.customName);
       // Compact memory if needed (runs in background)

@@ -32,6 +32,7 @@ import type { PersonaId, PersonaRole } from '../../types';
 import { APP_THEME_PRESETS, createCustomPreset, applyAppTheme, applyCustomTheme, getPresetById, getSystemTheme, resetToDefault } from '../../utils/appTheme';
 import { AnalyticsDashboard } from '../Analytics/AnalyticsDashboard';
 import { PerformanceDashboard, OptimizationPanel, AgentLeaderboard } from '../AgentOptimizer';
+import { BotChannelsSettings } from './BotChannelsSettings';
 
 const PROVIDER_LABELS: Record<string, string> = {
   openai: 'OpenAI',
@@ -1309,6 +1310,11 @@ export const Settings: React.FC = () => {
             </Button>
           </Stack>
         </Paper>
+
+        <Divider sx={{ opacity: 0.1 }} />
+
+        {/* V102: Bot Channels Settings */}
+        <BotChannelsSettings />
 
         <Divider sx={{ opacity: 0.1 }} />
 
