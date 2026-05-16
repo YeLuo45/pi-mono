@@ -44,4 +44,8 @@ export interface BusEvents {
   'checkpoint:cleared': { sessionId: string };
   'progress:updated': ProgressState;
   'progress:completed': ProgressState;
+  // V106: Provider Abstraction events
+  'provider:registered': { providerId: string; name: string };
+  'provider:unregistered': { providerId: string };
+  'provider:switched': { fromProviderId: string; toProviderId: string };
 }
