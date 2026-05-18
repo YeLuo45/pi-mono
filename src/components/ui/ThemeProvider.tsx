@@ -8,7 +8,7 @@
 import { Global, css } from '@emotion/react';
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { ReactNode, createContext, useContext } from 'react';
-import { borderRadius } from './design-tokens';
+import { borderRadius, spacing } from './design-tokens';
 
 // ============================================================================
 // Theme Types (compatible with MUI theme structure)

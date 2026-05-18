@@ -1,10 +1,45 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import electron from 'vite-plugin-electron'
 import path from 'node:path'
 
 const isGitHubPages = !!process.env.GITHUB_PAGES
+
+// Electron plugin — only available in non-GitHub Pages builds
+const electronPlugin = isGitHubPages ? [] : (() => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const electron = require('vite-plugin-electron');
+  return electron.default([
+    {
+      entry: 'electron/main.ts',
+      onstart(args) {
+        args.startup();
+      },
+      vite: {
+        build: {
+          outDir: 'dist/main',
+          rollupOptions: {
+            external: ['electron'],
+          },
+        },
+      },
+    },
+    {
+      entry: 'electron/preload.ts',
+      onstart(args) {
+        args.reload();
+      },
+      vite: {
+        build: {
+          outDir: 'dist/main',
+          rollupOptions: {
+            external: ['electron'],
+          },
+        },
+      },
+    },
+  ]);
+})();
 
 export default defineConfig({
   test: {
@@ -18,38 +53,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    ...(isGitHubPages ? [] : [
-      electron([
-        {
-          entry: 'electron/main.ts',
-          onstart(args) {
-            args.startup();
-          },
-          vite: {
-            build: {
-              outDir: 'dist/main',
-              rollupOptions: {
-                external: ['electron'],
-              },
-            },
-          },
-        },
-        {
-          entry: 'electron/preload.ts',
-          onstart(args) {
-            args.reload();
-          },
-          vite: {
-            build: {
-              outDir: 'dist/main',
-              rollupOptions: {
-                external: ['electron'],
-              },
-            },
-          },
-        },
-      ]),
-    ]),
+    ...electronPlugin,
   ],
   build: {
     outDir: 'dist/renderer',
