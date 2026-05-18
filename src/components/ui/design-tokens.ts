@@ -17,7 +17,7 @@
 // Spacing (8px base unit)
 // ============================================================================
 
-export const spacing = {
+export const spacing: Record<number, number> = {
   0: 0,
   0.5: 4,   // 0.5 * 8 = 4px
   1: 8,     // 1 * 8 = 8px
@@ -33,7 +33,7 @@ export const spacing = {
   8: 64,    // 8 * 8 = 64px
   9: 72,    // 9 * 8 = 72px
   10: 80,   // 10 * 8 = 80px
-} as const;
+};
 
 export type SpacingKey = keyof typeof spacing;
 
@@ -41,7 +41,7 @@ export type SpacingKey = keyof typeof spacing;
 // Border Radius
 // ============================================================================
 
-export const borderRadius = {
+export const borderRadius: Record<string, number> = {
   none: 0,
   xs: 2,
   sm: 4,
@@ -50,7 +50,7 @@ export const borderRadius = {
   xl: 16,
   '2xl': 24,
   full: 9999,
-} as const;
+};
 
 export type BorderRadiusKey = keyof typeof borderRadius;
 
@@ -58,7 +58,7 @@ export type BorderRadiusKey = keyof typeof borderRadius;
 // Shadows
 // ============================================================================
 
-export const shadows = {
+export const shadows: Record<string, Record<string, string>> = {
   // Dark theme shadows
   dark: {
     none: 'none',
@@ -81,7 +81,7 @@ export const shadows = {
     '2xl': '0 25px 50px rgba(0, 0, 0, 0.15)',
     inner: 'inset 0 2px 4px rgba(0, 0, 0, 0.06)',
   },
-} as const;
+};
 
 export type ShadowKey = keyof typeof shadows.dark;
 
@@ -228,6 +228,6 @@ export const colors = {
     closeFriend: '#4caf50',  // 60-80: green - 挚友
     soulmate: '#9c27b0',    // 80-100: purple - 灵魂伴侣
   },
-} as const;
+};
 
 export type Colors = typeof colors;
