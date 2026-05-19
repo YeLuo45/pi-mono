@@ -1,7 +1,8 @@
 import React from 'react';
-import { Card, CardContent, Typography, Switch, IconButton, Chip } from '@mui/material';
+import { Card, CardContent, Typography, IconButton, Chip } from '@mui/material';
 import { Box } from '../ui/Box';
 import { Edit as EditIcon, Delete as DeleteIcon, Bolt as BoltIcon } from '@mui/icons-material';
+import { MySwitch } from '../MUI替代';
 import type { Scene } from '../../types/scene';
 import { useTranslation } from 'react-i18next';
 
@@ -43,7 +44,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, onEdit, onDelete, o
           <Typography variant="subtitle1" sx={{ fontWeight: 600, fontSize: 14 }}>
             {scene.name}
           </Typography>
-          <Switch
+          <MySwitch
             size="small"
             checked={scene.enabled}
             onChange={() => onToggle(scene.id)}

@@ -19,6 +19,7 @@ import {
   Switch,
   FormControlLabel,
 } from '@mui/material';
+import { MySwitch } from '../MUI替代';
 import {
   Person as PersonIcon,
   Add as AddIcon,
@@ -249,11 +250,10 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({ collapsed }) =
       <Box sx={{ px: 1.5, pt: 0.5 }}>
         <FormControlLabel
           control={
-            <Switch
+            <MySwitch
               size="small"
               checked={collaborationMode}
               onChange={(e) => setCollaborationMode(e.target.checked)}
-              sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#863bff' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#863bff' } }}
             />
           }
           label={

@@ -27,8 +27,6 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Switch,
-  FormControlLabel,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -45,7 +43,9 @@ import {
   Card,
   CardContent,
   CardHeader,
+  FormControlLabel,
 } from '@mui/material';
+import { MySwitch } from '../MUI替代';
 import {
   Add as AddIcon,
   Remove as RemoveIcon,
@@ -634,11 +634,10 @@ export const MultiPersonaCollaboration: React.FC = () => {
                           </Tooltip>
                         )}
                         <Tooltip title={member.isActive ? t('team.setAsObserver') || 'Set as Observer' : t('team.setAsActive') || 'Set as Active'}>
-                          <Switch
+                          <MySwitch
                             size="small"
                             checked={member.isActive}
                             onChange={() => handleToggleActive(member.personaId, member.isActive)}
-                            sx={{ '& .MuiSwitch-thumb': { width: 10, height: 10 } }}
                           />
                         </Tooltip>
                         <Tooltip title={t('team.removeFromTeam') || 'Remove from Team'}>
@@ -679,7 +678,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
           <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
             <FormControlLabel
               control={
-                <Switch
+                <MySwitch
                   size="small"
                   checked={teamConfig.allowDebate}
                   onChange={(_, checked) => setTeamConfig({ allowDebate: checked })}
@@ -694,7 +693,7 @@ export const MultiPersonaCollaboration: React.FC = () => {
             />
             <FormControlLabel
               control={
-                <Switch
+                <MySwitch
                   size="small"
                   checked={teamConfig.allowCrossTalk}
                   onChange={(_, checked) => setTeamConfig({ allowCrossTalk: checked })}

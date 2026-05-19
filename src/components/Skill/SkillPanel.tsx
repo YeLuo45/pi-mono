@@ -8,7 +8,6 @@ import {
   Box,
   Typography,
   Paper,
-  Switch,
   Stack,
   Chip,
   Collapse,
@@ -33,6 +32,7 @@ import {
   Add as AddIcon,
   Build as BuildIcon,
 } from '@mui/icons-material';
+import { MySwitch } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { skillRunner } from '../../services/skills/skillRunner';
@@ -177,7 +177,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ skill, onToggle, onRun, isRunning
         </Tooltip>
 
         {/* Switch */}
-        <Switch
+        <MySwitch
           size="small"
           checked={skill.enabled}
           onClick={(e) => e.stopPropagation()}

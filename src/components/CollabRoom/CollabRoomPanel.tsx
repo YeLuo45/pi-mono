@@ -30,6 +30,7 @@ import {
   Divider,
   Alert,
 } from '@mui/material';
+import { MySwitch } from '../MUI替代';
 import {
   Add as AddIcon,
   Link as LinkIcon,
@@ -223,7 +224,7 @@ export const CollabRoomPanel: React.FC<CollabRoomPanelProps> = ({ className }) =
 
             <FormControlLabel
               control={
-                <Switch
+                <MySwitch
                   checked={settings.isPublic}
                   onChange={(e) => setSettings({ ...settings, isPublic: e.target.checked })}
                 />
@@ -233,7 +234,7 @@ export const CollabRoomPanel: React.FC<CollabRoomPanelProps> = ({ className }) =
 
             <FormControlLabel
               control={
-                <Switch
+                <MySwitch
                   checked={settings.allowVoice}
                   onChange={(e) => setSettings({ ...settings, allowVoice: e.target.checked })}
                 />
@@ -243,7 +244,7 @@ export const CollabRoomPanel: React.FC<CollabRoomPanelProps> = ({ className }) =
 
             <FormControlLabel
               control={
-                <Switch
+                <MySwitch
                   checked={settings.allowFileShare}
                   onChange={(e) => setSettings({ ...settings, allowFileShare: e.target.checked })}
                 />
@@ -419,7 +420,7 @@ export const CollabRoomPanel: React.FC<CollabRoomPanelProps> = ({ className }) =
         <DialogContent>
           <FormControlLabel
             control={
-              <Switch
+              <MySwitch
                 checked={settings.isPublic}
                 onChange={(e) => setSettings({ ...settings, isPublic: e.target.checked })}
               />
@@ -430,7 +431,7 @@ export const CollabRoomPanel: React.FC<CollabRoomPanelProps> = ({ className }) =
 
           <FormControlLabel
             control={
-              <Switch
+              <MySwitch
                 checked={settings.allowVoice}
                 onChange={(e) => setSettings({ ...settings, allowVoice: e.target.checked })}
               />
@@ -441,7 +442,7 @@ export const CollabRoomPanel: React.FC<CollabRoomPanelProps> = ({ className }) =
 
           <FormControlLabel
             control={
-              <Switch
+              <MySwitch
                 checked={settings.allowFileShare}
                 onChange={(e) => setSettings({ ...settings, allowFileShare: e.target.checked })}
               />

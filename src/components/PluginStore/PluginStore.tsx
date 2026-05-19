@@ -1,8 +1,9 @@
 // PluginStore — V62 Plugin Market UI
 import React, { useState, useEffect } from 'react';
-import { Typography, Paper, Switch, Stack, Chip, Collapse, Button, Divider } from '@mui/material';
+import { Typography, Paper, Stack, Chip, Collapse, Button, Divider } from '@mui/material';
 import { Box } from '../ui/Box';
 import { ExpandMore as ExpandIcon, ExpandLess as CollapseIcon, Add as AddIcon } from '@mui/icons-material';
+import { MySwitch } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
 import { pluginRegistry } from '../../services/plugins/pluginRegistry';
 import type { Plugin } from '../../types/plugin';
@@ -57,7 +58,7 @@ const PluginCard: React.FC<PluginCardProps> = ({ plugin, onToggle, onEdit }) => 
         </Box>
 
         {/* Switch */}
-        <Switch
+        <MySwitch
           size="small"
           checked={plugin.enabled}
           onClick={(e) => e.stopPropagation()}

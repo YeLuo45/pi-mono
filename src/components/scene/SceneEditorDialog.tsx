@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
-  FormControlLabel, Switch, useMediaQuery, Box, Chip,
+  FormControlLabel, useMediaQuery, Box, Chip,
 } from '@mui/material';
+import { MySwitch } from '../MUI替代';
 import type { Scene, Trigger, Action } from '../../types/scene';
 import { TriggerConfig } from './TriggerConfig';
 import { ActionConfig } from './ActionConfig';
@@ -101,7 +102,7 @@ export const SceneEditorDialog: React.FC<SceneEditorDialogProps> = ({ open, onCl
         />
 
         <FormControlLabel
-          control={<Switch checked={isQuick} onChange={(e) => setIsQuick(e.target.checked)} />}
+          control={<MySwitch checked={isQuick} onChange={(e) => setIsQuick(e.target.checked)} />}
           label={t('scene.showInQuickBar', '显示在快捷栏')}
         />
 

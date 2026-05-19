@@ -26,6 +26,7 @@ import {
   Switch,
   FormControlLabel,
 } from '@mui/material';
+import { MySwitch } from '../MUI替代';
 import {
   Search as SearchIcon,
   Refresh as RefreshIcon,
@@ -169,7 +170,7 @@ export const KnowledgePanel: React.FC = () => {
         <Box sx={{ p: 1.5, borderBottom: '1px solid rgba(255,255,255,0.06)', bgcolor: 'rgba(0,0,0,0.2)' }}>
           <FormControlLabel
             control={
-              <Switch
+              <MySwitch
                 size="small"
                 checked={autoRAG}
                 onChange={(e) => setAutoRAG(e.target.checked)}

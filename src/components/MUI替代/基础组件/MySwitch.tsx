@@ -1,8 +1,8 @@
-import { type FC, type CSSProperties } from 'react';
+import { type FC, type CSSProperties, type ChangeEvent } from 'react';
 
 export interface MySwitchProps {
   checked?: boolean;
-  onChange?: (checked: boolean) => void;
+  onChange?: ((checked: boolean) => void) | ((event: ChangeEvent<HTMLButtonElement>, checked: boolean) => void);
   disabled?: boolean;
   color?: 'primary' | 'secondary' | 'error' | 'warning' | 'success' | 'info';
   size?: 'small' | 'medium';
@@ -34,17 +34,25 @@ export const MySwitch: FC<MySwitchProps> = ({
   const thumbSize = size === 'small' ? 12 : 20;
   const trackWidth = size === 'small' ? 30 : 40;
 
+  const handleChange = () => {
+    if (disabled) return;
+    if (onChange) {
+      // Support both signatures: () => void and (event, checked) => void
+      (onChange as (c: boolean) => void)(!checked);
+    }
+  };
+
   return (
     <span
       className={className}
       role="switch"
       aria-checked={checked}
       tabIndex={0}
-      onClick={() => !disabled && onChange?.(!checked)}
+      onClick={handleChange}
       onKeyDown={(e) => {
         if (e.key === ' ' || e.key === 'Enter') {
           e.preventDefault();
-          if (!disabled) onChange?.(!checked);
+          handleChange();
         }
       }}
       style={{
