@@ -18,6 +18,7 @@ import { getAllPersonas } from './services/persona/personaStorage';
 import { generateYesterdaySummaryIfNeeded } from './services/summary/dailySummary';
 import { checkAndCreateMilestones } from './services/milestone/milestoneTracker';
 import { pluginRegistry } from './services/plugins/pluginRegistry';
+import { initToolRegistry } from './services/tools/init';
 import { applyAppTheme, getPresetById, getSystemTheme, resetToDefault, applyCustomTheme } from './utils/appTheme';
 import { useHotkeys } from './hooks/useHotkeys';
 import { CostAlertToast } from './components/Usage/CostAlertToast';
@@ -1085,6 +1086,9 @@ function App() {
 
       // V59: Load plugin system
       pluginRegistry.loadPlugins().catch(() => {});
+
+      // V126: Initialize MCP Tool Registry
+      initToolRegistry().catch(console.error);
 
       // Apply initial persona theme if enabled
       if (personaFollowTheme) {

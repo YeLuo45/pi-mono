@@ -26,6 +26,7 @@ const NAV_ITEMS = [
   { id: 'scenes', labelKey: 'nav.scenes', icon: ScenesIcon },
   { id: 'agent', labelKey: 'nav.agent', icon: FlashOnIcon },
   { id: 'multiagent', labelKey: 'nav.multiAgent', icon: MultiAgentIcon },
+  { id: 'tools', labelKey: 'nav.tools', icon: ExtensionIcon },
   { id: 'settings', labelKey: 'nav.settings', icon: SettingsIcon },
 ] as const;
 

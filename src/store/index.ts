@@ -123,7 +123,7 @@ interface AppState {
   updateLastActivity: () => void;
 
   // UI
-  activePanel: 'chat' | 'calendar' | 'tasks' | 'document' | 'knowledge' | 'email' | 'writing' | 'settings' | 'team' | 'plugin' | 'memory' | 'analytics' | 'scenes' | 'mall' | 'pluginStore' | 'agent';
+  activePanel: 'chat' | 'calendar' | 'tasks' | 'document' | 'knowledge' | 'email' | 'writing' | 'settings' | 'team' | 'plugin' | 'memory' | 'analytics' | 'scenes' | 'mall' | 'pluginStore' | 'agent' | 'tools';
   setActivePanel: (panel: AppState['activePanel']) => void;
 
   // Active plugin (used when activePanel === 'plugin')
