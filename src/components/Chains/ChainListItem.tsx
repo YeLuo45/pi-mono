@@ -3,9 +3,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  alpha,
-} from '@mui/material';
+import { MyAlpha } from '../MUI替代';
 import { MyBox, MyTypography, MySwitch, MyIconButton, MyChip, MyStack, MyTooltip } from '../MUI替代';
 import {
   Edit as EditIcon,

@@ -4,7 +4,9 @@
  */
 
 import React from 'react';
-import { alpha, useTheme } from '@mui/material';
+import { MyUseTheme } from '../MUI替代';
+
+import { MyAlpha } from '../MUI替代';
 import { MyTypography, MyChip, MyButton, MyStack } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Star as StarIcon, Download as DownloadIcon, Check as CheckIcon } from '@mui/icons-material';

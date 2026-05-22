@@ -10,11 +10,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-} from '@mui/material';
+import { MyDialog } from '../MUI替代';
 import { MyIconButton, MyTypography, MyBox, MyPaper, MyChip } from '../MUI替代';
 import { Close as CloseIcon } from '@mui/icons-material';
 import {

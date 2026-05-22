@@ -5,13 +5,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Slider,
-} from '@mui/material';
+import { MyDialog, MySlider } from '../MUI替代';
 import { MyBox, MyTypography, MyPaper, MyTextField, MyInputAdornment, MyChip, MyStack, MyButton, MyIconButton, MyTabs, MyTabs, MyList, MyListItem, MyListItemText, MyLinearProgress, MyDivider, MyTooltip, MyCard, MyCard, MyGrid } from '../MUI替代';
 import {
   Search as SearchIcon,

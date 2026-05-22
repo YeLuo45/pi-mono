@@ -8,10 +8,8 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  useTheme,
-  useMediaQuery,
-} from '@mui/material';
+import { MyUseTheme } from '../components/MUI替代';
+import { useMediaQuery } from '../components/MUI替代/useMediaQuery';
 import { MyTypography, MyIconButton, MyTooltip, MyDivider } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import {

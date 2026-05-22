@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { MyDialog } from '../MUI替代';
 import { MyBox, MyTypography, MyIconButton, MyButton, MyTextField, MySelect, MySelect, MySelect, MySelect, MyChip } from '../MUI替代';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { Add as AddIcon } from '@mui/icons-material';

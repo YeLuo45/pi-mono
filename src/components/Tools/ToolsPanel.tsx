@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { alpha } from '@mui/material';
+import { MyAlpha } from '../MUI替代';
 import { MyBox, MyTypography, MyPaper, MyChip, MyList, MyListItem, MyListItemText } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
 import { ToolRegistry } from '../../services/tools/registry';

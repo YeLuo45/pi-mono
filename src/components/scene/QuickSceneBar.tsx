@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMediaQuery } from '@mui/material';
+import { useMediaQuery } from '../MUI替代/useMediaQuery';
 import { MyIconButton, MyChip, MyTypography, MyDrawer } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Bolt as BoltIcon, Close as CloseIcon } from '@mui/icons-material';

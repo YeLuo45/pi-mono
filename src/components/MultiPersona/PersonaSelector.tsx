@@ -7,11 +7,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Menu,
-  ListItemIcon,
-  Badge,
-} from '@mui/material';
+import { MyMenu, MyListItemIcon, MyBadge } from '../MUI替代';
 import { MyBox, MyPaper, MyTypography, MyButton, MyIconButton, MyChip, MyIconButton, MySelect, MyListItemText, MyDivider, MyTooltip } from '../MUI替代';
 import {
   Person as PersonIcon,

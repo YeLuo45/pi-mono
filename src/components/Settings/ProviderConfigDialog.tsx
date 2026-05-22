@@ -5,12 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { MyDialog } from '../MUI替代';
 import { MyButton, MyTextField, MySelect, MySelect, MySelect, MySelect, MyStack, MyTypography, MyIconButton, MyAlert, MyCircularProgress } from '../MUI替代';
 import CloseIcon from '@mui/icons-material/Close';
 import type { ProviderConfig } from '../../services/providers/types';

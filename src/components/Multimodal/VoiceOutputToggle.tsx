@@ -8,10 +8,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import {
-  Menu,
-  Slider,
-} from '@mui/material';
+import { MyMenu, MySlider } from '../MUI替代';
 import { MyIconButton, MyTooltip, MySelect, MyTypography, MyBox } from '../MUI替代';
 import {
   VolumeUp as VolumeUpIcon,

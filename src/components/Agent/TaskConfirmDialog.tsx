@@ -9,14 +9,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox,
-  ListItemIcon,
-} from '@mui/material';
+import { MyDialog, MyCheckbox, MyListItemIcon } from '../MUI替代';
 import { MyBox, MyTypography, MyIconButton, MyButton, MyPaper, MyList, MyListItem, MyListItemText, MyTextField, MyChip, MyDivider, MyTooltip } from '../MUI替代';
 import {
   Delete as DeleteIcon,

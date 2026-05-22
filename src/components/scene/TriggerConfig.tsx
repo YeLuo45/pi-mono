@@ -1,7 +1,8 @@
 import React from 'react';
 import { MySelect, MySelect, MySelect, MySelect, MyTextField, MyChip, MyTypography } from '../MUI替代';
 import { Box } from '../ui/Box';
-import type { SelectChangeEvent } from '@mui/material';
+// SelectChangeEvent type - using string/number for Select onChange
+type SelectChangeEvent = { target: { value: string | number } };
 import type { Trigger, TimeTrigger, KeywordTrigger } from '../../types/scene';
 import { createTrigger } from '../../types/scene';
 import { useTranslation } from 'react-i18next';

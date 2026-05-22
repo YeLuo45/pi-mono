@@ -3,15 +3,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-} from '@mui/material';
+import { MyTable, MyTableBody, MyTableContainer, MyTableHead } from '../MUI替代';
+
+import { MyTableCell, MyTableRow, MyTableSortLabel } from '../MUI替代';
 import { MyBox, MyTypography, MyCard, MyChip, MyIconButton, MyTooltip, MyLinearProgress } from '../MUI替代';
 import { Visibility as ViewIcon } from '@mui/icons-material';
 import { performanceTracker } from '../../services/agentOptimizer/performanceTracker';

@@ -8,14 +8,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  ListItemAvatar,
-  FormControlLabel,
-} from '@mui/material';
+import { MyDialog, MyListItemAvatar, MyFormControlLabel } from '../MUI替代';
 import { MyBox, MyTypography, MyButton, MyTextField, MyIconButton, MyChip, MyList, MyListItem, MyListItemText, MyIconButton, MySwitch, MyTooltip, MyDivider, MyAlert } from '../MUI替代';
 import { MySwitch } from '../MUI替代';
 import {

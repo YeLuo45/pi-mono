@@ -7,13 +7,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  useMediaQuery,
-} from '@mui/material';
+import { useMediaQuery } from '../MUI替代/useMediaQuery';
+
+import { MyDialog } from '../MUI替代';
 import { MyButton, MyTextField, MyBox, MyTypography, MyChip, MyStack, MyIconButton, MyDivider, MyAlert, MyCollapse, MyList, MyListItem, MyListItemText, MySelect, MySelect, MySelect, MySelect, MyTooltip } from '../MUI替代';
 import {
   Add as AddIcon,

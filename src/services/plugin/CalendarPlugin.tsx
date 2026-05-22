@@ -1,11 +1,6 @@
 // CalendarPlugin — Built-in calendar plugin with Google Calendar API support
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { MyDialog } from '../../components/MUI替代';
 import { MyBox, MyTypography, MyIconButton, MyButton, MyTextField, MyList, MyListItem, MyListItemText } from '../../components/MUI替代';
 import { Add as AddIcon, ChevronLeft, ChevronRight, Delete as DeleteIcon } from '@mui/icons-material';
 import type { Plugin } from './types';

@@ -4,12 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { MyDialog } from '../MUI替代';
 import { MyList, MyListItem, MyListItemText, MyButton, MyTextField, MyIconButton, MyBox, MyTypography } from '../MUI替代';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';

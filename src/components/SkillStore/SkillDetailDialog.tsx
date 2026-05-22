@@ -4,12 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogActions,
-  alpha,
-} from '@mui/material';
+import { MyDialog, MyAlpha } from '../MUI替代';
 import { MyBox, MyTypography, MyButton, MyStack, MyChip, MyIconButton, MyDivider, MyAlert, MyCollapse, MyList, MyListItem, MyListItemText } from '../MUI替代';
 import {
   Close as CloseIcon,

@@ -3,13 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  alpha,
-} from '@mui/material';
+import { MyDialog, MyAlpha } from '../MUI替代';
 import { MyBox, MyTypography, MyTextField, MyButton, MyIconButton, MyStack, MyChip, MySelect, MySelect, MySelect, MySelect, MyDivider, MyCircularProgress, MyAlert } from '../MUI替代';
 import {
   Close as CloseIcon,

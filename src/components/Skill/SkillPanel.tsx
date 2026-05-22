@@ -4,9 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  alpha,
-} from '@mui/material';
+import { MyAlpha } from '../MUI替代';
 import { MyBox, MyTypography, MyPaper, MyStack, MyChip, MyCollapse, MyButton, MyDivider, MyIconButton, MyTextField, MyInputAdornment, MyTooltip, MyCircularProgress } from '../MUI替代';
 import {
   ExpandMore as ExpandIcon,

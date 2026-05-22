@@ -5,13 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react/i18next';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  ListItemIcon,
-} from '@mui/material';
+import { MyDialog, MyListItemIcon } from '../MUI替代';
 import { MyBox, MyTypography, MyPaper, MyLinearProgress, MyStack, MyChip, MyCard, MyCard, MyButton, MyIconButton, MyList, MyListItem, MyListItemText } from '../MUI替代';
 import {
   Favorite as HeartIcon,

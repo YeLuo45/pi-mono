@@ -5,9 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  Slider,
-} from '@mui/material';
+import { MySlider } from '../MUI替代';
 import { MyBox, MyTypography, MyTextField, MySelect, MySelect, MySelect, MySelect, MyChip, MyStack, MyButton, MyCircularProgress, MyAlert, MyPaper } from '../MUI替代';
 import {
   Check as CheckIcon,

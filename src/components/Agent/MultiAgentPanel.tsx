@@ -3,13 +3,7 @@
 // 侧边栏Agent列表
 
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Badge,
-  ListItemIcon,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from '@mui/material';
+import { MyBadge, MyListItemIcon, MyAccordion, MyAccordionSummary, MyAccordionDetails } from '../MUI替代';
 import { MyBox, MyTypography, MyIconButton, MyTooltip, MyDrawer, MyDivider, MyChip, MyIconButton, MyList, MyListItem, MyListItemText, MyCollapse, MyPaper, MyButton } from '../MUI替代';
 import {
   ExpandLess,

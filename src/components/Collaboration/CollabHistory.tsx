@@ -10,9 +10,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ListItemAvatar,
-} from '@mui/material';
+import { MyListItemAvatar } from '../MUI替代';
 import { MyBox, MyTypography, MyList, MyListItem, MyListItemText, MyChip, MyIconButton, MyCollapse, MyDivider, MyTooltip } from '../MUI替代';
 import {
   ExpandMore as ExpandMoreIcon,

@@ -5,12 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { MyDialog } from '../MUI替代';
 import { MyBox, MyTypography, MyTextField, MyIconButton, MySelect, MySelect, MySelect, MySelect, MySnackbar, MyAlert, MyButton, MyInputAdornment, MyChip } from '../MUI替代';
 import {
   Search as SearchIcon,

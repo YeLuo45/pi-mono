@@ -5,12 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { MyDialog } from '../MUI替代';
 import { MyButton, MyTextField, MyBox, MyTypography, MyIconButton, MyTooltip, MyAlert, MyFade, MyChip } from '../MUI替代';
 import {
   ContentCopy as CopyIcon,

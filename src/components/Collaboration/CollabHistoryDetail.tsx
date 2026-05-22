@@ -9,12 +9,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  ListItemAvatar,
-} from '@mui/material';
+import { MyAccordion, MyAccordionSummary, MyAccordionDetails, MyListItemAvatar } from '../MUI替代';
 import { MyBox, MyTypography, MyCollapse, MyDivider, MyChip, MyList, MyListItem, MyListItemText } from '../MUI替代';
 import {
   ChevronDown as ExpandMoreIcon,

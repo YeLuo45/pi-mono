@@ -1,10 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { MyDialog } from '../components/MUI替代';
 import { MyTypography, MyButton, MyGrid, MyTabs, MyTabs, MyChip } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import {

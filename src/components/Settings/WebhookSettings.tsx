@@ -1,11 +1,6 @@
 // WebhookSettings — Webhook management panel for Settings page
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { MyDialog } from '../MUI替代';
 import { MyBox, MyTypography, MyTextField, MyButton, MyPaper, MyStack, MySwitch, MyDivider, MyList, MyListItem, MyChip, MyIconButton, MySelect, MySelect, MySelect, MySelect, MyTooltip, MyCircularProgress } from '../MUI替代';
 import {
   Add as AddIcon, Delete as DeleteIcon, PlayArrow as RunIcon,

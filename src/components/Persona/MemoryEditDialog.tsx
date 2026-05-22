@@ -5,13 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react/i18next';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Slider,
-} from '@mui/material';
+import { MyDialog, MySlider } from '../MUI替代';
 import { MyButton, MyTextField, MyIconButton, MyBox, MyTypography, MyChip, MyStack, MySelect, MySelect, MySelect, MySelect, MyDivider } from '../MUI替代';
 import {
   Close as CloseIcon,

@@ -2,12 +2,7 @@
 // 任务看板（Kanban三列）
 
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { MyDialog } from '../MUI替代';
 import { MyBox, MyTypography, MyIconButton, MyButton, MyTextField, MyChip, MyPaper, MyList, MyListItem, MyListItemText, MyDivider } from '../MUI替代';
 import {
   Close as CloseIcon,

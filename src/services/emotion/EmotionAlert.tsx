@@ -15,9 +15,7 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
-import {
-  Badge,
-} from '@mui/material';
+import { MyBadge } from '../../components/MUI替代';
 import { MyBox, MyTypography, MyPaper, MyIconButton, MyChip, MyTooltip, MyFade } from '../../components/MUI替代';
 import {
   Favorite as HeartIcon,

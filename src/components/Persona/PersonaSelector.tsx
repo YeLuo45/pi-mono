@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Menu,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Badge,
-  FormControlLabel,
-} from '@mui/material';
+import { MyMenu, MyDialog, MyBadge, MyFormControlLabel } from '../MUI替代';
 import { MyBox, MyTypography, MySelect, MyDivider, MyButton, MyTextField, MySelect, MyIconButton, MyTooltip, MyLinearProgress, MySwitch } from '../MUI替代';
 import { MySwitch } from '../MUI替代';
 import {

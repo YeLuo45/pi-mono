@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { MyDialog } from '../MUI替代';
 import { MyBox, MyTypography, MyButton, MyTextField, MyCircularProgress, MyList, MyListItem, MyListItemText, MyPaper, MyIconButton, MyDivider, MyChip, MyAlert } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
 import { Email as EmailIcon, Send as SendIcon, Refresh as RefreshIcon, ArrowBack } from '@mui/icons-material';

@@ -9,13 +9,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import {
-  ImageList,
-  ImageListItem,
-  ImageListItemBar,
-  Dialog,
-  DialogContent,
-} from '@mui/material';
+import { MyImageList, MyImageListItem, MyImageListItemBar, MyDialog } from '../MUI替代';
 import { MyBox, MyPaper, MyTypography, MyIconButton, MyCollapse, MyTooltip, MyButton } from '../MUI替代';
 import {
   ExpandMore as ExpandMoreIcon,

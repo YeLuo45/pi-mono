@@ -11,17 +11,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  ListItemAvatar,
-  ListItemSecondaryAction,
-  Badge,
-  CardHeader,
-  FormControlLabel,
-} from '@mui/material';
+import { MyCardHeader } from '../MUI替代';
+
+import { MyDialog, MyListItemAvatar, MyListItemSecondaryAction, MyBadge, MyFormControlLabel } from '../MUI替代';
 import { MyBox, MyPaper, MyTypography, MyButton, MyIconButton, MyChip, MyIconButton, MyCollapse, MyDivider, MyTooltip, MyTextField, MySelect, MySelect, MySelect, MySelect, MyList, MyListItem, MyListItemText, MyLinearProgress, MyTabs, MyTabs, MyCard, MyCard } from '../MUI替代';
 import { MySwitch } from '../MUI替代';
 import {
