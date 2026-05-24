@@ -34,3 +34,12 @@ export {
   type EvolutionConfig, 
   type EvolutionState 
 } from './EvolutionEngine';
+
+// SkillHealthChecker
+export { skillHealthChecker, type HealthStatus } from './SkillHealthChecker';
+
+// EvolutionTimeoutController
+export { EvolutionTimeoutController, type TimeoutConfig } from './EvolutionTimeoutController';
+
+// CircuitBreaker
+export { CircuitBreaker, type CircuitState, type CircuitBreakerConfig } from './CircuitBreaker';

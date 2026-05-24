@@ -11,6 +11,9 @@ import { getSkillCrystallizer, type SkillCrystallizer } from './SkillCrystallize
 import type { InteractionPattern, OptimizationStrategy, CrystallizedSkill, PatternAnalysisResult, StrategyOptimizationResult, SkillCrystallizationResult } from './types';
 import { hookManager } from '../core/hooks/HookManager';
 import { getDreamMemoryStore } from '../memory/DreamMemoryStore';
+import { skillHealthChecker, type HealthStatus } from './SkillHealthChecker';
+import { EvolutionTimeoutController } from './EvolutionTimeoutController';
+import { CircuitBreaker } from './CircuitBreaker';
 
 /**
  * EvolutionEngine configuration
@@ -63,12 +66,16 @@ export class EvolutionEngine {
   private skillCrystallizer: SkillCrystallizer;
   private isRunning: boolean = false;
   private totalEvolutions: number = 0;
+  private timeoutController: EvolutionTimeoutController;
+  private circuitBreakers: Map<string, CircuitBreaker>;
 
   constructor(config: Partial<EvolutionConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.patternAnalyzer = getPatternAnalyzer();
     this.strategyOptimizer = getStrategyOptimizer();
     this.skillCrystallizer = getSkillCrystallizer();
+    this.timeoutController = new EvolutionTimeoutController();
+    this.circuitBreakers = new Map();
   }
 
   /**
@@ -301,6 +308,37 @@ export class EvolutionEngine {
     hookManager.registerHook('onSkillCrystallized', async (context) => {
       console.log('[EvolutionEngine] Skill crystallized:', context.data);
     });
+  }
+
+  /**
+   * Check skill health status
+   */
+  checkSkillHealth(skillId: string): HealthStatus {
+    return skillHealthChecker.check(skillId);
+  }
+
+  /**
+   * Check if a skill is available (healthy + circuit breaker allows execution)
+   */
+  isSkillAvailable(skillId: string): boolean {
+    if (!skillHealthChecker.isHealthy(skillId)) {
+      return false;
+    }
+    const breaker = this.circuitBreakers.get(skillId);
+    if (breaker && !breaker.canExecute()) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Get or create circuit breaker for a skill
+   */
+  getCircuitBreaker(skillId: string): CircuitBreaker {
+    if (!this.circuitBreakers.has(skillId)) {
+      this.circuitBreakers.set(skillId, new CircuitBreaker());
+    }
+    return this.circuitBreakers.get(skillId)!;
   }
 }
 
