@@ -105,3 +105,37 @@ export type Setting = typeof settings.$inferSelect;
 export type Persona = typeof personas.$inferSelect;
 export type Skill = typeof skills.$inferSelect;
 export type SyncLogEntry = typeof syncLog.$inferSelect;
+
+// ============================================================================
+// Knowledge Graph tables (V148)
+// ============================================================================
+
+export const kgEntities = sqliteTable('kg_entities', {
+  id: text('id').primaryKey(),
+  type: text('type').notNull(),
+  name: text('name').notNull(),
+  properties: text('properties'), // JSON string
+  persona_id: text('persona_id'), // null = shared across personas
+  created_at: integer('created_at').notNull(),
+  updated_at: integer('updated_at').notNull(),
+  change_id: text('change_id'),
+  last_modified: integer('last_modified'),
+  device_id: text('device_id'),
+});
+
+export const kgRelations = sqliteTable('kg_relations', {
+  id: text('id').primaryKey(),
+  source_id: text('source_id').notNull(),
+  target_id: text('target_id').notNull(),
+  relation_type: text('relation_type').notNull(),
+  properties: text('properties'), // JSON string
+  persona_id: text('persona_id'), // null = shared across personas
+  created_at: integer('created_at').notNull(),
+  change_id: text('change_id'),
+  last_modified: integer('last_modified'),
+  device_id: text('device_id'),
+});
+
+// Type exports
+export type KGEntityRow = typeof kgEntities.$inferSelect;
+export type KGRelationRow = typeof kgRelations.$inferSelect;

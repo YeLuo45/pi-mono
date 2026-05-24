@@ -1,0 +1,33 @@
+{
+  "knowledge": {
+    "title": "知识图谱",
+    "noData": "暂无知识条目",
+    "type": "类型",
+    "relations": "条关系",
+    "shared": "共享",
+    "personaOwned": "角色",
+    "entityTypes": {
+      "person": "人物",
+      "place": "地点",
+      "event": "事件",
+      "concept": "概念",
+      "object": "物体",
+      "topic": "主题",
+      "fact": "事实"
+    },
+    "actions": {
+      "addEntity": "添加实体",
+      "addRelation": "添加关系",
+      "deleteEntity": "删除实体",
+      "deleteRelation": "删除关系",
+      "shareFact": "共享事实",
+      "propagateFact": "传播事实"
+    },
+    "labels": {
+      "name": "名称",
+      "entityType": "实体类型",
+      "relationType": "关系类型",
+      "properties": "属性"
+    }
+  }
+}

@@ -151,6 +151,45 @@ async function createTables(db: Database): Promise<void> {
     )
   `;
   SQL`CREATE INDEX IF NOT EXISTS idx_pipelines_status ON pipelines(status)`;
+
+  // Knowledge Graph entities table (V148)
+  SQL`
+    CREATE TABLE IF NOT EXISTS kg_entities (
+      id TEXT PRIMARY KEY,
+      type TEXT NOT NULL,
+      name TEXT NOT NULL,
+      properties TEXT,
+      persona_id TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      change_id TEXT,
+      last_modified INTEGER,
+      device_id TEXT
+    )
+  `;
+  SQL`CREATE INDEX IF NOT EXISTS idx_kg_entities_persona ON kg_entities(persona_id)`;
+  SQL`CREATE INDEX IF NOT EXISTS idx_kg_entities_type ON kg_entities(type)`;
+
+  // Knowledge Graph relations table (V148)
+  SQL`
+    CREATE TABLE IF NOT EXISTS kg_relations (
+      id TEXT PRIMARY KEY,
+      source_id TEXT NOT NULL,
+      target_id TEXT NOT NULL,
+      relation_type TEXT NOT NULL,
+      properties TEXT,
+      persona_id TEXT,
+      created_at INTEGER NOT NULL,
+      change_id TEXT,
+      last_modified INTEGER,
+      device_id TEXT,
+      FOREIGN KEY (source_id) REFERENCES kg_entities(id),
+      FOREIGN KEY (target_id) REFERENCES kg_entities(id)
+    )
+  `;
+  SQL`CREATE INDEX IF NOT EXISTS idx_kg_relations_source ON kg_relations(source_id)`;
+  SQL`CREATE INDEX IF NOT EXISTS idx_kg_relations_target ON kg_relations(target_id)`;
+  SQL`CREATE INDEX IF NOT EXISTS idx_kg_relations_persona ON kg_relations(persona_id)`;
 }
 
 export function getDatabase(): Database | null {
