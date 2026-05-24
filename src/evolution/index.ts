@@ -58,3 +58,12 @@ export {
 // V157: Evolution Event Persistence & Analytics
 export { evolutionEventStore } from './persistence/EvolutionEventStore';
 export { evolutionAnalytics, type EvolutionReport } from './analytics/EvolutionAnalytics';
+
+// V158: Evolution Integration Hub
+export {
+  EvolutionIntegrationHub,
+  type EvolutionResult,
+  type IntegratedHealthStatus,
+  type StrategyAdaptation,
+  type FallbackEvent,
+} from './integration/EvolutionIntegrationHub';
