@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ruleRegistry, type EvolutionRule } from '../rules/EvolutionRule';
+import { ruleRegistry } from '../rules/RuleRegistry';
+import type { EvolutionRule } from '../rules/EvolutionRule';
 import { ruleEngine } from '../rules/RuleEngine';
 import { ruleScheduler } from '../rules/RuleScheduler';
 

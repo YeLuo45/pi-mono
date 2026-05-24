@@ -9,7 +9,7 @@
 
 import http from 'node:http';
 import { URL } from 'node:url';
-import { handleToolRoute } from './ToolRouter.js';
+import { handleToolRoute } from './ToolRouter';
 import {
   createSession,
   heartbeatSession,
@@ -18,7 +18,7 @@ import {
   listSessions,
   startSessionCleanup,
   stopSessionCleanup,
-} from './McpSession.js';
+} from './McpSession';
 
 // SSE heartbeat interval: 30 seconds
 const HEARTBEAT_INTERVAL_MS = 30 * 1000;

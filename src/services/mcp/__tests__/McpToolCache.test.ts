@@ -2,7 +2,7 @@
  * McpToolCache Tests - V164
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ToolCache, getToolCache } from '../McpToolCache';
 
 describe('ToolCache', () => {
@@ -10,6 +10,10 @@ describe('ToolCache', () => {
 
   beforeEach(() => {
     cache = new ToolCache();
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('get/set', () => {
@@ -23,9 +27,10 @@ describe('ToolCache', () => {
       expect(cache.get('agent1')).toEqual(tools);
     });
 
-    it('should return null after TTL expires', () => {
+    it('should return null after TTL expires', async () => {
       const tools = [{ name: 'tool1', description: 'A tool' }];
-      cache.set('agent1', tools, 0); // TTL of 0 = immediate expiry
+      cache.set('agent1', tools, 50); // 50ms TTL
+      vi.advanceTimersByTime(100); // advance past expiry
       expect(cache.get('agent1')).toBeNull();
     });
   });

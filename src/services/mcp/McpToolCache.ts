@@ -3,7 +3,7 @@
  * TTL-based cache for external MCP tool discovery
  */
 
-import { McpTool } from '../types/mcp-client.js';
+import { McpTool } from './types/mcp-client';
 
 interface CacheEntry {
   tools: McpTool[];

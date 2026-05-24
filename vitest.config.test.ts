@@ -9,7 +9,18 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporters: ['text'],
-      include: ['src/services/composition/**'],
+      include: ['src/**'],
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/*.d.ts',
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/__tests__/**',
+        '**/mocks/**',
+        'src/**/index.ts',
+      ],
+
     },
   },
   resolve: {

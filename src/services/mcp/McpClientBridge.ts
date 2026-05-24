@@ -4,8 +4,8 @@
  * Enables consumption of external Agent tools
  */
 
-import { McpClientConfig, McpTool, ToolCallResult, AgentConnectionStatus } from '../types/mcp-client.js';
-import { ToolCache } from './McpToolCache.js';
+import { McpClientConfig, McpTool, ToolCallResult, AgentConnectionStatus } from './types/mcp-client';
+import { ToolCache } from './McpToolCache';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 

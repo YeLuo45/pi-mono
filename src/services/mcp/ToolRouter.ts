@@ -7,7 +7,7 @@
 
 import http from 'node:http';
 import { URL } from 'node:url';
-import { listToolsJsonRpc, callTool } from './McpToolRegistry.js';
+import { listToolsJsonRpc, callTool } from './McpToolRegistry';
 
 // JSON-RPC 2.0 constants
 const JSONRPC_VERSION = '2.0';
