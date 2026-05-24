@@ -54,3 +54,7 @@ export {
   type TriggerType,
   type ActionType,
 } from './rules';
+
+// V157: Evolution Event Persistence & Analytics
+export { evolutionEventStore } from './persistence/EvolutionEventStore';
+export { evolutionAnalytics, type EvolutionReport } from './analytics/EvolutionAnalytics';
