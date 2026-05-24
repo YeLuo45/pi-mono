@@ -206,6 +206,42 @@ async function createTables(db: Database): Promise<void> {
   `;
   SQL`CREATE INDEX IF NOT EXISTS idx_hooks_name ON hooks(name)`;
   SQL`CREATE INDEX IF NOT EXISTS idx_hooks_enabled ON hooks(enabled)`;
+
+  // Agent Council tables (V150)
+  SQL`
+    CREATE TABLE IF NOT EXISTS council_agents (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      role TEXT NOT NULL,
+      personality TEXT,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      council_id TEXT,
+      created_at INTEGER NOT NULL,
+      change_id TEXT,
+      last_modified INTEGER,
+      device_id TEXT
+    )
+  `;
+  SQL`CREATE INDEX IF NOT EXISTS idx_council_agents_role ON council_agents(role)`;
+  SQL`CREATE INDEX IF NOT EXISTS idx_council_agents_council ON council_agents(council_id)`;
+
+  SQL`
+    CREATE TABLE IF NOT EXISTS council_messages (
+      id TEXT PRIMARY KEY,
+      agent_id TEXT NOT NULL,
+      type TEXT NOT NULL,
+      content TEXT NOT NULL,
+      timestamp INTEGER NOT NULL,
+      references TEXT,
+      council_id TEXT,
+      change_id TEXT,
+      last_modified INTEGER,
+      device_id TEXT
+    )
+  `;
+  SQL`CREATE INDEX IF NOT EXISTS idx_council_messages_agent ON council_messages(agent_id)`;
+  SQL`CREATE INDEX IF NOT EXISTS idx_council_messages_type ON council_messages(type)`;
+  SQL`CREATE INDEX IF NOT EXISTS idx_council_messages_council ON council_messages(council_id)`;
 }
 
 export function getDatabase(): Database | null {

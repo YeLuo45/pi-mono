@@ -157,3 +157,37 @@ export const hooks = sqliteTable('hooks', {
 
 // Type exports
 export type HookRow = typeof hooks.$inferSelect;
+
+// ============================================================================
+// Agent Council tables (V150)
+// ============================================================================
+
+export const councilAgents = sqliteTable('council_agents', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  role: text('role').notNull(), // 'proposer' | 'critic' | 'synthesizer' | 'voter'
+  personality: text('personality'),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  councilId: text('council_id'), // null = global agent
+  createdAt: integer('created_at').notNull(),
+  change_id: text('change_id'),
+  last_modified: integer('last_modified'),
+  device_id: text('device_id'),
+});
+
+export const councilMessages = sqliteTable('council_messages', {
+  id: text('id').primaryKey(),
+  agentId: text('agent_id').notNull(),
+  type: text('type').notNull(), // 'proposal' | 'critique' | 'synthesis' | 'vote' | 'broadcast'
+  content: text('content').notNull(),
+  timestamp: integer('timestamp').notNull(),
+  references: text('references'), // JSON string array
+  councilId: text('council_id'),
+  change_id: text('change_id'),
+  last_modified: integer('last_modified'),
+  device_id: text('device_id'),
+});
+
+// Type exports
+export type CouncilAgentRow = typeof councilAgents.$inferSelect;
+export type CouncilMessageRow = typeof councilMessages.$inferSelect;
