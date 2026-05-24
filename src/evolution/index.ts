@@ -43,3 +43,14 @@ export { EvolutionTimeoutController, type TimeoutConfig } from './EvolutionTimeo
 
 // CircuitBreaker
 export { CircuitBreaker, type CircuitState, type CircuitBreakerConfig } from './CircuitBreaker';
+
+// Evolution Rules Engine (V156)
+export {
+  ruleRegistry,
+  ruleEngine,
+  ruleScheduler,
+  type EvolutionRule,
+  type EvolutionContext,
+  type TriggerType,
+  type ActionType,
+} from './rules';
