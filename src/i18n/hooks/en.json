@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "registered": "Hook registered",
+    "unregistered": "Hook unregistered",
+    "triggered": "Hook triggered",
+    "error": "Hook execution error",
+    "notFound": "Hook not found",
+    "disabled": "Hook disabled",
+    "enabled": "Hook enabled",
+    "priority": "Priority",
+    "name": "Name",
+    "metadata": "Metadata",
+    "noHooks": "No hooks",
+    "clearAll": "Clear all",
+    "trigger": "Trigger",
+    "register": "Register",
+    "unregister": "Unregister",
+    "plugin": "Plugin",
+    "lifecycle": "Lifecycle",
+    "system": "System",
+    "chat": "Chat",
+    "agent": "Agent",
+    "pipeline": "Pipeline"
+  }
+}

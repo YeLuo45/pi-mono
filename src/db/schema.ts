@@ -139,3 +139,21 @@ export const kgRelations = sqliteTable('kg_relations', {
 // Type exports
 export type KGEntityRow = typeof kgEntities.$inferSelect;
 export type KGRelationRow = typeof kgRelations.$inferSelect;
+
+// ============================================================================
+// Hook system tables (V149)
+// ============================================================================
+
+export const hooks = sqliteTable('hooks', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  priority: integer('priority').notNull().default(0),
+  enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+  metadata: text('metadata'), // JSON string
+  source: text('source'), // Plugin ID or component name
+  created_at: integer('created_at').notNull(),
+  updated_at: integer('updated_at').notNull(),
+});
+
+// Type exports
+export type HookRow = typeof hooks.$inferSelect;

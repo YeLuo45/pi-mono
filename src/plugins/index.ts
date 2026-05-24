@@ -8,6 +8,11 @@ import { NewsPlugin } from '../services/plugin/NewsPlugin';
 import { telegramPlugin } from '../services/plugin/TelegramPlugin';
 import { WebhookService } from '../services/webhook/WebhookService';
 
+// V149: Plugin Protocol v2 exports
+export { PluginManager, pluginManager } from './PluginProtocolV2';
+export { PluginAdapter, LegacyPluginBusAdapter, adaptLegacyPlugin } from './PluginAdapter';
+export type { Plugin, PluginContext, PluginStorage, PluginMetadata, InstalledPlugin } from './PluginProtocolV2';
+
 // All available plugins (built-in + optional)
 export const ALL_PLUGINS = [
   todoPlugin,

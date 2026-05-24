@@ -190,6 +190,22 @@ async function createTables(db: Database): Promise<void> {
   SQL`CREATE INDEX IF NOT EXISTS idx_kg_relations_source ON kg_relations(source_id)`;
   SQL`CREATE INDEX IF NOT EXISTS idx_kg_relations_target ON kg_relations(target_id)`;
   SQL`CREATE INDEX IF NOT EXISTS idx_kg_relations_persona ON kg_relations(persona_id)`;
+
+  // Hooks table (V149: Hook System)
+  SQL`
+    CREATE TABLE IF NOT EXISTS hooks (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      priority INTEGER NOT NULL DEFAULT 0,
+      enabled INTEGER NOT NULL DEFAULT 1,
+      metadata TEXT,
+      source TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    )
+  `;
+  SQL`CREATE INDEX IF NOT EXISTS idx_hooks_name ON hooks(name)`;
+  SQL`CREATE INDEX IF NOT EXISTS idx_hooks_enabled ON hooks(enabled)`;
 }
 
 export function getDatabase(): Database | null {
