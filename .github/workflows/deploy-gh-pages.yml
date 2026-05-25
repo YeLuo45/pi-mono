@@ -38,8 +38,27 @@ jobs:
 
       - name: Prepare SPA fallback files
         run: |
-          cp dist/renderer/index.html dist/renderer/404.html
-          echo '/*  /index.html  200' > dist/renderer/_redirects
+          # Create 404.html that redirects to index.html with path preservation
+          cat > dist/renderer/404.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PixelPal</title>
+    <script>
+      var base = '/pixel-pal-web/';
+      var path = window.location.pathname;
+      if (path.startsWith(base)) {
+        path = path.slice(base.length);
+      }
+      window.location.href = base + (path || '');
+    </script>
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+</html>
+EOF
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
