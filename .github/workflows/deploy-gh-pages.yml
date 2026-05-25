@@ -34,7 +34,12 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Build
-        run: npx vite build
+        run: GITHUB_PAGES=1 npx vite build
+
+      - name: Prepare SPA fallback files
+        run: |
+          cp dist/renderer/index.html dist/renderer/404.html
+          echo '/*  /index.html  200' > dist/renderer/_redirects
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
