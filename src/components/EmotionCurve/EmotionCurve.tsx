@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { MyTypography, MyPaper, MyTabs, MyChip, MySkeleton } from '../MUI替代';
+import { MyTypography as Typography, MyPaper, MyTabs as Tabs, MyChip as Chip, MySkeleton as Skeleton , MyTab as Tab } from '../MUI替代';
 import { Box } from '../ui/Box';
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar,

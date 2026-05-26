@@ -10,6 +10,7 @@ export { MySwitch } from './基础组件/MySwitch';
 
 // 核心组件
 export { MyAlert } from './MyAlert';
+export { MyAvatar } from './MyAvatar';
 export { MyCard, MyCardContent } from './MyCard';
 export { MyCardActionArea } from './MyCardActionArea';
 export { MyCardHeader } from './MyCardHeader';

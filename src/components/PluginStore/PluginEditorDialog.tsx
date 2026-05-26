@@ -9,8 +9,8 @@
 import React, { useState, useEffect } from 'react';
 import { useMediaQuery } from '../MUI替代/useMediaQuery';
 
-import { MyDialog } from '../MUI替代';
-import { MyButton, MyTextField, MyBox, MyTypography, MyChip, MyStack, MyIconButton, MyDivider, MyAlert, MyCollapse, MyList, MyListItem, MyListItemText, MySelect, MyTooltip } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../MUI替代';
+import { MyButton as Button, MyTextField as TextField, MyBox as Box, MyTypography as Typography, MyChip as Chip, MyStack as Stack, MyIconButton as IconButton, MyDivider as Divider, MyAlert as Alert, MyCollapse as Collapse, MyList, MyListItem, MyListItemText, MySelect as Select, MyTooltip } from '../MUI替代';
 import {
   Add as AddIcon,
   Delete as DeleteIcon,

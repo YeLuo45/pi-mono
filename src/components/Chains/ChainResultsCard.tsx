@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import { MyAlpha } from '../MUI替代';
-import { MyBox, MyTypography, MyCollapse, MyChip, MyStack, MyDivider } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyCollapse as Collapse, MyChip as Chip, MyStack as Stack, MyDivider as Divider } from '../MUI替代';
 import {
   ExpandMore as ExpandIcon,
   ExpandLess as CollapseIcon,

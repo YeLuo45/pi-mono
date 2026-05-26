@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Box } from '../ui/Box';
-import { MyTypography, MyPaper } from '../MUI替代';
+import { MyTypography, MyPaper , MySwitch as Switch, MyTab as Tab } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
 import { NetworkIcon, TerminalIcon, ListIcon, TimeIcon } from '../ui/muiIconMap';
 

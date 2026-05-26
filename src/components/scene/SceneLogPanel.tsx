@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MyBox, MyTypography, MyIconButton, MyChip, MyList, MyListItem, MyDivider, MyButton } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyChip as Chip, MyList as List, MyListItem as ListItem, MyDivider as Divider, MyButton as Button } from '../MUI替代';
 import {
   History as HistoryIcon,
   Delete as DeleteIcon,

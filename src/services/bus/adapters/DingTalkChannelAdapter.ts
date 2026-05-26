@@ -51,8 +51,9 @@ export class DingTalkChannelAdapter implements ChannelAdapter {
 
     try {
       // Dynamic import dingtalk_stream SDK (Node.js SDK, will fail in browser)
-      // Use /* @vite-ignore */ to prevent bundler from trying to resolve this module
-      const dingtalkSDK = await import(/* @vite-ignore */ '@dingtalk_stream');
+      // Keep the package name out of a literal import so Vite does not pre-resolve it.
+      const sdkPackage = '@dingtalk_stream';
+      await import(/* @vite-ignore */ sdkPackage);
       console.log(`[DingTalkChannelAdapter] Initialized (SDK loaded)`);
       return true;
     } catch (e) {

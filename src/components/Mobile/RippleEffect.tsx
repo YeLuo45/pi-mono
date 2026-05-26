@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { MyButton, MyIconButton } from '../MUI替代';
+import { MyButton as Button, MyIconButton } from '../MUI替代';
 import { Box } from '../ui/Box';
 
 export interface RippleEffectProps {

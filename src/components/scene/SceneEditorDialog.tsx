@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useMediaQuery } from '../MUI替代/useMediaQuery';
 
-import { MyDialog, MyFormControlLabel } from '../MUI替代';
-import { MyButton, MyTextField, MyBox, MyChip } from '../MUI替代';
+import { MyDialog as Dialog, MyFormControlLabel as FormControlLabel , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyButton as Button, MyTextField as TextField, MyBox as Box, MyChip as Chip } from '../MUI替代';
 import { MySwitch } from '../MUI替代';
 import type { Scene, Trigger, Action } from '../../types/scene';
 import { TriggerConfig } from './TriggerConfig';

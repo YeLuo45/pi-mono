@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { MyTypography, MyStack, MyGrid, MyChip, MySnackbar, MyAlert, MyCircularProgress } from '../components/MUI替代';
+import { MyTypography as Typography, MyStack as Stack, MyGrid as Grid, MyChip, MySnackbar as Snackbar, MyAlert as Alert, MyCircularProgress as CircularProgress , MyDialog as Dialog, MyTabs as Tabs } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import { useTheme } from '../components/ui/ThemeProvider';
 import { useNavigate } from 'react-router-dom';

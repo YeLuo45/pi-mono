@@ -11,7 +11,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyBox, MyTypography, MyButton, MyLinearProgress, MyChip, MyCollapse, MyIconButton, MyDivider, MyTooltip } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyLinearProgress as LinearProgress, MyChip as Chip, MyCollapse as Collapse, MyIconButton as IconButton, MyDivider as Divider, MyTooltip as Tooltip } from '../MUI替代';
 import {
   PlayArrow as PlayIcon,
   Stop as StopIcon,

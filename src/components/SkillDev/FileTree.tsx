@@ -4,8 +4,8 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { MyMenu, MyListItemIcon, MyDialog } from '../MUI替代';
-import { MyBox, MyTypography, MyIconButton, MySelect, MyListItemText, MyDivider, MyTextField, MyButton, MyTooltip } from '../MUI替代';
+import { MyMenu as Menu, MyListItemIcon as ListItemIcon, MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyMenuItem as MenuItem } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MySelect, MyListItemText as ListItemText, MyDivider as Divider, MyTextField as TextField, MyButton as Button, MyTooltip as Tooltip } from '../MUI替代';
 import {
   CreateNewFolder as NewFolderIcon,
   Description as FileIcon,

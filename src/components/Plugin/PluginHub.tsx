@@ -1,6 +1,6 @@
 // PluginHub — landing page listing all registered plugin panels + install/uninstall
 import React from 'react';
-import { MyTypography, MyCardActionArea, MyCard, MyDivider, MyButton, MyChip } from '../MUI替代';
+import { MyTypography as Typography, MyCardActionArea as CardActionArea, MyCard as Card, MyDivider as Divider, MyButton as Button, MyChip as Chip , MyCardContent as CardContent } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Add as AddIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';

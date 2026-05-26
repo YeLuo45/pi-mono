@@ -9,8 +9,8 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { MyImageList, MyImageListItem, MyImageListItemBar, MyDialog } from '../MUI替代';
-import { MyBox, MyPaper, MyTypography, MyIconButton, MyCollapse, MyTooltip, MyButton } from '../MUI替代';
+import { MyImageList as ImageList, MyImageListItem as ImageListItem, MyImageListItemBar as ImageListItemBar, MyDialog as Dialog , MyDialogContent as DialogContent } from '../MUI替代';
+import { MyBox as Box, MyPaper as Paper, MyTypography as Typography, MyIconButton as IconButton, MyCollapse as Collapse, MyTooltip as Tooltip, MyButton as Button } from '../MUI替代';
 import {
   ExpandMore as ExpandMoreIcon,
   VolumeUp as VolumeUpIcon,

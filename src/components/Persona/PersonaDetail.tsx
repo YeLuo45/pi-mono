@@ -6,8 +6,8 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyDialog, MyFormControlLabel, MySlider } from '../MUI替代';
-import { MyButton, MyTextField, MySelect, MyBox, MyTypography, MyDivider, MyIconButton, MyChip, MySwitch, MySnackbar, MyAlert } from '../MUI替代';
+import { MyDialog as Dialog, MyFormControlLabel as FormControlLabel, MySlider as Slider , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyMenuItem as MenuItem, MyTab as Tab, MyTabs as Tabs , MyAvatar as Avatar } from '../MUI替代';
+import { MyButton as Button, MyTextField as TextField, MySelect as Select, MyBox as Box, MyTypography as Typography, MyDivider as Divider, MyIconButton as IconButton, MyChip as Chip, MySwitch as Switch, MySnackbar as Snackbar, MyAlert as Alert } from '../MUI替代';
 import {
   Close as CloseIcon,
   Edit as EditIcon,

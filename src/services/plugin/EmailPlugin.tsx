@@ -1,7 +1,7 @@
 // EmailPlugin — Built-in Gmail plugin with OAuth support
 import React, { useState, useEffect } from 'react';
-import { MyDialog } from '../../components/MUI替代';
-import { MyBox, MyTypography, MyIconButton, MyButton, MyList, MyListItem, MyListItemText, MyTextField, MyChip, MyCircularProgress } from '../../components/MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyTab as Tab } from '../../components/MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyButton as Button, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyTextField as TextField, MyChip as Chip, MyCircularProgress as CircularProgress } from '../../components/MUI替代';
 import { Email as EmailIcon, Refresh as RefreshIcon, OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import type { Plugin } from './types';
 import { PluginService } from './PluginService';

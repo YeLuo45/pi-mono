@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyTypography, MyCollapse, MyIconButton, MyCircularProgress } from '../MUI替代';
+import { MyTypography as Typography, MyCollapse as Collapse, MyIconButton as IconButton, MyCircularProgress as CircularProgress } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from '@mui/icons-material';
 import { useStore } from '../../store';

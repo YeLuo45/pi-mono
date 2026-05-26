@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { MyIconButton, MyTypography } from '../components/MUI替代';
+import { MyIconButton as IconButton, MyTypography as Typography } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import { ArrowBackIcon } from '../components/ui/muiIconMap';
 import { useNavigate } from 'react-router-dom';

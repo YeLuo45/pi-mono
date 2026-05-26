@@ -8,9 +8,9 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { MyUseTheme } from '../components/MUI替代';
+import { MyUseTheme , MyList as List, MyMenu as Menu } from '../components/MUI替代';
 import { useMediaQuery } from '../components/MUI替代/useMediaQuery';
-import { MyTypography, MyIconButton, MyTooltip, MyDivider } from '../components/MUI替代';
+import { MyTypography as Typography, MyIconButton as IconButton, MyTooltip as Tooltip, MyDivider } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import {
   Menu as MenuIcon,

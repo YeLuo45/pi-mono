@@ -4,8 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import { MyDialog, MyAlpha } from '../MUI替代';
-import { MyBox, MyTypography, MyButton, MyStack, MyTextField, MyIconButton } from '../MUI替代';
+import { MyDialog as Dialog, MyAlpha , MyDialogContent as DialogContent } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyStack as Stack, MyTextField as TextField, MyIconButton as IconButton } from '../MUI替代';
 import { Close as CloseIcon, Star as StarIcon } from '@mui/icons-material';
 import type { MarketplaceSkill } from '../../data/sampleMarketplaceSkills';
 import type { SkillRating } from '../../data/sampleMarketplaceSkills';

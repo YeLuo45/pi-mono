@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyTypography, MyPaper, MyButton, MySelect, MyStack, MyAlert } from '../components/MUI替代';
+import { MyTypography as Typography, MyPaper as Paper, MyButton, MySelect as Select, MyStack as Stack, MyAlert , MyDialog as Dialog, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import AddIcon from '@mui/icons-material/Add';
 import { providerManager, DEFAULT_PROVIDERS } from '../services/providers';

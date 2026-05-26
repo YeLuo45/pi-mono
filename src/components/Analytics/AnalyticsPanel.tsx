@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { MyTooltip as MuiTooltip } from '../MUI替代';
-import { MyTypography, MyPaper, MyGrid, MyChip, MySkeleton, MyToggleButton, MyToggleButtonGroup, MyButton } from '../MUI替代';
+import { MyTypography as Typography, MyPaper as Paper, MyGrid as Grid, MyChip as Chip, MySkeleton as Skeleton, MyToggleButton as ToggleButton, MyToggleButtonGroup as ToggleButtonGroup, MyButton as Button } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useTranslation } from 'react-i18next';

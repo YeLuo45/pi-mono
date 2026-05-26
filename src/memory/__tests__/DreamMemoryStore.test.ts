@@ -25,13 +25,13 @@ const mockDb = {
 };
 
 const mockChangeLog: Array<{ table: string; id: string; op: string; data: unknown }> = [];
-jest.mock('../../db/index', () => ({
+vi.mock('../../db/index', () => ({
   getDatabase: () => mockDb,
   generateChangeId: () => 'mock-change-id',
   now: () => Date.now(),
 }));
 
-jest.mock('../../db/syncLog', () => ({
+vi.mock('../../db/syncLog', () => ({
   addChangeLogEntry: (table: string, id: string, op: string, data: unknown) => {
     mockChangeLog.push({ table, id, op, data });
   },

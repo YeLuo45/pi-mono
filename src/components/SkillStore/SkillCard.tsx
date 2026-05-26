@@ -7,7 +7,7 @@ import React from 'react';
 import { MyUseTheme } from '../MUI替代';
 
 import { MyAlpha } from '../MUI替代';
-import { MyTypography, MyChip, MyButton, MyStack } from '../MUI替代';
+import { MyTypography as Typography, MyChip as Chip, MyButton as Button, MyStack as Stack } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Star as StarIcon, Download as DownloadIcon, Check as CheckIcon } from '@mui/icons-material';
 import type { MarketplaceSkill } from '../../data/sampleMarketplaceSkills';

@@ -3,8 +3,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyDialog, MyAlpha } from '../MUI替代';
-import { MyBox, MyTypography, MyTextField, MyButton, MyIconButton, MyStack, MyChip, MySelect, MyDivider, MyCircularProgress, MyAlert } from '../MUI替代';
+import { MyDialog as Dialog, MyAlpha , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyTextField as TextField, MyButton as Button, MyIconButton as IconButton, MyStack as Stack, MyChip as Chip, MySelect as Select, MyDivider as Divider, MyCircularProgress as CircularProgress, MyAlert as Alert } from '../MUI替代';
 import {
   Close as CloseIcon,
   Add as AddIcon,

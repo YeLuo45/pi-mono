@@ -13,18 +13,7 @@
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  MyBox,
-  MyTypography,
-  MyPaper,
-  MyTabs,
-  MyTab,
-  MyChip,
-  MyStack,
-  MyCard,
-  MyCardHeader,
-  MyLinearProgress,
-} from '../MUI替代';
+import { MyBox, MyTypography, MyPaper, MyTabs, MyTabs as Tabs, MyTab, MyChip, MyStack, MyCard, MyCardHeader, MyLinearProgress , MyList as List } from '../MUI替代';
 import {
   RadarChart,
   PolarGrid,

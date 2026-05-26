@@ -5,8 +5,8 @@
  */
 
 import React, { useState } from 'react';
-import { MyDialog } from '../MUI替代';
-import { MyBox, MyTypography, MyTextField, MyIconButton, MySelect, MySnackbar, MyAlert, MyButton, MyInputAdornment, MyChip } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyList as List, MyMenuItem as MenuItem } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyTextField as TextField, MyIconButton as IconButton, MySelect as Select, MySnackbar as Snackbar, MyAlert as Alert, MyButton as Button, MyInputAdornment as InputAdornment, MyChip as Chip } from '../MUI替代';
 import {
   Search as SearchIcon,
   LocalOffer as RedeemIcon,

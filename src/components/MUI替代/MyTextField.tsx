@@ -11,7 +11,7 @@ import { borderRadius } from '../ui/design-tokens';
 
 export interface MyTextFieldProps {
   value?: string;
-  onChange?: (value: string) => void;
+  onChange?: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   placeholder?: string;
   error?: boolean;
   helperText?: string;
@@ -29,6 +29,7 @@ export interface MyTextFieldProps {
     endAdornment?: React.ReactNode;
     sx?: Record<string, string | number>;
   };
+  [key: string]: unknown;
 }
 
 export const MyTextField: FC<MyTextFieldProps> = ({
@@ -47,6 +48,7 @@ export const MyTextField: FC<MyTextFieldProps> = ({
   className = '',
   sx = {},
   InputProps = {},
+  ...rest
 }) => {
   const theme = useTheme();
   const [isFocused, setIsFocused] = useState(false);
@@ -55,7 +57,7 @@ export const MyTextField: FC<MyTextFieldProps> = ({
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setValue(newValue);
-    onChange?.(newValue);
+    onChange?.(e);
   };
 
   // Use value from props if controlled
@@ -216,6 +218,7 @@ export const MyTextField: FC<MyTextFieldProps> = ({
             onChange={handleChange}
             placeholder={placeholder}
             disabled={disabled}
+            {...rest}
             rows={rows}
             style={{
               ...styles.input,
@@ -231,6 +234,7 @@ export const MyTextField: FC<MyTextFieldProps> = ({
             onChange={handleChange}
             placeholder={placeholder}
             disabled={disabled}
+            {...rest}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             style={styles.input}

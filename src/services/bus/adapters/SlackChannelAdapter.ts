@@ -40,8 +40,9 @@ export class SlackChannelAdapter implements ChannelAdapter {
     // @slack/bolt is Node.js only - use vite-ignore to prevent bundler from failing
     let SlackApp: unknown = null;
     try {
-      // Use /* @vite-ignore */ to prevent bundler from resolving this module
-      const mod = await import(/* @vite-ignore */ '@slack/bolt');
+      // Keep the package name out of a literal import so Vite does not pre-resolve it.
+      const sdkPackage = '@slack/bolt';
+      const mod = await import(/* @vite-ignore */ sdkPackage);
       if (mod && mod.App) SlackApp = mod;
     } catch {
       // Module not available - expected in browser

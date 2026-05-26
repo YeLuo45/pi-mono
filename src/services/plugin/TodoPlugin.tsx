@@ -1,7 +1,7 @@
 // TodoPlugin — Built-in task management plugin
 import React, { useState } from 'react';
-import { MyDialog, MyCheckbox } from '../../components/MUI替代';
-import { MyBox, MyTypography, MyIconButton, MyButton, MyTextField, MySelect, MyList, MyListItem, MyListItemText, MyChip } from '../../components/MUI替代';
+import { MyDialog as Dialog, MyCheckbox as Checkbox , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../../components/MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyButton as Button, MyTextField as TextField, MySelect as Select, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyChip as Chip } from '../../components/MUI替代';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import type { Plugin } from './types';
 import { PluginService } from './PluginService';

@@ -47,8 +47,9 @@ export class EmailChannelAdapter implements ChannelAdapter {
 
     try {
       // Dynamic import nodemailer (Node.js SDK, will fail in browser)
-      // Use /* @vite-ignore */ to prevent bundler from trying to resolve this module
-      const nodemailer = await import(/* @vite-ignore */ 'nodemailer');
+      // Keep the package name out of a literal import so Vite does not pre-resolve it.
+      const sdkPackage = 'nodemailer';
+      await import(/* @vite-ignore */ sdkPackage);
       console.log(`[EmailChannelAdapter] Initialized (nodemailer loaded)`);
       return true;
     } catch (e) {

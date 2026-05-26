@@ -5,8 +5,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MySlider } from '../MUI替代';
-import { MyBox, MyTypography, MyTextField, MySelect, MyChip, MyStack, MyButton, MyCircularProgress, MyAlert, MyPaper } from '../MUI替代';
+import { MySlider as Slider , MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyTextField as TextField, MySelect as Select, MyChip as Chip, MyStack as Stack, MyButton as Button, MyCircularProgress as CircularProgress, MyAlert as Alert, MyPaper as Paper } from '../MUI替代';
 import {
   Check as CheckIcon,
   Edit as EditIcon,

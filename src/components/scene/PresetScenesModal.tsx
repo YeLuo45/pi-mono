@@ -1,8 +1,8 @@
 import React from 'react';
 import { useMediaQuery } from '../MUI替代/useMediaQuery';
 
-import { MyDialog } from '../MUI替代';
-import { MyButton, MyBox, MyTypography, MyGrid } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyButton as Button, MyBox as Box, MyTypography as Typography, MyGrid as Grid } from '../MUI替代';
 import { PRESET_SCENES, type PresetScene } from '../../data/presetScenes';
 import { useTranslation } from 'react-i18next';
 

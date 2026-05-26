@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MyMenu } from '../MUI替代';
-import { MyBox, MyTextField, MyIconButton, MyTypography, MyPaper, MyDivider, MyTooltip, MyChip, MySelect, MyButton } from '../MUI替代';
+import { MyMenu as Menu , MyDialog as Dialog, MyMenuItem as MenuItem , MyAvatar as Avatar } from '../MUI替代';
+import { MyBox as Box, MyTextField as TextField, MyIconButton as IconButton, MyTypography as Typography, MyPaper as Paper, MyDivider as Divider, MyTooltip as Tooltip, MyChip as Chip, MySelect, MyButton as Button } from '../MUI替代';
 import { Send as SendIcon, Mic as MicIcon, MicOff as MicOffIcon, VolumeUp as VolumeUpIcon, VolumeOff as VolumeOffIcon, Stop as StopIcon, Close as CloseIcon, Pause as PauseIcon, AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
 import { MemoPanel } from '../Memo/MemoPanel';

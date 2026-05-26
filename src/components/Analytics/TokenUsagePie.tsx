@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyTypography, MyCard } from '../MUI替代';
+import { MyTypography as Typography, MyCard as Card , MyCardContent as CardContent } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { tokenTracker } from '../../services/usage/TokenTracker';

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyDialog, MySlider } from '../MUI替代';
-import { MyBox, MyTypography, MyTextField, MyButton, MyPaper, MySelect, MyAlert, MyDivider, MyStack, MyIconButton, MyChip, MyTooltip, MyCollapse, MySwitch, MyList, MyListItem } from '../MUI替代';
+import { MyDialog as Dialog, MySlider as Slider , MyCard as Card, MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem, MyTab as Tab } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyTextField as TextField, MyButton as Button, MyPaper as Paper, MySelect as Select, MyAlert as Alert, MyDivider as Divider, MyStack as Stack, MyIconButton as IconButton, MyChip as Chip, MyTooltip as Tooltip, MyCollapse as Collapse, MySwitch as Switch, MyList as List, MyListItem as ListItem } from '../MUI替代';
 import {
   Visibility, VisibilityOff, Save as SaveIcon,
   Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon,

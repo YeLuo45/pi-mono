@@ -2,7 +2,7 @@
 // Visualizes task decomposition tree structure
 
 import React, { useState } from 'react';
-import { MyBox, MyTypography, MyCollapse, MyIconButton, MyChip, MyPaper, MyDivider } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyCollapse as Collapse, MyIconButton as IconButton, MyChip as Chip, MyPaper as Paper, MyDivider as Divider , MyBadge as Badge, MyButton as Button } from '../MUI替代';
 import {
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,

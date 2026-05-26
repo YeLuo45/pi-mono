@@ -2,11 +2,12 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { AIConfig, Message, Event, Task, DocumentFile, PetStatus, EmailAccount, InteractionSettings, InteractionCooldowns, CompanionState, PersonaId, VoiceSettings, TaskStatus } from '../types';
 import type { EmotionState } from '../services/voice/emotionDetector';
-import { getActivePersona, getAllPersonas } from '../services/persona/personaStorage';
+import { getActivePersona, getAllPersonas, setActivePersonaId as setStoragePersonaId } from '../services/persona/personaStorage';
 import { applyPersonaTheme, resetPersonaTheme } from '../utils/personaTheme';
 import { getPersonaSystemPrompt } from '../services/persona/personaPrompt';
 import type { Persona, PersonaVoice } from '../services/persona/personaStorage';
 import { setVoiceConfig as setVoiceServiceConfig } from '../services/voice/voiceService';
+import { getPresetById, getSystemTheme, applyAppTheme, resetToDefault, applyCustomTheme } from '../utils/appTheme';
 import type { AppThemePreset } from '../utils/appTheme';
 import { saveMessage, loadMessages, clearMessages as clearMessagesFromDB, saveMessages } from '../services/storage/messageStorage';
 import { saveTask, loadTasks, deleteTask as deleteTaskFromDB, saveTasks } from '../services/storage/taskStorage';
@@ -547,7 +548,6 @@ export const useStore = create<AppState>()(
       setActivePersonaId: (id) => {
         // V33: First apply the current app theme (so persona theme overlays on top)
         const { appThemeMode, appThemePresetId, customTheme } = useStore.getState();
-        const { getPresetById, getSystemTheme, applyAppTheme, resetToDefault, applyCustomTheme } = require('../utils/appTheme');
         let effectivePresetId = appThemePresetId;
         if (appThemeMode === 'system') {
           effectivePresetId = getSystemTheme();
@@ -561,8 +561,7 @@ export const useStore = create<AppState>()(
         }
 
         // Update active persona in localStorage (for personaStorage)
-        const { setActivePersonaId: setStorageId } = require('../services/persona/personaStorage');
-        setStorageId(id);
+        setStoragePersonaId(id);
         // V37: Apply persona voice config immediately on switch
         const persona = getAllPersonas().find((p) => p.id === id);
         if (persona?.voice) {
@@ -598,7 +597,7 @@ export const useStore = create<AppState>()(
 
           return {
             activePersonaId: id,
-            personaSystemPrompt: getPersonaSystemPrompt(require('../services/persona/personaStorage').getActivePersona()),
+            personaSystemPrompt: getPersonaSystemPrompt(getActivePersona()),
             messages: state.messages.filter(
               (m) => !m.personaId || m.personaId === id
             ),
@@ -611,7 +610,6 @@ export const useStore = create<AppState>()(
         set({ personaFollowTheme: v });
         // V33: Re-apply app theme first before persona theme
         const { appThemeMode, appThemePresetId, customTheme } = useStore.getState();
-        const { getPresetById, getSystemTheme, applyAppTheme, resetToDefault, applyCustomTheme } = require('../utils/appTheme');
         let effectivePresetId = appThemePresetId;
         if (appThemeMode === 'system') {
           effectivePresetId = getSystemTheme();
@@ -867,7 +865,6 @@ export const useStore = create<AppState>()(
       onRehydrateStorage: () => async (state) => {
         // V33: Apply app theme after rehydration
         if (state) {
-          const { getPresetById, getSystemTheme, applyAppTheme, resetToDefault, applyCustomTheme } = require('../utils/appTheme');
           let effectivePresetId = state.appThemePresetId;
           if (state.appThemeMode === 'system') {
             effectivePresetId = getSystemTheme();

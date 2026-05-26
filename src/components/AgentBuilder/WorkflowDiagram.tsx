@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { MyTypography, MySelect, MyPaper } from '../MUI替代';
+import { MyTypography as Typography, MySelect as Select, MyPaper as Paper , MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../MUI替代';
 import { Box } from '../ui/Box';
 import type { WorkflowDefinition, WorkflowTemplate, WorkflowStep } from '../../types/agentBuilder';
 import { TEMPLATE_ICONS } from '../../types/agentBuilder';

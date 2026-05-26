@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Box } from '../ui/Box';
-import { MyTypography, MyChip, MyTooltip } from '../MUI替代';
+import { MyTypography as Typography, MyChip as Chip, MyTooltip as Tooltip } from '../MUI替代';
 import {
   FileText as ArticleIcon,
   Globe as UrlIcon,

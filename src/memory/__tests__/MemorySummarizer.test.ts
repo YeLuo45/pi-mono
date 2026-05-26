@@ -6,26 +6,26 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { MemorySummarizer } from '../MemorySummarizer';
 
 // Mock dependencies
-jest.mock('../DreamMemoryStore', () => ({
+vi.mock('../DreamMemoryStore', () => ({
   getDreamMemoryStore: () => ({
     count: () => 0,
     getTotalTokens: () => 0,
     getAll: () => [],
     queryByLayer: () => [],
-    deleteMany: jest.fn(),
-    create: jest.fn(),
+    deleteMany: vi.fn(),
+    create: vi.fn(),
   }),
 }));
 
-jest.mock('../../core/hooks/HookManager', () => ({
+vi.mock('../../core/hooks/HookManager', () => ({
   hookManager: {
-    trigger: jest.fn().mockResolvedValue(undefined),
+    trigger: vi.fn().mockResolvedValue(undefined),
   },
 }));
 
-jest.mock('../../services/bus/UnifiedMessageBus', () => ({
+vi.mock('../../services/bus/UnifiedMessageBus', () => ({
   unifiedMessageBus: {
-    receive: jest.fn().mockResolvedValue(undefined),
+    receive: vi.fn().mockResolvedValue(undefined),
   },
 }));
 

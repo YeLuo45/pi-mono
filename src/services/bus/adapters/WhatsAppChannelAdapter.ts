@@ -44,8 +44,9 @@ export class WhatsAppChannelAdapter implements ChannelAdapter {
 
     try {
       // Dynamically import whatsapp-web.js (Node.js SDK, will fail in browser)
-      // Use /* @vite-ignore */ to prevent bundler from trying to resolve this module
-      const whatsappWeb = await import(/* @vite-ignore */ 'whatsapp-web.js');
+      // Keep the package name out of a literal import so Vite does not pre-resolve it.
+      const sdkPackage = 'whatsapp-web.js';
+      const whatsappWeb = await import(/* @vite-ignore */ sdkPackage);
       const { Client, LocalAuth } = whatsappWeb;
 
       this.client = new Client({

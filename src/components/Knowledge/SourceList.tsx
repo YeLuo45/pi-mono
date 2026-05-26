@@ -3,10 +3,10 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { MyListItemButton } from '../MUI替代';
+import { MyListItemButton as ListItemButton , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
 
-import { MyDialog, MyListItemSecondaryAction } from '../MUI替代';
-import { MyBox, MyTypography, MyButton, MyTextField, MyInputAdornment, MyIconButton, MyChip, MyTooltip, MyList, MyListItem, MyListItemText, MyCircularProgress } from '../MUI替代';
+import { MyDialog as Dialog, MyListItemSecondaryAction as ListItemSecondaryAction } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyTextField as TextField, MyInputAdornment as InputAdornment, MyIconButton as IconButton, MyChip as Chip, MyTooltip as Tooltip, MyList as List, MyListItem as ListItem, MyListItemText, MyCircularProgress as CircularProgress } from '../MUI替代';
 import {
   Add as AddIcon,
   Search as SearchIcon,

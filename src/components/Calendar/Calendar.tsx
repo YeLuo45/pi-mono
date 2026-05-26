@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { MyDialog } from '../MUI替代';
-import { MyBox, MyTypography, MyIconButton, MyButton, MyTextField, MyList, MyListItem, MyListItemText, MyPopper, MyPaper, MyFade } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyButton as Button, MyTextField as TextField, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyPopper as Popper, MyPaper as Paper, MyFade as Fade } from '../MUI替代';
 import { Add as AddIcon, ChevronLeft, ChevronRight, Delete as DeleteIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
 import type { Event } from '../../types';

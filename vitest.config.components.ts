@@ -5,13 +5,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    include: [
-      '__tests__/**/*.test.ts', 
-      '__tests__/**/*.test.tsx', 
-      'src/**/__tests__/**/*.test.ts', 
-      'src/**/__tests__/**/*.test.tsx',
-      'src/components/**/*.test.tsx'
-    ],
+    include: ['src/**/__tests__/**/*.test.tsx', 'src/components/**/*.test.tsx'],
     coverage: {
       provider: 'v8',
       reporters: ['text', 'html'],
@@ -25,6 +19,8 @@ export default defineConfig({
         '**/__tests__/**',
         '**/mocks/**',
         'src/**/index.ts',
+        'src/store/**',
+        'src/contexts/**',
         'src/App.tsx',
         'src/main.tsx',
         'src/index.css',

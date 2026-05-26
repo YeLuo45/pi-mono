@@ -9,7 +9,7 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import { MyBox, MyTextField, MyIconButton, MyTooltip, MyPaper, MyCircularProgress } from '../MUI替代';
+import { MyBox as Box, MyTextField as TextField, MyIconButton as IconButton, MyTooltip as Tooltip, MyPaper, MyCircularProgress as CircularProgress , MyButton as Button } from '../MUI替代';
 import {
   Send as SendIcon,
   Mic as MicIcon,

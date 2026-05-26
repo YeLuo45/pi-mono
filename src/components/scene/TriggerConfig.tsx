@@ -1,5 +1,5 @@
 import React from 'react';
-import { MySelect, MyTextField, MyChip, MyTypography } from '../MUI替代';
+import { MySelect as Select, MyTextField as TextField, MyChip as Chip, MyTypography as Typography , MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../MUI替代';
 import { Box } from '../ui/Box';
 // SelectChangeEvent type - using string/number for Select onChange
 type SelectChangeEvent = { target: { value: string | number } };

@@ -5,8 +5,8 @@
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyDialog } from '../MUI替代';
-import { MyBox, MyTypography, MyButton, MyIconButton, MyChip } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogContent as DialogContent, MyDialogTitle as DialogTitle , MyAvatar as Avatar } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyIconButton as IconButton, MyChip as Chip } from '../MUI替代';
 import {
   Close as CloseIcon,
   Reply as ReplyIcon,

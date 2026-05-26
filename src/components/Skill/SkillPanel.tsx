@@ -4,8 +4,8 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { MyAlpha } from '../MUI替代';
-import { MyBox, MyTypography, MyPaper, MyStack, MyChip, MyCollapse, MyButton, MyDivider, MyIconButton, MyTextField, MyInputAdornment, MyTooltip, MyCircularProgress } from '../MUI替代';
+import { MyAlpha , MyCard as Card, MyTab as Tab } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyStack as Stack, MyChip as Chip, MyCollapse as Collapse, MyButton as Button, MyDivider as Divider, MyIconButton as IconButton, MyTextField as TextField, MyInputAdornment as InputAdornment, MyTooltip as Tooltip, MyCircularProgress as CircularProgress } from '../MUI替代';
 import {
   ExpandMore as ExpandIcon,
   ExpandLess as CollapseIcon,
@@ -18,7 +18,7 @@ import {
   Add as AddIcon,
   Build as BuildIcon,
 } from '@mui/icons-material';
-import { MySwitch } from '../MUI替代';
+import { MySwitch, MySwitch as Switch } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { skillRunner } from '../../services/skills/skillRunner';

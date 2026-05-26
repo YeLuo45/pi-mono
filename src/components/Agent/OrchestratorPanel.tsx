@@ -2,8 +2,8 @@
 // Displays task decomposition tree with full execution flow
 
 import React, { useState, useEffect } from 'react';
-import { MyListItemIcon, MyDialog } from '../MUI替代';
-import { MyBox, MyTypography, MyButton, MyIconButton, MyTextField, MyCollapse, MyPaper, MyDivider, MyChip, MyList, MyListItem, MyListItemText, MyCircularProgress, MyLinearProgress, MyTooltip } from '../MUI替代';
+import { MyListItemIcon, MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle , MyAvatar as Avatar } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyIconButton as IconButton, MyTextField as TextField, MyCollapse, MyPaper as Paper, MyDivider as Divider, MyChip as Chip, MyList, MyListItem, MyListItemText, MyCircularProgress as CircularProgress, MyLinearProgress as LinearProgress, MyTooltip as Tooltip } from '../MUI替代';
 import {
   Close as CloseIcon,
   PlayArrow as PlayIcon,

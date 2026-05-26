@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { MyBox, MyTypography, MyTextField, MyButton, MyIconButton, MyCircularProgress, MyChip, MyPaper, MyDivider } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyTextField as TextField, MyButton as Button, MyIconButton, MyCircularProgress as CircularProgress, MyChip as Chip, MyPaper as Paper, MyDivider } from '../MUI替代';
 import {
   Search as SearchIcon,
   Article as ArticleIcon,

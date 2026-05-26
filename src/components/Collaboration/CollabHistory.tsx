@@ -11,7 +11,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MyListItemAvatar } from '../MUI替代';
-import { MyBox, MyTypography, MyList, MyListItem, MyListItemText, MyChip, MyIconButton, MyCollapse, MyDivider, MyTooltip } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyList as List, MyListItem as ListItem, MyListItemText, MyChip as Chip, MyIconButton as IconButton, MyCollapse as Collapse, MyDivider as Divider, MyTooltip as Tooltip } from '../MUI替代';
 import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,

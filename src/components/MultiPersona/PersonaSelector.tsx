@@ -7,8 +7,8 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyMenu, MyListItemIcon, MyBadge } from '../MUI替代';
-import { MyBox, MyPaper, MyTypography, MyButton, MyIconButton, MyChip, MySelect, MyListItemText, MyDivider, MyTooltip } from '../MUI替代';
+import { MyMenu as Menu, MyListItemIcon as ListItemIcon, MyBadge , MyMenuItem as MenuItem, MySwitch as Switch , MyAvatar as Avatar } from '../MUI替代';
+import { MyBox as Box, MyPaper as Paper, MyTypography as Typography, MyButton, MyIconButton as IconButton, MyChip as Chip, MySelect as Select, MyListItemText as ListItemText, MyDivider as Divider, MyTooltip as Tooltip } from '../MUI替代';
 import {
   Person as PersonIcon,
   Star as StarIcon,

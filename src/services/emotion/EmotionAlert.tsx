@@ -15,8 +15,8 @@
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { MyBadge } from '../../components/MUI替代';
-import { MyBox, MyTypography, MyPaper, MyIconButton, MyChip, MyTooltip, MyFade } from '../../components/MUI替代';
+import { MyBadge as Badge , MyAlert as Alert, MyButton as Button } from '../../components/MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyIconButton as IconButton, MyChip as Chip, MyTooltip as Tooltip, MyFade as Fade } from '../../components/MUI替代';
 import {
   Favorite as HeartIcon,
   FavoriteBorder as HeartBorderIcon,

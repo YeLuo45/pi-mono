@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { MyTypography, MyTextField, MyButton, MyStack, MyCircularProgress, MyChip, MyIconButton, MyTooltip, MyDivider } from '../MUI替代';
+import { MyTypography as Typography, MyTextField as TextField, MyButton as Button, MyStack, MyCircularProgress as CircularProgress, MyChip as Chip, MyIconButton as IconButton, MyTooltip as Tooltip, MyDivider } from '../MUI替代';
 import { Box } from '../ui/Box';
 import {
   Play as RunIcon,

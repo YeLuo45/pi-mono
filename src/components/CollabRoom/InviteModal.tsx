@@ -5,8 +5,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyDialog } from '../MUI替代';
-import { MyButton, MyTextField, MyBox, MyTypography, MyIconButton, MyTooltip, MyAlert, MyFade, MyChip } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyButton as Button, MyTextField as TextField, MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyTooltip as Tooltip, MyAlert as Alert, MyFade as Fade, MyChip as Chip } from '../MUI替代';
 import {
   ContentCopy as CopyIcon,
   Check as CheckIcon,

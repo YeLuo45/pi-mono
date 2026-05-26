@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyBox, MyTypography, MyChip, MyCollapse, MyIconButton, MyTooltip, MyTabs } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyChip, MyCollapse as Collapse, MyIconButton as IconButton, MyTooltip, MyTabs as Tabs , MyCard as Card, MyTab as Tab } from '../MUI替代';
 import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,

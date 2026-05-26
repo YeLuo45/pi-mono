@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MySnackbar, MyAlert, MyTypography, MyIconButton, MyButton } from '../MUI替代';
+import { MySnackbar as Snackbar, MyAlert as Alert, MyTypography as Typography, MyIconButton as IconButton, MyButton as Button } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Close as CloseIcon, Settings as SettingsIcon } from '@mui/icons-material';
 import { budgetManager, type BudgetAlert } from '../../services/usage/BudgetManager';

@@ -9,8 +9,8 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MyFormControlLabel } from '../MUI替代';
-import { MyBox, MyTypography, MyTextField, MyButton, MyIconButton, MyChip, MyCircularProgress, MyAlert, MyPaper, MyList, MyListItem, MyListItemText, MyTooltip, MySwitch } from '../MUI替代';
+import { MyFormControlLabel as FormControlLabel } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyTextField as TextField, MyButton as Button, MyIconButton as IconButton, MyChip as Chip, MyCircularProgress as CircularProgress, MyAlert as Alert, MyPaper as Paper, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyTooltip as Tooltip, MySwitch } from '../MUI替代';
 import {
   Search as SearchIcon,
   Refresh as RefreshIcon,

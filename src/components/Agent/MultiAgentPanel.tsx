@@ -3,8 +3,8 @@
 // 侧边栏Agent列表
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { MyBadge, MyListItemIcon } from '../MUI替代';
-import { MyBox, MyTypography, MyIconButton, MyTooltip, MyDrawer, MyDivider, MyChip, MyList, MyListItem, MyListItemText, MyCollapse, MyPaper, MyButton } from '../MUI替代';
+import { MyBadge as Badge, MyListItemIcon as ListItemIcon , MyAvatar as Avatar } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyTooltip as Tooltip, MyDrawer as Drawer, MyDivider as Divider, MyChip as Chip, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyCollapse as Collapse, MyPaper as Paper, MyButton as Button } from '../MUI替代';
 import {
   ExpandLess,
   ExpandMore,

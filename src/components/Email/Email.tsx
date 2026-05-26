@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { MyDialog } from '../MUI替代';
-import { MyBox, MyTypography, MyButton, MyTextField, MyCircularProgress, MyList, MyListItem, MyListItemText, MyPaper, MyIconButton, MyDivider, MyChip, MyAlert } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyTextField as TextField, MyCircularProgress as CircularProgress, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyPaper as Paper, MyIconButton as IconButton, MyDivider as Divider, MyChip as Chip, MyAlert as Alert } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
 import { Email as EmailIcon, Send as SendIcon, Refresh as RefreshIcon, ArrowBack } from '@mui/icons-material';
 import { useStore } from '../../store';

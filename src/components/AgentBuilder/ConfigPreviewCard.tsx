@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { MyBox, MyTypography, MyPaper, MyCollapse, MyIconButton, MyChip, MyStack, MyDivider, MyButton, MyTextField } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyCollapse as Collapse, MyIconButton as IconButton, MyChip as Chip, MyStack as Stack, MyDivider as Divider, MyButton, MyTextField as TextField , MyCard as Card } from '../MUI替代';
 import {
   ExpandMore as ExpandIcon,
   ExpandLess as CollapseIcon,

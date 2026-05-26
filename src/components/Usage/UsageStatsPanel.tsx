@@ -5,10 +5,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyTable, MyTableBody, MyTableContainer, MyTableHead } from '../MUI替代';
+import { MyTable as Table, MyTableBody as TableBody, MyTableContainer as TableContainer, MyTableHead as TableHead , MyCardContent as CardContent, MyTab as Tab } from '../MUI替代';
 
-import { MyTableCell, MyTableRow } from '../MUI替代';
-import { MyBox, MyTypography, MyPaper, MyGrid, MyTabs, MyCard, MyChip, MyLinearProgress, MySwitch, MyTextField, MyIconButton, MyTooltip, MyToggleButton, MyToggleButtonGroup } from '../MUI替代';
+import { MyTableCell as TableCell, MyTableRow as TableRow } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyGrid as Grid, MyTabs as Tabs, MyCard as Card, MyChip as Chip, MyLinearProgress as LinearProgress, MySwitch as Switch, MyTextField as TextField, MyIconButton as IconButton, MyTooltip as Tooltip, MyToggleButton as ToggleButton, MyToggleButtonGroup as ToggleButtonGroup } from '../MUI替代';
 import { TrendingUp, TrendingDown, AttachMoney, ShowChart, Speed, CheckCircle, 
   Warning, Error as ErrorIcon, Refresh as RefreshIcon, Download as DownloadIcon,
   Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';

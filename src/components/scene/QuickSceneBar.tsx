@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMediaQuery } from '../MUI替代/useMediaQuery';
-import { MyIconButton, MyChip, MyTypography, MyDrawer } from '../MUI替代';
+import { MyIconButton as IconButton, MyChip as Chip, MyTypography as Typography, MyDrawer as Drawer } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Bolt as BoltIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useSceneStore } from '../../stores/sceneStore';

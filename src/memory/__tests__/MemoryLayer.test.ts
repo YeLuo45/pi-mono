@@ -6,26 +6,26 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { MemoryLayerManager } from '../MemoryLayer';
 
 // Mock dependencies
-jest.mock('../DreamMemoryStore', () => ({
+vi.mock('../DreamMemoryStore', () => ({
   getDreamMemoryStore: () => ({
     queryByLayer: () => [],
     countByLayer: () => 0,
     count: () => 0,
     getAll: () => [],
-    update: jest.fn(),
-    getReadOnly: jest.fn(),
+    update: vi.fn(),
+    getReadOnly: vi.fn(),
   }),
 }));
 
-jest.mock('../../core/hooks/HookManager', () => ({
+vi.mock('../../core/hooks/HookManager', () => ({
   hookManager: {
-    trigger: jest.fn().mockResolvedValue(undefined),
+    trigger: vi.fn().mockResolvedValue(undefined),
   },
 }));
 
-jest.mock('../../services/bus/UnifiedMessageBus', () => ({
+vi.mock('../../services/bus/UnifiedMessageBus', () => ({
   unifiedMessageBus: {
-    receive: jest.fn().mockResolvedValue(undefined),
+    receive: vi.fn().mockResolvedValue(undefined),
   },
 }));
 

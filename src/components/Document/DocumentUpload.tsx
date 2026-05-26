@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { MyBox, MyTypography, MyButton, MyLinearProgress, MyList, MyListItem, MyListItemText, MyIconButton, MyTextField, MyCircularProgress, MyAlert } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyLinearProgress as LinearProgress, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyIconButton as IconButton, MyTextField as TextField, MyCircularProgress as CircularProgress, MyAlert as Alert } from '../MUI替代';
 import { Upload as UploadIcon, Delete as DeleteIcon, QuestionAnswer as AskIcon, Article as ArticleIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
 import { parseDocument, formatFileSize, isFileSizeValid } from '../../utils/documentParser';

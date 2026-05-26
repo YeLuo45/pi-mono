@@ -9,7 +9,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { MyBox, MyTypography, MyIconButton, MyChip, MyTextField, MySelect, MyButton, MyCollapse, MyTooltip } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyChip as Chip, MyTextField as TextField, MySelect as Select, MyButton, MyCollapse as Collapse, MyTooltip as Tooltip , MyFormControl as FormControl, MyMenuItem as MenuItem } from '../MUI替代';
 import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,

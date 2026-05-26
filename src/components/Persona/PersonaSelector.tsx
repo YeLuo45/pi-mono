@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { MyMenu, MyDialog, MyBadge, MyFormControlLabel } from '../MUI替代';
-import { MyBox, MyTypography, MySelect, MyDivider, MyButton, MyTextField, MyIconButton, MyTooltip, MyLinearProgress } from '../MUI替代';
+import { MyMenu as Menu, MyDialog as Dialog, MyBadge, MyFormControlLabel as FormControlLabel , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyMenuItem as MenuItem, MySwitch } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MySelect as Select, MyDivider as Divider, MyButton as Button, MyTextField as TextField, MyIconButton as IconButton, MyTooltip as Tooltip, MyLinearProgress as LinearProgress } from '../MUI替代';
 import {
   Person as PersonIcon,
   Add as AddIcon,

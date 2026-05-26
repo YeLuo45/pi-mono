@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 
-import { MyBox, MyTypography, MyPaper, MyButton, MyTextField, MyStack, MyAlert, MyCircularProgress, MyIconButton } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyButton as Button, MyTextField as TextField, MyStack as Stack, MyAlert as Alert, MyCircularProgress as CircularProgress, MyIconButton as IconButton , MySelect as Select } from '../MUI替代';
 import {
   Close as CloseIcon,
   ArrowBack as BackIcon,

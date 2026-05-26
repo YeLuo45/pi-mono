@@ -3,7 +3,7 @@
  */
 
 import React, { useState } from 'react';
-import { MyBox, MyTypography, MyButton, MyChip, MyDivider, MyIconButton, MyTooltip } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyChip as Chip, MyDivider, MyIconButton as IconButton, MyTooltip as Tooltip } from '../MUI替代';
 import {
   X as CloseIcon,
   Edit3 as EditIcon,

@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { MyTypography, MyChip, MyLinearProgress, MyIconButton, MyTooltip } from '../MUI替代';
+import { MyTypography as Typography, MyChip as Chip, MyLinearProgress as LinearProgress, MyIconButton as IconButton, MyTooltip as Tooltip } from '../MUI替代';
 import { Box } from '../ui/Box';
 import {
   PlayArrow as PlayIcon,

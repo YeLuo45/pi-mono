@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ThemeProvider } from './components/ui/ThemeProvider';
 import { Box } from './components/ui/Box';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Sidebar } from './components/Layout/Sidebar';
 import { MainPage } from './pages/MainPage';
 import { SkillStorePage } from './pages/SkillStorePage';

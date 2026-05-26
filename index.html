@@ -30,6 +30,18 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
+          const isLocalDev = ['127.0.0.1', 'localhost'].includes(window.location.hostname);
+          if (isLocalDev) {
+            navigator.serviceWorker.getRegistrations()
+              .then((registrations) => registrations.forEach((registration) => registration.unregister()))
+              .catch(() => {});
+            if ('caches' in window) {
+              caches.keys()
+                .then((keys) => keys.filter((key) => key.startsWith('pixelpal-')).forEach((key) => caches.delete(key)))
+                .catch(() => {});
+            }
+            return;
+          }
           navigator.serviceWorker.register('/pixel-pal-web/sw.js').catch(() => {});
         });
       }

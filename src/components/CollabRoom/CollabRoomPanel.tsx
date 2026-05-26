@@ -8,8 +8,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyDialog, MyListItemAvatar, MyFormControlLabel } from '../MUI替代';
-import { MyBox, MyTypography, MyButton, MyTextField, MyIconButton, MyChip, MyList, MyListItem, MyListItemText, MySwitch, MyTooltip, MyDivider, MyAlert } from '../MUI替代';
+import { MyDialog as Dialog, MyListItemAvatar as ListItemAvatar, MyFormControlLabel as FormControlLabel , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle , MyAvatar as Avatar } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyTextField as TextField, MyIconButton as IconButton, MyChip as Chip, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MySwitch, MyTooltip as Tooltip, MyDivider as Divider, MyAlert as Alert } from '../MUI替代';
 import { MySwitch } from '../MUI替代';
 import {
   Add as AddIcon,

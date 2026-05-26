@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import { MyAlpha } from '../MUI替代';
-import { MyBox, MyTypography, MySwitch, MyIconButton, MyChip, MyStack, MyTooltip } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MySwitch as Switch, MyIconButton as IconButton, MyChip as Chip, MyStack as Stack, MyTooltip as Tooltip } from '../MUI替代';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,

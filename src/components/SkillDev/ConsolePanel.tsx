@@ -4,7 +4,7 @@
  */
 
 import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { MyTypography, MyIconButton, MyTooltip, MyCollapse, MyButton } from '../MUI替代';
+import { MyTypography as Typography, MyIconButton as IconButton, MyTooltip as Tooltip, MyCollapse as Collapse, MyButton as Button } from '../MUI替代';
 import { Box } from '../ui/Box';
 import {
   Trash2 as ClearIcon,

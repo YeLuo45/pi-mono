@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Box } from '../ui/Box';
-import { MyIconButton, MyTooltip } from '../MUI替代';
+import { MyIconButton as IconButton, MyTooltip as Tooltip } from '../MUI替代';
 import { ChatIcon, CalendarMonthIcon, CheckBoxIcon, DescriptionIcon, EmailIcon, EditIcon, SettingsIcon, GroupIcon, PsychologyIcon, ExtensionIcon, MemoryIcon, BarChartIcon, HubIcon, ScenesIcon, FlashOnIcon, MultiAgentIcon, ChevronLeftIcon, ChevronRightIcon, ActivityIcon, NetworkIcon } from '../ui/muiIconMap';
 const CalendarIcon = CalendarMonthIcon;
 const ExecutionIcon = ActivityIcon;

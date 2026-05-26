@@ -5,8 +5,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyCheckbox, MyFormControlLabel } from '../MUI替代';
-import { MyBox, MyTypography, MyPaper, MyChip, MyButton, MyCircularProgress, MyDivider, MyIconButton, MyCollapse, MyTextField, MyInputAdornment } from '../MUI替代';
+import { MyCheckbox as Checkbox, MyFormControlLabel as FormControlLabel } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyChip as Chip, MyButton as Button, MyCircularProgress as CircularProgress, MyDivider, MyIconButton, MyCollapse as Collapse, MyTextField as TextField, MyInputAdornment as InputAdornment } from '../MUI替代';
 import {
   Search as SearchIcon,
   ExpandMore as ExpandIcon,

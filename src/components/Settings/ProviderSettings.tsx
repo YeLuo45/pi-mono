@@ -4,8 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import { MyDialog } from '../MUI替代';
-import { MyList, MyListItem, MyListItemText, MyButton, MyTextField, MyIconButton, MyBox, MyTypography } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyButton as Button, MyTextField as TextField, MyIconButton as IconButton, MyBox as Box, MyTypography as Typography } from '../MUI替代';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { builtInProviders } from '../../services/providers';

@@ -9,8 +9,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyDialog, MyCheckbox, MyListItemIcon } from '../MUI替代';
-import { MyBox, MyTypography, MyIconButton, MyButton, MyPaper, MyList, MyListItem, MyListItemText, MyTextField, MyChip, MyDivider, MyTooltip } from '../MUI替代';
+import { MyDialog as Dialog, MyCheckbox as Checkbox, MyListItemIcon as ListItemIcon , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyButton as Button, MyPaper as Paper, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyTextField, MyChip as Chip, MyDivider as Divider, MyTooltip as Tooltip } from '../MUI替代';
 import {
   Delete as DeleteIcon,
   ArrowUpward as ArrowUpIcon,

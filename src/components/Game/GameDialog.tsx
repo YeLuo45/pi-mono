@@ -5,8 +5,8 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MyDialog } from '../MUI替代';
-import { MyButton, MyTextField, MyBox, MyTypography, MyIconButton, MyChip, MyPaper, MyInputAdornment } from '../MUI替代';
+import { MyDialog as Dialog , MyCard as Card, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyButton as Button, MyTextField as TextField, MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyChip as Chip, MyPaper as Paper, MyInputAdornment as InputAdornment } from '../MUI替代';
 import {
   Close as CloseIcon,
   EmojiEvents as TrophyIcon,

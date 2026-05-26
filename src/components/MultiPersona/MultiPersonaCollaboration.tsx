@@ -11,10 +11,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyCardHeader } from '../MUI替代';
+import { MyCardHeader , MyCardContent as CardContent, MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyGrid as Grid, MyInputLabel as InputLabel, MyMenuItem as MenuItem, MyTab as Tab, MyTabs as Tabs , MyAvatar as Avatar } from '../MUI替代';
 
-import { MyDialog, MyListItemAvatar, MyListItemSecondaryAction, MyBadge, MyFormControlLabel } from '../MUI替代';
-import { MyBox, MyPaper, MyTypography, MyButton, MyIconButton, MyChip, MyCollapse, MyDivider, MyTooltip, MyTextField, MySelect, MyList, MyListItem, MyListItemText, MyLinearProgress, MyCard } from '../MUI替代';
+import { MyDialog as Dialog, MyListItemAvatar as ListItemAvatar, MyListItemSecondaryAction as ListItemSecondaryAction, MyBadge as Badge, MyFormControlLabel as FormControlLabel } from '../MUI替代';
+import { MyBox as Box, MyPaper as Paper, MyTypography as Typography, MyButton as Button, MyIconButton as IconButton, MyChip as Chip, MyCollapse as Collapse, MyDivider as Divider, MyTooltip as Tooltip, MyTextField as TextField, MySelect as Select, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyLinearProgress as LinearProgress, MyCard as Card } from '../MUI替代';
 import { MySwitch } from '../MUI替代';
 import {
   Add as AddIcon,

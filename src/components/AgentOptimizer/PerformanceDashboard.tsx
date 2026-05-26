@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyTypography, MyCard, MyGrid, MyChip, MyLinearProgress } from '../MUI替代';
+import { MyTypography as Typography, MyCard as Card, MyGrid as Grid, MyChip as Chip, MyLinearProgress as LinearProgress , MyCardContent as CardContent, MyList as List } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { performanceTracker } from '../../services/agentOptimizer/performanceTracker';
 import type { AgentPerformance } from '../../types/agentOptimizer';

@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { MyTypography, MyButton, MyIconButton, MyTooltip, MyChip, MyStack } from '../components/MUI替代';
+import { MyTypography as Typography, MyButton as Button, MyIconButton as IconButton, MyTooltip as Tooltip, MyChip as Chip, MyStack , MySelect as Select } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import { useNavigate } from 'react-router-dom';
 import {

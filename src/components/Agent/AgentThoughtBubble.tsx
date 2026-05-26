@@ -3,7 +3,7 @@
 // 思考气泡
 
 import React from 'react';
-import { MyTypography, MyIconButton, MyPaper, MyChip, MyCircularProgress } from '../MUI替代';
+import { MyTypography as Typography, MyIconButton, MyPaper, MyChip as Chip, MyCircularProgress as CircularProgress , MyAvatar as Avatar } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { agentRegistry } from '../../services/agents/AgentRegistry';
 

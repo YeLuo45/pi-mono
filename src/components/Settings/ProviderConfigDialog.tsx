@@ -5,8 +5,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyDialog } from '../MUI替代';
-import { MyButton, MyTextField, MySelect, MyStack, MyTypography, MyIconButton, MyAlert, MyCircularProgress } from '../MUI替代';
+import { MyDialog as Dialog , MyBox as Box, MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../MUI替代';
+import { MyButton as Button, MyTextField as TextField, MySelect as Select, MyStack as Stack, MyTypography, MyIconButton as IconButton, MyAlert as Alert, MyCircularProgress as CircularProgress } from '../MUI替代';
 import CloseIcon from '@mui/icons-material/Close';
 import type { ProviderConfig } from '../../services/providers/types';
 import { DEFAULT_PROVIDERS, PROVIDER_BASE_URLS, getProviderDefinition } from '../../data/defaultProviders';

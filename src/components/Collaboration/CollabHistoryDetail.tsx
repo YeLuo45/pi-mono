@@ -9,8 +9,8 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyListItemAvatar } from '../MUI替代';
-import { MyBox, MyTypography, MyCollapse, MyDivider, MyChip, MyList, MyListItem, MyListItemText } from '../MUI替代';
+import { MyListItemAvatar , MyCard as Card , MyAvatar as Avatar } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyCollapse, MyDivider as Divider, MyChip as Chip, MyList as List, MyListItem as ListItem, MyListItemText } from '../MUI替代';
 import {
   ChevronDown as ExpandMoreIcon,
   MessageCircle as MessageIcon,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { MyDialog } from '../components/MUI替代';
-import { MyTypography, MyButton, MyGrid, MyTabs, MyChip } from '../components/MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyTab as Tab } from '../components/MUI替代';
+import { MyTypography as Typography, MyButton as Button, MyGrid as Grid, MyTabs as Tabs, MyChip as Chip } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import {
   Add as AddIcon, AutoAwesome as AutoAwesomeIcon,

@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyBox, MyTypography, MyTextField, MyButton, MyPaper, MyStack, MySwitch, MyCollapse, MyIconButton } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyTextField as TextField, MyButton as Button, MyPaper as Paper, MyStack as Stack, MySwitch as Switch, MyCollapse as Collapse, MyIconButton as IconButton } from '../MUI替代';
 import {
   Send as TelegramIcon,
   Games as DiscordIcon,

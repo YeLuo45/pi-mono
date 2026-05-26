@@ -1,9 +1,9 @@
 // PluginStore — V62 Plugin Market UI
 import React, { useState, useEffect } from 'react';
-import { MyTypography, MyPaper, MyStack, MyChip, MyCollapse, MyButton, MyDivider } from '../MUI替代';
+import { MyTypography as Typography, MyPaper as Paper, MyStack as Stack, MyChip as Chip, MyCollapse as Collapse, MyButton as Button, MyDivider as Divider } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { ExpandMore as ExpandIcon, ExpandLess as CollapseIcon, Add as AddIcon } from '@mui/icons-material';
-import { MySwitch } from '../MUI替代';
+import { MySwitch, MySwitch as Switch } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
 import { pluginRegistry } from '../../services/plugins/pluginRegistry';
 import type { Plugin } from '../../types/plugin';

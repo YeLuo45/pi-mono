@@ -3,10 +3,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyTable, MyTableBody, MyTableContainer, MyTableHead } from '../MUI替代';
+import { MyTable as Table, MyTableBody as TableBody, MyTableContainer as TableContainer, MyTableHead as TableHead } from '../MUI替代';
 
-import { MyTableCell, MyTableRow, MyTableSortLabel } from '../MUI替代';
-import { MyBox, MyTypography, MyCard, MyChip, MyIconButton, MyTooltip, MyLinearProgress } from '../MUI替代';
+import { MyTableCell as TableCell, MyTableRow as TableRow, MyTableSortLabel as TableSortLabel } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyCard as Card, MyChip as Chip, MyIconButton, MyTooltip as Tooltip, MyLinearProgress as LinearProgress } from '../MUI替代';
 import { Visibility as ViewIcon } from '@mui/icons-material';
 import { performanceTracker } from '../../services/agentOptimizer/performanceTracker';
 import type { AgentPerformance } from '../../types/agentOptimizer';

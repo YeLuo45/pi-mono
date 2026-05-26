@@ -8,8 +8,8 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { MyMenu, MySlider } from '../MUI替代';
-import { MyIconButton, MyTooltip, MySelect, MyTypography, MyBox } from '../MUI替代';
+import { MyMenu as Menu, MySlider as Slider , MyMenuItem as MenuItem } from '../MUI替代';
+import { MyIconButton as IconButton, MyTooltip as Tooltip, MySelect, MyTypography as Typography, MyBox as Box } from '../MUI替代';
 import {
   VolumeUp as VolumeUpIcon,
   VolumeOff as VolumeOffIcon,

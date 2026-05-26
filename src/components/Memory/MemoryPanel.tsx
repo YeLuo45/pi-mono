@@ -13,10 +13,10 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 import WordCloud from 'wordcloud';
-import { MyList, MyListItem } from '../MUI替代';
+import { MyList as List, MyListItem as ListItem , MyCard as Card, MyCircularProgress as CircularProgress, MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyTab as Tab } from '../MUI替代';
 
-import { MyListItemSecondaryAction, MyDialog, MySlider } from '../MUI替代';
-import { MyBox, MyTypography, MyPaper, MyTextField, MyInputAdornment, MyChip, MyStack, MyButton, MyIconButton, MyTabs, MyListItemText, MyLinearProgress, MyDivider, MyCollapse, MyPopper } from '../MUI替代';
+import { MyListItemSecondaryAction as ListItemSecondaryAction, MyDialog as Dialog, MySlider as Slider } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyTextField as TextField, MyInputAdornment as InputAdornment, MyChip as Chip, MyStack as Stack, MyButton as Button, MyIconButton as IconButton, MyTabs as Tabs, MyListItemText as ListItemText, MyLinearProgress as LinearProgress, MyDivider as Divider, MyCollapse as Collapse, MyPopper as Popper } from '../MUI替代';
 import {
   Search as SearchIcon,
   Memory as MemoryIcon,

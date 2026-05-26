@@ -4,8 +4,8 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { MyDialog, MyAlpha } from '../MUI替代';
-import { MyBox, MyTypography, MyButton, MyStack, MyChip, MyIconButton, MyDivider, MyAlert, MyCollapse, MyList, MyListItem, MyListItemText } from '../MUI替代';
+import { MyDialog as Dialog, MyAlpha , MyDialogContent as DialogContent } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyStack as Stack, MyChip as Chip, MyIconButton as IconButton, MyDivider as Divider, MyAlert as Alert, MyCollapse as Collapse, MyList, MyListItem, MyListItemText } from '../MUI替代';
 import {
   Close as CloseIcon,
   Star as StarIcon,

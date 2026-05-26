@@ -60,9 +60,11 @@ export default defineConfig({
     emptyOutDir: true,
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+    alias: [
+      { find: /^@mui\/icons-material\/.+$/, replacement: path.resolve(__dirname, './src/components/ui/muiIconsShim.tsx') },
+      { find: '@mui/icons-material', replacement: path.resolve(__dirname, './src/components/ui/muiIconsShim.tsx') },
+      { find: '@', replacement: path.resolve(__dirname, './src') },
+    ],
   },
   server: {
     host: '127.0.0.1',

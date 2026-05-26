@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { MyIconButton, MyTypography, MyDrawer } from '../MUI替代';
+import { MyIconButton as IconButton, MyTypography, MyDrawer as Drawer } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { Sidebar } from './Sidebar';

@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyBox, MyTypography, MyIconButton, MyChip, MyDivider, MyTextField, MyButton, MySelect } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyChip as Chip, MyDivider, MyTextField as TextField, MyButton as Button, MySelect as Select , MyFormControl as FormControl, MyMenuItem as MenuItem } from '../MUI替代';
 import {
   Add as AddIcon,
   FlashOn as FlashIcon,

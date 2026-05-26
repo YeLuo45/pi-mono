@@ -2,8 +2,8 @@
 // 任务看板（Kanban三列）
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { MyDialog } from '../MUI替代';
-import { MyBox, MyTypography, MyIconButton, MyButton, MyTextField, MyChip, MyPaper, MyList, MyListItem, MyListItemText, MyDivider } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyButton as Button, MyTextField as TextField, MyChip as Chip, MyPaper as Paper, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyDivider as Divider } from '../MUI替代';
 import {
   Close as CloseIcon,
   Add as AddIcon,

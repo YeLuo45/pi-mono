@@ -18,7 +18,7 @@ import {
   MyDivider,
   MyIconButton,
   MyTooltip,
-} from '../MUI替代';
+ MyTable as Table } from '../MUI替代';
 import {
   Check as CheckIcon,
   Close as CloseIcon,

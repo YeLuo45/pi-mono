@@ -62,8 +62,9 @@ export class QQChannelAdapter implements ChannelAdapter {
 
     try {
       // Dynamic import oicq (Node.js QQ SDK, will fail in browser)
-      // Use /* @vite-ignore */ to prevent bundler from trying to resolve this module
-      const oicq = await import(/* @vite-ignore */ 'oicq');
+      // Keep the package name out of a literal import so Vite does not pre-resolve it.
+      const sdkPackage = 'oicq';
+      await import(/* @vite-ignore */ sdkPackage);
       console.log(`[QQChannelAdapter] Initialized (oicq loaded)`);
       return true;
     } catch (e) {

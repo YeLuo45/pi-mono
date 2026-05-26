@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { MyIconButton, MyTooltip, MyBox, MyTypography } from '../MUI替代';
+import { MyIconButton as IconButton, MyTooltip as Tooltip, MyBox as Box, MyTypography } from '../MUI替代';
 import { Mic as MicIcon, MicOff as MicOffIcon } from '@mui/icons-material';
 import { useSpeechRecognition } from '../../hooks/useSpeechRecognition';
 import { voiceRecorder, type RecordingResult } from '../../services/multimodal/VoiceRecorder';

@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyTypography, MyCard, MyGrid, MyChip, MyAlert, MyIconButton, MyCollapse, MyButton } from '../MUI替代';
+import { MyTypography as Typography, MyCard as Card, MyGrid as Grid, MyChip as Chip, MyAlert as Alert, MyIconButton as IconButton, MyCollapse as Collapse, MyButton as Button , MyCardContent as CardContent } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { ExpandMore as ExpandIcon, ExpandLess as CollapseIcon, Download as DownloadIcon } from '@mui/icons-material';
 import { tokenTracker } from '../../services/usage/TokenTracker';

@@ -8,8 +8,8 @@
  */
 
 import React, { useState } from 'react';
-import { MyListItemAvatar, MyMenu } from '../MUI替代';
-import { MyBox, MyTypography, MyList, MyListItem, MyListItemText, MyIconButton, MyChip, MySelect, MyTooltip, MyDivider } from '../MUI替代';
+import { MyListItemAvatar as ListItemAvatar, MyMenu as Menu , MyMenuItem as MenuItem , MyAvatar as Avatar } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyIconButton as IconButton, MyChip as Chip, MySelect, MyTooltip, MyDivider as Divider } from '../MUI替代';
 import {
   MoreVert as MoreVertIcon,
   AdminPanelSettings as OwnerIcon,

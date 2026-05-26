@@ -1,5 +1,5 @@
 import React from 'react';
-import { MyTypography, MyButton, MyStack, MyChip } from '../MUI替代';
+import { MyTypography as Typography, MyButton as Button, MyStack as Stack, MyChip as Chip } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Update as UpdateIcon } from '@mui/icons-material';
 

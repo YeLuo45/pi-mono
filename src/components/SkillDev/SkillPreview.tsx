@@ -5,7 +5,7 @@
 
 import React, { useMemo } from 'react';
 import { MyAlpha } from '../MUI替代';
-import { MyTypography, MyChip, MyStack, MyDivider } from '../MUI替代';
+import { MyTypography as Typography, MyChip as Chip, MyStack as Stack, MyDivider as Divider } from '../MUI替代';
 import { Box } from '../ui/Box';
 import type { SkillDefinition } from '../../services/skills/types';
 

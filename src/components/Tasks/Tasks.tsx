@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { MyDialog } from '../MUI替代';
-import { MyBox, MyTypography, MyIconButton, MyButton, MyTextField, MySelect, MyChip } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyButton as Button, MyTextField as TextField, MySelect as Select, MyChip as Chip } from '../MUI替代';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { Add as AddIcon } from '@mui/icons-material';
 import {

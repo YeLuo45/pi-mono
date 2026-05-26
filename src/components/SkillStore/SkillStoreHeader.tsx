@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { MyTextField, MyInputAdornment, MyTypography, MyIconButton } from '../MUI替代';
+import { MyTextField as TextField, MyInputAdornment as InputAdornment, MyTypography as Typography, MyIconButton as IconButton } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
 

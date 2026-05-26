@@ -9,7 +9,7 @@
  */
 
 import React, { useState, useCallback, useRef } from 'react';
-import { MyBox, MyTypography, MyIconButton, MyLinearProgress } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyIconButton, MyLinearProgress as LinearProgress } from '../MUI替代';
 import {
   CloudUpload as CloudUploadIcon,
   Image as ImageIcon,

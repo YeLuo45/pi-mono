@@ -5,8 +5,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyDialog, MySlider } from '../MUI替代';
-import { MyBox, MyTypography, MyPaper, MyTextField, MyInputAdornment, MyChip, MyStack, MyButton, MyIconButton, MyTabs, MyList, MyListItem, MyListItemText, MyLinearProgress, MyDivider, MyTooltip, MyCard, MyGrid } from '../MUI替代';
+import { MyDialog as Dialog, MySlider as Slider , MyCardContent as CardContent, MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyTextField as TextField, MyInputAdornment as InputAdornment, MyChip as Chip, MyStack as Stack, MyButton as Button, MyIconButton as IconButton, MyTabs, MyList, MyListItem, MyListItemText, MyLinearProgress as LinearProgress, MyDivider as Divider, MyTooltip, MyCard as Card, MyGrid as Grid } from '../MUI替代';
 import {
   Search as SearchIcon,
   Timeline as TimelineIcon,

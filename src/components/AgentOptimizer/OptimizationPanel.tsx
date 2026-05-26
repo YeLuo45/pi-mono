@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyBox, MyTypography, MyCard, MyButton, MyChip, MyIconButton, MyCollapse, MyList, MyListItem, MyDivider, MyAlert, MyCircularProgress } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyCard as Card, MyButton as Button, MyChip as Chip, MyIconButton as IconButton, MyCollapse as Collapse, MyList, MyListItem, MyDivider as Divider, MyAlert as Alert, MyCircularProgress as CircularProgress , MySwitch as Switch } from '../MUI替代';
 import {
   ExpandMore as ExpandIcon, ExpandLess as CollapseIcon,
   AutoFixHigh as OptimizeIcon, CheckCircle as ApplyIcon, Close as RejectIcon,

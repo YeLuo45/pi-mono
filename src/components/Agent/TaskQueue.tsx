@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { MyTypography, MyChip, MyTabs, MyIconButton, MyTooltip } from '../MUI替代';
+import { MyTypography as Typography, MyChip as Chip, MyTabs as Tabs, MyIconButton as IconButton, MyTooltip as Tooltip , MyTab as Tab } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import { TaskCard } from './TaskCard';

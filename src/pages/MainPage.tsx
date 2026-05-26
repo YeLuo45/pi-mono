@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MyIconButton } from '../components/MUI替代';
+import { MyIconButton as IconButton , MyDialog as Dialog, MyDrawer as Drawer, MyTab as Tab } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import { MenuIcon } from '../components/ui/muiIconMap';
 

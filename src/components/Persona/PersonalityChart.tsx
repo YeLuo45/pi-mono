@@ -5,8 +5,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyDialog, MyListItemSecondaryAction } from '../MUI替代';
-import { MyBox, MyTypography, MyPaper, MyTabs, MyChip, MyStack, MyCard, MyButton, MyIconButton, MyList, MyListItem, MyListItemText } from '../MUI替代';
+import { MyDialog as Dialog, MyListItemSecondaryAction as ListItemSecondaryAction , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyTab as Tab } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyTabs as Tabs, MyChip as Chip, MyStack as Stack, MyCard, MyButton as Button, MyIconButton as IconButton, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText } from '../MUI替代';
 import {
   Close as CloseIcon,
   TrendingUp as TrendingUpIcon,

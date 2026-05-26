@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { MyCard, MyTypography, MyChip, MyLinearProgress, MyBox } from '../MUI替代';
+import { MyCard as Card, MyTypography as Typography, MyChip as Chip, MyLinearProgress as LinearProgress, MyBox as Box , MyCardContent as CardContent } from '../MUI替代';
 
 export const ChainStatus: React.FC = () => {
   return (

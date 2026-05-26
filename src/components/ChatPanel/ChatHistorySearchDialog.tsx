@@ -6,8 +6,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyDialog } from '../MUI替代';
-import { MyBox, MyTextField, MyTypography, MyIconButton, MyPaper, MyList, MyListItem, MyListItemText, MyChip, MyInputAdornment, MyCircularProgress } from '../MUI替代';
+import { MyDialog as Dialog , MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
+import { MyBox as Box, MyTextField as TextField, MyTypography as Typography, MyIconButton as IconButton, MyPaper as Paper, MyList as List, MyListItem as ListItem, MyListItemText, MyChip as Chip, MyInputAdornment as InputAdornment, MyCircularProgress as CircularProgress } from '../MUI替代';
 import {
   Search as SearchIcon,
   Close as CloseIcon,

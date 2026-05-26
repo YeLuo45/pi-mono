@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { MyBox, MyTypography, MyPaper, MyButton, MyChip, MyStack, MyIconButton, MyTooltip } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyButton as Button, MyChip as Chip, MyStack as Stack, MyIconButton as IconButton, MyTooltip as Tooltip , MyCard as Card } from '../MUI替代';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';

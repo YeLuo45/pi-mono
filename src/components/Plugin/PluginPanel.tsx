@@ -1,6 +1,6 @@
 // PluginPanel — wrapper component that renders a plugin's panel by pluginId
 import React from 'react';
-import { MyTypography, MyIconButton } from '../MUI替代';
+import { MyTypography as Typography, MyIconButton as IconButton } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { useTranslation } from 'react-i18next';
 import { ArrowBack as ArrowBackIcon, Settings as SettingsIcon } from '@mui/icons-material';

@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { MyTypography, MyStack } from '../MUI替代';
+import { MyTypography as Typography, MyStack as Stack } from '../MUI替代';
 import { Box } from '../ui/Box';
 import type { SkillCategory } from '../../services/skills/types';
 
