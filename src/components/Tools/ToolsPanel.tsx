@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { } from '../MUI替代';
-import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyChip as Chip, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyChip as Chip, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyAlpha as alpha } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
 import { ToolRegistry } from '../../services/tools/registry';
 import { ToolExecutionLogger, type ToolCallLog } from '../../services/tools/logger';
