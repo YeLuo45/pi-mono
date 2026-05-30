@@ -29,7 +29,7 @@ interface KnowledgePageProps {
 }
 
 export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onMenuClick }) => {
-  const theme = useTheme();
+  const theme = MyUseTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   const [selectedSource, setSelectedSource] = useState<KnowledgeSource | null>(null);
