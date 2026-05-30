@@ -8,9 +8,9 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { MyUseTheme , MyList as List, MyMenu as Menu } from '../components/MUI替代';
+import { MyList as List, MyMenu as Menu } from '../components/MUI替代';
 import { useMediaQuery } from '../components/MUI替代/useMediaQuery';
-import { MyTypography as Typography, MyIconButton as IconButton, MyTooltip as Tooltip, MyDivider } from '../components/MUI替代';
+import { MyTypography as Typography, MyIconButton as IconButton, MyTooltip as Tooltip } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import {
   Menu as MenuIcon,
@@ -29,8 +29,7 @@ interface KnowledgePageProps {
 }
 
 export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onMenuClick }) => {
-  const theme = MyUseTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery('(max-width: 900px)');
   
   const [selectedSource, setSelectedSource] = useState<KnowledgeSource | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
