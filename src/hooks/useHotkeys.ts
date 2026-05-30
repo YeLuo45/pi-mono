@@ -116,6 +116,15 @@ export function useHotkeys() {
         const prevIdx = (currentIdx - 1 + personas.length) % personas.length;
         setActivePersonaId(personas[prevIdx].id);
       }
+
+      // Show version: Ctrl/Cmd + Shift + V
+      if (key === 'v' && event.shiftKey) {
+        event.preventDefault();
+        const version = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0';
+        const hash = typeof __BUILD_HASH__ !== 'undefined' ? __BUILD_HASH__ : 'unknown';
+        const time = typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : new Date().toISOString();
+        window.alert(`PixelPal v${version}\nBuild: ${hash}\nTime: ${time}`);
+      }
     },
     [activePanel, setActivePanel, clearMessages, setActivePersonaId, activePersonaId, hotkeySettings]
   );
