@@ -1,40 +1,70 @@
 /**
- * TelegramChannelAdapter (Stub)
- * V102: Telegram bot adapter implementing ChannelAdapter interface
+ * TelegramChannelAdapter Phase 2
+ * V172: Full dynamic import implementation with polling
  * 
- * NOTE: This is a STUB implementation for type safety and architecture clarity.
- * The actual Telegram bot connection requires node-telegram-bot-api which cannot
- * be bundled into GitHub Pages static builds. The real connection logic should
- * live in a separate bot-runner Node.js service.
- * 
- * See: src/plugins/bot-runner/README.md for Phase 2 implementation
+ * Uses dynamic import of node-telegram-bot-api to avoid bundling in GitHub Pages
  */
 
 import type { Channel, RawMessage, UnifiedMessage } from '../types';
 import type { ChannelAdapter } from '../ChannelAdapter';
+import { unifiedMessageBus } from '../UnifiedMessageBus';
+import { botConfigManager } from '../BotConfigManager';
 
 export class TelegramChannelAdapter implements ChannelAdapter {
   readonly channel: Channel = 'telegram';
   
   private token: string | null = null;
-  private bot: unknown = null; // TelegramBot instance (lazy loaded in Phase 2)
+  private bot: any = null;  // TelegramBot instance, lazy loaded
 
-  /**
-   * Initialize the adapter with a bot token
-   * In Phase 2, this will create the actual TelegramBot instance
-   */
-  initialize(token: string): void {
-    this.token = token;
-    // Phase 2: Dynamic import of node-telegram-bot-api and create bot instance
-    // import('node-telegram-bot-api').then(({ default: TelegramBot }) => {
-    //   this.bot = new TelegramBot(token, { polling: true });
-    //   this.setupMessageHandler();
-    // });
+  get enabled(): boolean {
+    return !!botConfigManager.config.telegram?.token;
+  }
+
+  async start(): Promise<void> {
+    const config = botConfigManager.config.telegram;
+    if (!config?.token) {
+      console.log('[Telegram] No token configured, skipping start');
+      return;
+    }
+    this.token = config.token;
+    
+    // Dynamic import — MUST NOT be static import
+    const { default: TelegramBot } = await import('node-telegram-bot-api');
+    this.bot = new TelegramBot(this.token, { polling: true });
+    
+    this.bot.on('message', (msg: any) => {
+      if (!msg.text && !msg.document) return;
+      const raw: RawMessage = {
+        channel: 'telegram',
+        userId: String(msg.from?.id ?? 'unknown'),
+        channelUserId: String(msg.chat?.id ?? msg.from?.id),
+        content: msg.text || '[non-text message]',
+        timestamp: (msg.date ?? Date.now() / 1000) * 1000,
+        metadata: { messageId: msg.message_id },
+      };
+      
+      // Check allowed users
+      if (config.allowedUsers) {
+        const allowed = config.allowedUsers.split('|');
+        if (!allowed.includes(raw.userId)) return;
+      }
+      
+      unifiedMessageBus.receive(raw);
+    });
+    
+    console.log('[Telegram] Bot started with polling');
+  }
+
+  async stop(): Promise<void> {
+    if (this.bot) {
+      await this.bot.closePolling();
+      this.bot = null;
+      console.log('[Telegram] Bot stopped');
+    }
   }
 
   /**
-   * Convert Telegram message to RawMessage format
-   * Input format matches Telegram Bot API Message object shape
+   * Convert raw Telegram message to RawMessage format
    */
   toAgentFormat(raw: unknown): RawMessage | null {
     if (!raw || typeof raw !== 'object') return null;
@@ -49,7 +79,6 @@ export class TelegramChannelAdapter implements ChannelAdapter {
     };
 
     if (!msg.chat?.id && !msg.from?.id) return null;
-    // Accept text or document messages
     if (!msg.text && !msg.document) return null;
 
     return {
@@ -66,7 +95,6 @@ export class TelegramChannelAdapter implements ChannelAdapter {
 
   /**
    * Convert agent response to Telegram message format
-   * Returns payload for bot.sendMessage
    */
   fromAgentResponse(msg: UnifiedMessage, response: string): unknown {
     return {
@@ -75,33 +103,28 @@ export class TelegramChannelAdapter implements ChannelAdapter {
     };
   }
 
-  /**
-   * Send message to Telegram chat
-   * Phase 2: Will call bot.sendMessage with the prepared payload
-   */
   async send(target: unknown, content: string): Promise<void> {
-    if (!this.token) {
-      console.warn('[TelegramChannelAdapter] Bot not initialized - no token');
+    if (!this.bot) {
+      console.warn('[Telegram] Bot not started');
       return;
     }
-
     const payload = target as { chat_id?: string | number };
     if (!payload.chat_id) {
-      console.warn('[TelegramChannelAdapter] No chat_id provided');
+      console.warn('[Telegram] No chat_id provided');
       return;
     }
-
-    // Phase 2: Actual implementation would call:
-    // await this.bot.sendMessage(payload.chat_id, content);
-    console.log(`[TelegramChannelAdapter] Would send to ${payload.chat_id}: ${content.substring(0, 50)}...`);
+    try {
+      await this.bot.sendMessage(payload.chat_id, content, { parse_mode: 'Markdown' });
+    } catch (e) {
+      console.error('[Telegram] Send error:', e);
+    }
   }
+}
 
-  /**
-   * Check if adapter is initialized and ready
-   */
-  isReady(): boolean {
-    return this.token !== null && this.bot !== null;
-  }
+// Legacy initialize method for backward compatibility with App.tsx
+export function initialize(token: string): void {
+  // Phase 2: start() is called from App.tsx lifecycle instead
+  console.log('[TelegramChannelAdapter] Legacy initialize called - use start() instead');
 }
 
 // Singleton instance for bus registration
