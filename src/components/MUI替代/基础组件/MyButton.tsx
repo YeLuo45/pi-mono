@@ -82,6 +82,26 @@ export const MyButton: FC<MyButtonProps> = ({
       disabled={disabled}
       className={className}
       style={baseStyle}
+      onMouseEnter={(e) => {
+        if (!disabled) {
+          e.currentTarget.style.transform = 'scale(1.02)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.boxShadow = 'none';
+      }}
+      onMouseDown={(e) => {
+        if (!disabled) {
+          e.currentTarget.style.transform = 'scale(0.97)';
+        }
+      }}
+      onMouseUp={(e) => {
+        if (!disabled) {
+          e.currentTarget.style.transform = 'scale(1.02)';
+        }
+      }}
     >
       {startIcon && <span style={{ display: 'flex' }}>{startIcon}</span>}
       {children}

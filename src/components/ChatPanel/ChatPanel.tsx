@@ -88,9 +88,9 @@ const CollabBubble: React.FC<CollabBubbleProps> = ({ personaName, avatar, conten
     <Paper
       onContextMenu={onContextMenu}
       sx={{
-        maxWidth: '80%',
+        maxWidth: 680,
         p: 1.5,
-        borderRadius: 2,
+        borderRadius: '16px',
         bgcolor: isUser ? 'rgba(94, 106, 210, 0.15)' : '#191a1b',
         border: isUser ? 'none' : `1px solid ${color}40`,
         color: '#f7f8f8',
@@ -1467,10 +1467,11 @@ export const ChatPanel: React.FC = () => {
             >
               <Paper
                 onContextMenu={(e) => handleContextMenu(e, msg)}
+                className="message-enter"
                 sx={{
-                  maxWidth: '80%',
+                  maxWidth: 680,
                   p: 1.5,
-                  borderRadius: 2,
+                  borderRadius: '16px',
                   bgcolor: msg.role === 'user'
                     ? 'var(--color-chat-user-bg, rgba(94, 106, 210, 0.15))'
                     : 'var(--color-chat-ai-bg, #191a1b)',

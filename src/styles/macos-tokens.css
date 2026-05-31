@@ -152,3 +152,15 @@
   --z-tooltip: 600;
   --z-toast: 700;
 }
+
+/* ============================================
+ * ACCESSIBILITY: Reduced Motion
+ * ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
