@@ -12,6 +12,10 @@ export interface BotChannelConfig {
   enabled: boolean;
   token: string;
   allowFrom: string[]; // List of user IDs allowed to interact (future use)
+  // V172: Phase 2 extended fields
+  allowedUsers?: string;    // "id1|id2" format for Telegram
+  allowedChannels?: string; // "ch1|ch2" format for Discord
+  guildId?: string;         // Discord guild ID
 }
 
 export interface BotConfig {
