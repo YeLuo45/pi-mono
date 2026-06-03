@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { MyIconButton as IconButton, MyTypography, MyDrawer as Drawer } from '../MUI替代';
+import React, { useRef } from 'react';
+import { MyIconButton as IconButton, MyDrawer as Drawer } from '../MUI替代';
 import { Box } from '../ui/Box';
 import { Close as CloseIcon } from '@mui/icons-material';
-import { Sidebar } from './Sidebar';
+import { MacSourceList } from '../macos/MacSourceList';
 import { useSwipeGesture } from '../../hooks/useSwipeGesture';
 
 interface MobileDrawerProps {
@@ -13,11 +13,6 @@ interface MobileDrawerProps {
 
 export const MobileDrawer: React.FC<MobileDrawerProps> = ({ open, onClose, onOpen }) => {
   const drawerRef = useRef<HTMLDivElement>(null);
-  const [drawerOpen, setDrawerOpen] = useState(open);
-
-  useEffect(() => {
-    setDrawerOpen(open);
-  }, [open]);
 
   // Swipe right to open drawer
   useSwipeGesture(drawerRef, {
@@ -61,11 +56,12 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ open, onClose, onOpe
         variant="temporary"
         sx={{
           '& .MuiDrawer-paper': {
-            bgcolor: '#0f1011',
-            border: '1px solid rgba(255,255,255,0.05)',
+            bgcolor: 'var(--bg-sidebar)',
+            border: '1px solid var(--separator)',
             width: 260,
             pt: 2,
             touchAction: 'none',
+            backdropFilter: 'blur(20px)',
           },
         }}
       >
@@ -74,13 +70,13 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ open, onClose, onOpe
           <IconButton
             onClick={onClose}
             size="small"
-            sx={{ color: 'var(--color-text-secondary, #d0d6e0)' }}
+            sx={{ color: 'var(--text-secondary)' }}
           >
             <CloseIcon />
           </IconButton>
         </Box>
 
-        <Sidebar onNavigate={onClose} />
+        <MacSourceList onNavigate={onClose} />
       </Drawer>
     </>
   );

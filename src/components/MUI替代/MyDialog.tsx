@@ -60,8 +60,8 @@ export const MyDialogTitle: FC<MyDialogTitleProps> = ({
         paddingBottom: theme.spacing(1),
         fontSize: '18px',
         fontWeight: 600,
-        color: theme.palette.text.primary || '#f7f8f8',
-        borderBottom: `1px solid ${theme.palette.divider || 'rgba(255,255,255,0.05)'}`,
+        color: 'var(--text-primary)',
+        borderBottom: '1px solid var(--separator)',
         ...sx,
       }}
     >
@@ -84,8 +84,8 @@ export const MyDialogContent: FC<MyDialogContentProps> = ({
         padding: theme.spacing(2),
         flex: 1,
         overflowY: 'auto',
-        color: theme.palette.text.secondary || '#d0d6e0',
-        borderBottom: dividers ? `1px solid ${theme.palette.divider || 'rgba(255,255,255,0.05)'}` : 'none',
+        color: 'var(--text-secondary)',
+        borderBottom: dividers ? '1px solid var(--separator)' : 'none',
         ...sx,
       }}
     >
@@ -109,7 +109,7 @@ export const MyDialogActions: FC<MyDialogActionsProps> = ({
         display: 'flex',
         justifyContent: 'flex-end',
         gap: theme.spacing(1),
-        borderTop: `1px solid ${theme.palette.divider || 'rgba(255,255,255,0.05)'}`,
+        borderTop: '1px solid var(--separator)',
         ...sx,
       }}
     >
@@ -198,10 +198,10 @@ export const MyDialog: FC<MyDialogProps> = ({
         className={`${className} ${paperClassName}`}
         style={{
           position: 'relative',
-          backgroundColor: theme.palette.background.paper || '#1a1a1a',
-          color: theme.palette.text.primary || '#f7f8f8',
-          borderRadius: '8px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          backgroundColor: 'var(--bg-elevated)',
+          color: 'var(--text-primary)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-lg)',
           maxWidth: paperMaxWidth,
           width: fullWidth || fullScreen ? '100%' : 'auto',
           maxHeight: fullScreen ? '100%' : '90vh',

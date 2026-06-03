@@ -16,7 +16,6 @@ import { MyBox, MyTypography, MyPaper, MyTabs, MyTab, MyTab as Tab, MyIconButton
 import {
   Close as CloseIcon,
   Refresh as RefreshIcon,
-  Help as HelpIcon,
   Dashboard as DashboardIcon,
   Pattern as PatternIcon,
   Speed as StrategyIcon,
@@ -26,6 +25,7 @@ import {
   Check as CheckIcon,
 } from '@mui/icons-material';
 import { useEvolutionStore, type EvolutionEvent } from '../../stores/evolutionStore';
+import { useStore } from '../../store';
 import { PatternVisualizer } from './PatternVisualizer';
 import { StrategyOptimizerPanel } from './StrategyOptimizerPanel';
 import { SkillCrystallizerPanel } from './SkillCrystallizerPanel';
@@ -43,6 +43,10 @@ interface EvolutionDashboardProps {
   personalityId?: string;
   /** Callback when dashboard is closed */
   onClose?: () => void;
+  /** Render inside macOS Detail pane (not fixed overlay) */
+  embedded?: boolean;
+  /** Hide tab bar; tabs driven by MacItemList */
+  splitLayout?: boolean;
 }
 
 /** Summary card component */
@@ -235,8 +239,11 @@ const DashboardView: React.FC<DashboardViewProps> = ({ engine, isLoading }) => {
 export const EvolutionDashboard: React.FC<EvolutionDashboardProps> = ({
   personalityId,
   onClose,
+  embedded = false,
+  splitLayout = false,
 }) => {
   const { t } = useTranslation();
+  const setActivePanel = useStore((s) => s.setActivePanel);
   const {
     isPanelOpen,
     activeTab,
@@ -244,11 +251,14 @@ export const EvolutionDashboard: React.FC<EvolutionDashboardProps> = ({
     lastRefreshAt,
     events,
     isLoading,
+    selectedEventId,
     setActiveTab,
+    selectEvent,
     toggleAutoRefresh,
     updateLastRefresh,
     addEvent,
     closePanel,
+    openPanel,
   } = useEvolutionStore();
 
   const [engine, setEngine] = useState<ReturnType<typeof getEvolutionEngine> | null>(null);
@@ -256,6 +266,29 @@ export const EvolutionDashboard: React.FC<EvolutionDashboardProps> = ({
   const [strategies, setStrategies] = useState<OptimizationStrategy[]>([]);
   const [skills, setSkills] = useState<CrystallizedSkill[]>([]);
   const [crystallizingSkills, setCrystallizingSkills] = useState<Array<{ id: string; condition: string; action: string; progress: number; patternIds: string[] }>>([]);
+
+  const activePanel = useStore((s) => s.activePanel);
+
+  useEffect(() => {
+    if (!embedded) return;
+    if (!useEvolutionStore.getState().isPanelOpen) {
+      openPanel();
+    }
+  }, [embedded, openPanel]);
+
+  useEffect(() => {
+    if (embedded && activePanel !== 'evolution') {
+      closePanel();
+    }
+  }, [embedded, activePanel, closePanel]);
+
+  const handleClose = () => {
+    closePanel();
+    if (embedded) {
+      setActivePanel('chat');
+    }
+    onClose?.();
+  };
 
   // Initialize evolution engine
   useEffect(() => {
@@ -332,6 +365,12 @@ export const EvolutionDashboard: React.FC<EvolutionDashboardProps> = ({
     }
   };
 
+  useEffect(() => {
+    const onRun = () => void handleRunEvolution();
+    window.addEventListener('pixelpal:runEvolution', onRun);
+    return () => window.removeEventListener('pixelpal:runEvolution', onRun);
+  });
+
   const handleAcceptOptimized = (newStrategies: OptimizationStrategy[]) => {
     setStrategies(newStrategies);
     addEvent({
@@ -385,14 +424,22 @@ export const EvolutionDashboard: React.FC<EvolutionDashboardProps> = ({
     { value: 'timeline', label: 'Timeline', icon: <TimelineIcon /> },
   ] as const;
 
-  if (!isPanelOpen) {
+  if (!embedded && !isPanelOpen) {
     return null;
   }
 
-  return (
-    <MyPaper
-      sx={{
-        position: 'fixed',
+  const shellSx = embedded
+    ? {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column' as const,
+        borderRadius: 0,
+        boxShadow: 'none',
+        bgcolor: 'var(--bg-base)',
+      }
+    : {
+        position: 'fixed' as const,
         right: 0,
         top: 0,
         bottom: 0,
@@ -400,10 +447,12 @@ export const EvolutionDashboard: React.FC<EvolutionDashboardProps> = ({
         maxWidth: '100vw',
         zIndex: 1200,
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column' as const,
         boxShadow: -4,
-      }}
-    >
+      };
+
+  return (
+    <MyPaper sx={shellSx}>
       {/* Header */}
       <MyBox
         sx={{
@@ -417,35 +466,33 @@ export const EvolutionDashboard: React.FC<EvolutionDashboardProps> = ({
       >
         <MyBox sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <AutoAwesomeIcon color="primary" />
-          <MyTypography variant="h6">Evolution Dashboard</MyTypography>
+          <MyTypography variant="h6">{t('nav.evolution', 'Evolution Dashboard')}</MyTypography>
         </MyBox>
         <MyStack direction="row" spacing={1}>
-          <MyTooltip title="Auto Refresh">
-            <MySwitch
-              size="small"
-              checked={autoRefresh}
-              onChange={toggleAutoRefresh}
-            />
-          </MyTooltip>
-          <MyTooltip title="Refresh Now">
-            <MyIconButton size="small" onClick={handleRunEvolution}>
-              <RefreshIcon fontSize="small" />
-            </MyIconButton>
-          </MyTooltip>
-          <MyTooltip title="Help">
-            <MyIconButton size="small">
-              <HelpIcon fontSize="small" />
-            </MyIconButton>
-          </MyTooltip>
-          <MyTooltip title="Close">
-            <MyIconButton size="small" onClick={onClose || closePanel}>
-              <CloseIcon fontSize="small" />
-            </MyIconButton>
-          </MyTooltip>
+          {!splitLayout && (
+            <MyTooltip title="Auto Refresh">
+              <MySwitch size="small" checked={autoRefresh} onChange={toggleAutoRefresh} />
+            </MyTooltip>
+          )}
+          {!splitLayout && (
+            <MyTooltip title="Refresh Now">
+              <MyIconButton size="small" onClick={handleRunEvolution}>
+                <RefreshIcon fontSize="small" />
+              </MyIconButton>
+            </MyTooltip>
+          )}
+          {!embedded && (
+            <MyTooltip title="Close">
+              <MyIconButton size="small" onClick={handleClose}>
+                <CloseIcon fontSize="small" />
+              </MyIconButton>
+            </MyTooltip>
+          )}
         </MyStack>
       </MyBox>
 
       {/* Status Bar */}
+      {!splitLayout && (
       <MyBox
         sx={{
           px: 2,
@@ -471,8 +518,10 @@ export const EvolutionDashboard: React.FC<EvolutionDashboardProps> = ({
           Auto: {autoRefresh ? 'ON' : 'OFF'}
         </MyTypography>
       </MyBox>
+      )}
 
       {/* Tab Navigation */}
+      {!splitLayout && (
       <MyTabs
         value={activeTab}
         onChange={(_, v) => setActiveTab(v)}
@@ -491,6 +540,7 @@ export const EvolutionDashboard: React.FC<EvolutionDashboardProps> = ({
           />
         ))}
       </MyTabs>
+      )}
 
       {/* Tab Content */}
       <MyBox sx={{ flex: 1, overflow: 'auto' }}>
@@ -537,9 +587,9 @@ export const EvolutionDashboard: React.FC<EvolutionDashboardProps> = ({
           <MyBox sx={{ p: 2 }}>
             <EvolutionTimeline
               events={events}
-              selectedEventId={null}
+              selectedEventId={selectedEventId}
               isLoading={isLoading}
-              onSelectEvent={(id) => console.log('Select event:', id)}
+              onSelectEvent={selectEvent}
               onExportEvents={handleExportEvents}
             />
           </MyBox>

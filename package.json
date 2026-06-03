@@ -15,6 +15,8 @@
     "build": "vite build",
     "build:electron": "npx vite build",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:macos": "vitest run src/utils/macThemePresets.test.ts src/utils/personaTheme.test.ts src/hooks/useMacTheme.test.ts src/theme/createMacMuiTheme.test.ts src/stores/macSplitPanels.test.ts src/components/macos/__tests__/MacSourceList.test.ts",
     "preview": "vite preview",
     "prepackage": "node -e \"const fs=require('fs');['node_modules/canvas','node_modules/@nut.tree'].forEach(p=>{try{fs.rmSync(p,{recursive:true,force:true});console.log('Removed',p)}catch(e){}})\"",
     "package": "npm run prepackage && npm run build:electron && electron-builder --win --x64",

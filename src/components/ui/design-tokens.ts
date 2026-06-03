@@ -116,51 +116,51 @@ export const colors = {
   // Primary colors
   primary: {
     dark: {
-      main: '#5e6ad2',
-      light: '#7170ff',
-      dark: '#4a52b8',
+      main: '#0A84FF',
+      light: '#409CFF',
+      dark: '#007AFF',
       contrastText: '#ffffff',
     },
     light: {
-      main: '#1456f0',
-      light: '#3daeff',
-      dark: '#0d44c7',
+      main: '#007AFF',
+      light: '#409CFF',
+      dark: '#0066CC',
       contrastText: '#ffffff',
     },
   },
   // Secondary colors
   secondary: {
     dark: {
-      main: '#7170ff',
+      main: '#AF52DE',
       contrastText: '#ffffff',
     },
     light: {
-      main: '#ea5ec1',
+      main: '#AF52DE',
       contrastText: '#ffffff',
     },
   },
   // Background colors
   background: {
     dark: {
-      default: '#08090a',
-      paper: '#0f1011',
+      default: '#1E1E1E',
+      paper: '#2D2D2D',
     },
     light: {
-      default: '#ffffff',
-      paper: '#ffffff',
+      default: '#FFFFFF',
+      paper: '#F5F5F7',
     },
   },
   // Text colors
   text: {
     dark: {
-      primary: '#f7f8f8',
-      secondary: '#d0d6e0',
-      disabled: '#62666d',
+      primary: '#FFFFFF',
+      secondary: 'rgba(255, 255, 255, 0.6)',
+      disabled: 'rgba(255, 255, 255, 0.3)',
     },
     light: {
-      primary: '#222222',
-      secondary: '#45515e',
-      disabled: '#b8b8b8',
+      primary: '#000000',
+      secondary: 'rgba(0, 0, 0, 0.55)',
+      disabled: 'rgba(0, 0, 0, 0.25)',
     },
   },
   // Divider colors
@@ -179,27 +179,27 @@ export const colors = {
   common: {
     // Dark theme specific
     dark: {
-      border: 'rgba(255, 255, 255, 0.05)',
-      hoverBackground: 'rgba(255, 255, 255, 0.05)',
-      selectedBackground: 'rgba(94, 106, 210, 0.2)',
-      inputBackground: '#191a1b',
-      cardBackground: '#0f1011',
-      hoverBorder: '#5e6ad2',
-      placeholder: '#62666d',
-      icon: '#8a8f98',
-      borderStrong: 'rgba(255, 255, 255, 0.1)',
+      border: 'rgba(255, 255, 255, 0.08)',
+      hoverBackground: 'rgba(255, 255, 255, 0.06)',
+      selectedBackground: 'color-mix(in srgb, #0A84FF 20%, transparent)',
+      inputBackground: 'rgba(255, 255, 255, 0.04)',
+      cardBackground: '#2D2D2D',
+      hoverBorder: '#0A84FF',
+      placeholder: 'rgba(255, 255, 255, 0.3)',
+      icon: 'rgba(255, 255, 255, 0.6)',
+      borderStrong: 'rgba(255, 255, 255, 0.12)',
     },
     // Light theme specific
     light: {
-      border: '#e5e7eb',
-      hoverBackground: '#f5f5f5',
-      selectedBackground: 'rgba(20, 86, 240, 0.1)',
-      inputBackground: '#f0f0f0',
-      cardBackground: '#ffffff',
-      hoverBorder: '#1456f0',
-      placeholder: '#8e8e93',
-      icon: '#8e8e93',
-      borderStrong: '#b8b8b8',
+      border: 'rgba(0, 0, 0, 0.1)',
+      hoverBackground: 'rgba(0, 0, 0, 0.04)',
+      selectedBackground: 'color-mix(in srgb, #007AFF 12%, transparent)',
+      inputBackground: 'rgba(0, 0, 0, 0.04)',
+      cardBackground: '#F5F5F7',
+      hoverBorder: '#007AFF',
+      placeholder: 'rgba(0, 0, 0, 0.25)',
+      icon: 'rgba(0, 0, 0, 0.55)',
+      borderStrong: 'rgba(0, 0, 0, 0.15)',
     },
   },
   // Chart colors for Analytics/EmotionCurve

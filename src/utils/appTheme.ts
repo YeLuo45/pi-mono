@@ -11,7 +11,9 @@ export interface AppThemePreset {
   variables: Record<string, string>;
 }
 
-// 4 preset themes
+/**
+ * @deprecated Use `MAC_THEME_PRESETS` from `macThemePresets` and `useMacTheme` instead.
+ */
 export const APP_THEME_PRESETS: AppThemePreset[] = [
   {
     id: 'light',
@@ -80,6 +82,7 @@ export function getPresetById(id: string): AppThemePreset | undefined {
 
 /**
  * Apply a theme preset to :root via data-theme attribute and CSS variables.
+ * @deprecated Use `applyMacThemePreset` from `macThemePresets` and `useMacTheme` instead.
  */
 export function applyAppTheme(preset: AppThemePreset): void {
   const root = document.documentElement;
@@ -159,6 +162,15 @@ export function createCustomPreset(colors: {
       '--border-color': colors.border,
       '--accent-color': colors.accent,
       '--shadow': `0 2px 8px ${colors.background}33`,
+      '--bg-base': colors.background,
+      '--bg-elevated': adjustBrightness(colors.background, 0.95),
+      '--bg-sidebar': colors.background,
+      '--bg-input': 'rgba(255, 255, 255, 0.05)',
+      '--bg-hover': 'rgba(255, 255, 255, 0.06)',
+      '--bg-active': 'rgba(255, 255, 255, 0.08)',
+      '--text-tertiary': adjustBrightness(colors.text, 1.6),
+      '--separator': colors.border,
+      '--system-blue': colors.accent,
     },
   };
 }

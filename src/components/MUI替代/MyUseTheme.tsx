@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * MyUseTheme.ts — Custom theme hook
  * 
@@ -5,7 +6,7 @@
  * Can be extended to work with MUI theme context.
  */
 
-import { useContext, createContext, type ReactNode, type CSSProperties, type FC } from 'react';
+import { useContext, createContext, type ReactNode, type FC } from 'react';
 
 export interface ThemeColors {
   primary: string;
@@ -55,20 +56,20 @@ export interface Theme {
 
 const defaultTheme: Theme = {
   colors: {
-    primary: '#5e6ad2',
-    secondary: '#7170ff',
-    error: '#ef5350',
-    warning: '#ff9800',
-    success: '#4caf50',
-    info: '#2196f3',
-    background: '#0f1011',
-    paper: '#1e1e1e',
+    primary: '#0A84FF',
+    secondary: '#AF52DE',
+    error: '#FF3B30',
+    warning: '#FF9500',
+    success: '#34C759',
+    info: '#007AFF',
+    background: '#1E1E1E',
+    paper: '#2D2D2D',
     text: {
-      primary: '#ffffff',
-      secondary: 'rgba(255, 255, 255, 0.7)',
+      primary: '#FFFFFF',
+      secondary: 'rgba(255, 255, 255, 0.6)',
       disabled: 'rgba(255, 255, 255, 0.3)',
     },
-    divider: 'rgba(255, 255, 255, 0.12)',
+    divider: 'rgba(255, 255, 255, 0.08)',
   },
   spacing: (factor: number) => factor * 8,
   borderRadius: {
@@ -78,7 +79,7 @@ const defaultTheme: Theme = {
     xl: '16px',
   },
   typography: {
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif',
     fontSize: {
       xs: '11px',
       sm: '12px',

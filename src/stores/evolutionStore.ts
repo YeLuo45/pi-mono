@@ -81,7 +81,10 @@ export const useEvolutionStore = create<EvolutionStore>((set, get) => ({
   // Panel actions
   openPanel: () => {
     set({ isPanelOpen: true });
-    // Start auto-refresh if enabled
+    // Sync main shell navigation (lazy import avoids circular deps at module load)
+    void import('../store').then(({ useStore }) => {
+      useStore.getState().setActivePanel('evolution');
+    });
     const { autoRefresh: autoRefreshEnabled } = get();
     if (autoRefreshEnabled) {
       startAutoRefresh(get, set);
@@ -89,7 +92,7 @@ export const useEvolutionStore = create<EvolutionStore>((set, get) => ({
   },
   
   closePanel: () => {
-    set({ isPanelOpen: false });
+    set({ isPanelOpen: false, selectedEventId: null });
     stopAutoRefresh();
   },
   

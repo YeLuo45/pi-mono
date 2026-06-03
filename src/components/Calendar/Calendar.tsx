@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
 import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyButton as Button, MyTextField as TextField, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyPopper as Popper, MyPaper as Paper, MyFade as Fade } from '../MUI替代';
 import { Add as AddIcon, ChevronLeft, ChevronRight, Delete as DeleteIcon } from '@mui/icons-material';
@@ -7,10 +7,20 @@ import type { Event } from '../../types';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, parseISO, startOfWeek, endOfWeek, addMonths, subMonths } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { useMacSplitStore } from '../../stores/macSplitStore';
 
-export const Calendar: React.FC = () => {
+interface CalendarProps {
+  splitLayout?: boolean;
+}
+
+export const Calendar: React.FC<CalendarProps> = ({ splitLayout = false }) => {
   const { t } = useTranslation();
   const events = useStore((s) => s.events);
+  const selectedEventId = useMacSplitStore((s) => s.selectedEventId);
+  const selectedEvent = useMemo(
+    () => events.find((e) => e.id === selectedEventId),
+    [events, selectedEventId],
+  );
   const addEvent = useStore((s) => s.addEvent);
   const updateEvent = useStore((s) => s.updateEvent);
   const deleteEvent = useStore((s) => s.deleteEvent);
@@ -81,6 +91,18 @@ export const Calendar: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
+      {splitLayout && selectedEvent && (
+        <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid var(--separator)' }}>
+          <Typography variant="subtitle2" sx={{ fontSize: 14, fontWeight: 600 }}>
+            {selectedEvent.title}
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
+            {format(parseISO(selectedEvent.startTime), 'PPp', { locale: zhCN })}
+            {selectedEvent.location ? ` · ${selectedEvent.location}` : ''}
+          </Typography>
+        </Box>
+      )}
+      {!splitLayout && (
       <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: 1 }}>
         <Typography variant="h6" sx={{ fontSize: 15, fontWeight: 600, flex: 1 }}>
           📅 {t('calendar.title')}
@@ -98,6 +120,23 @@ export const Calendar: React.FC = () => {
           <AddIcon sx={{ fontSize: 18 }} />
         </IconButton>
       </Box>
+      )}
+      {splitLayout && (
+        <Box sx={{ px: 1.5, py: 1, borderBottom: '1px solid var(--separator)', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <IconButton size="small" onClick={handlePrevMonth}>
+            <ChevronLeft sx={{ fontSize: 18 }} />
+          </IconButton>
+          <Typography variant="body2" sx={{ fontSize: 13, flex: 1, textAlign: 'center' }}>
+            {format(currentMonth, 'MMMM yyyy', { locale: zhCN })}
+          </Typography>
+          <IconButton size="small" onClick={handleNextMonth}>
+            <ChevronRight sx={{ fontSize: 18 }} />
+          </IconButton>
+          <IconButton size="small" color="primary" onClick={() => handleOpenDialog()}>
+            <AddIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Box>
+      )}
 
       {/* Week day headers */}
       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', p: '4px 8px' }}>

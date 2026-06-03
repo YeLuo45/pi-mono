@@ -49,15 +49,9 @@ export const MyListItemButton: FC<MyListItemButtonProps> = ({
         padding: dense ? `${theme.spacing(0.75)} ${theme.spacing(2)}` : `${theme.spacing(1)} ${theme.spacing(2)}`,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        backgroundColor: selected
-          ? `${theme.palette.primary?.main || '#5e6ad2'}15`
-          : 'transparent',
-        borderLeft: selected
-          ? `3px solid ${theme.palette.primary?.main || '#5e6ad2'}`
-          : '3px solid transparent',
-        color: selected
-          ? theme.palette.primary?.main || '#5e6ad2'
-          : theme.palette.text.primary || '#f7f8f8',
+        backgroundColor: selected ? 'var(--bg-active)' : 'transparent',
+        borderLeft: selected ? '3px solid var(--system-blue)' : '3px solid transparent',
+        color: selected ? 'var(--system-blue)' : 'var(--text-primary)',
         fontWeight: selected ? 500 : 400,
         transition: 'all 0.15s ease',
         outline: 'none',
@@ -65,12 +59,14 @@ export const MyListItemButton: FC<MyListItemButtonProps> = ({
       }}
       onMouseEnter={(e) => {
         if (!disabled && !selected) {
-          (e.target as HTMLDivElement).style.backgroundColor = 'rgba(255,255,255,0.05)';
+          (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--bg-hover)';
         }
       }}
       onMouseLeave={(e) => {
         if (!disabled && !selected) {
-          (e.target as HTMLDivElement).style.backgroundColor = 'transparent';
+          (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent';
+        } else if (selected) {
+          (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--bg-active)';
         }
       }}
     >

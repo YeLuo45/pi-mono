@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MyTypography as Typography, MyPaper as Paper, MyButton, MySelect as Select, MyStack as Stack, MyAlert , MyDialog as Dialog, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../components/MUI替代';
+import { MyTypography as Typography, MyPaper as Paper, MySelect as Select, MyStack as Stack, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import AddIcon from '@mui/icons-material/Add';
 import { providerManager, DEFAULT_PROVIDERS } from '../services/providers';
@@ -13,10 +13,13 @@ import type { ProviderConfig } from '../services/providers/types';
 import { ProviderCard } from '../components/Settings/ProviderCard';
 import { ProviderConfigDialog } from '../components/Settings/ProviderConfigDialog';
 
-export const ProvidersPage: React.FC = () => {
+interface ProvidersPageProps {
+  splitLayout?: boolean;
+}
+
+export const ProvidersPage: React.FC<ProvidersPageProps> = ({ splitLayout = false }) => {
   const [configs, setConfigs] = useState<Record<string, ProviderConfig>>({});
   const [defaultProviderId, setDefaultProviderId] = useState('openai');
-  const [fallbackOrder, setFallbackOrder] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProviderId, setEditingProviderId] = useState<string | null>(null);
   const [providerStatuses, setProviderStatuses] = useState<Record<string, 'connected' | 'error' | 'unconfigured'>>({});
@@ -26,7 +29,6 @@ export const ProvidersPage: React.FC = () => {
     const loadedConfigs = providerManager.getAllConfigs();
     setConfigs(loadedConfigs);
     setDefaultProviderId(providerManager.getDefaultId());
-    setFallbackOrder(providerManager.getFallbackOrder());
 
     // Initialize statuses from configs
     const statuses: Record<string, 'connected' | 'error' | 'unconfigured'> = {};
@@ -104,15 +106,17 @@ export const ProvidersPage: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
+      {!splitLayout && (
       <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <Typography variant="h6" sx={{ fontSize: 15, fontWeight: 600 }}>
           🤖 AI Providers
         </Typography>
       </Box>
+      )}
 
       <Box sx={{ p: 2 }}>
         {/* Default Provider Selector */}
-        <Paper sx={{ p: 2, mb: 3, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, mb: 3, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             Default Provider
           </Typography>
@@ -163,7 +167,7 @@ export const ProvidersPage: React.FC = () => {
               borderRadius: 2,
               border: '1px dashed rgba(255,255,255,0.15)',
               cursor: 'pointer',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
+              '&:hover': { bgcolor: 'var(--bg-hover)' },
             }}
             onClick={() => handleOpenAddDialog('custom')}
           >

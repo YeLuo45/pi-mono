@@ -10,6 +10,7 @@ import { Box } from '../ui/Box';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../../store';
+import { useMacSplitStore } from '../../stores/macSplitStore';
 import { getAllMemories, getMemoryStats } from '../../services/memory/memoryStorage';
 import type { MemoryEntry, MemoryStats } from '../../services/memory/memoryTypes';
 import { FileDownload as DownloadIcon, TrendingUp as TrendingUpIcon, TrendingDown as TrendingDownIcon, TrendingFlat as TrendingFlatIcon } from '@mui/icons-material';
@@ -294,10 +295,14 @@ const HabitChart: React.FC<{ data: HabitDataPoint[] }> = ({ data }) => {
 };
 
 // --- Main Analytics Panel ---
-export const AnalyticsPanel: React.FC = () => {
+export const AnalyticsPanel: React.FC<{ splitLayout?: boolean }> = ({ splitLayout = false }) => {
   const { t } = useTranslation();
   const messages = useStore((s) => s.messages);
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
+  const storeTimeRange = useMacSplitStore((s) => s.analyticsTimeRange);
+  const setStoreTimeRange = useMacSplitStore((s) => s.setAnalyticsTimeRange);
+  const [localTimeRange, setLocalTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
+  const timeRange = splitLayout ? storeTimeRange : localTimeRange;
+  const setTimeRange = splitLayout ? setStoreTimeRange : setLocalTimeRange;
   const [loading, setLoading] = useState(true);
   const [memories, setMemories] = useState<MemoryEntry[]>([]);
   const [memoryStats, setMemoryStats] = useState<MemoryStats | null>(null);
@@ -484,20 +489,23 @@ export const AnalyticsPanel: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ToggleButtonGroup
-            value={timeRange}
-            exclusive
-            onChange={(_, v) => v && setTimeRange(v)}
-            size="small"
-            sx={{
-              '& .MuiToggleButton-root': { px: 1, py: 0.5, fontSize: 10, border: '1px solid rgba(255,255,255,0.15)', color: 'text.secondary' },
-              '& .Mui-selected': { bgcolor: 'rgba(134,59,255,0.2)', color: 'primary.main' },
-            }}
-          >
-            <ToggleButton value="7d">{t('analytics.moodTrend.weekly')}</ToggleButton>
-            <ToggleButton value="30d">{t('analytics.moodTrend.monthly')}</ToggleButton>
-            <ToggleButton value="90d">{t('analytics.moodTrend.allTime')}</ToggleButton>
-          </ToggleButtonGroup>
+          {!splitLayout && (
+            <ToggleButtonGroup
+              value={timeRange}
+              exclusive
+              onChange={(_, v) => v && setTimeRange(v)}
+              size="small"
+              sx={{
+                '& .MuiToggleButton-root': { px: 1, py: 0.5, fontSize: 10, border: '1px solid rgba(255,255,255,0.15)', color: 'text.secondary' },
+                '& .Mui-selected': { bgcolor: 'rgba(134,59,255,0.2)', color: 'primary.main' },
+              }}
+            >
+              <ToggleButton value="7d">{t('analytics.moodTrend.weekly')}</ToggleButton>
+              <ToggleButton value="30d">{t('analytics.moodTrend.monthly')}</ToggleButton>
+              <ToggleButton value="90d">{t('analytics.moodTrend.allTime')}</ToggleButton>
+            </ToggleButtonGroup>
+          )}
+          {!splitLayout && (
           <Button
             size="small"
             variant="outlined"
@@ -507,6 +515,7 @@ export const AnalyticsPanel: React.FC = () => {
           >
             {t('analytics.exportReport')}
           </Button>
+          )}
         </Box>
       </Box>
 

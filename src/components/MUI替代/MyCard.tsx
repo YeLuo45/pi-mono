@@ -1,11 +1,12 @@
 /**
  * MyCard.tsx — MUI Card replacement
  * 
- * Replaces MUI Card component with custom styling.
+ * Replaces MUI Card component with custom styling using design tokens.
  * Supports: children, variant, elevation, outlined
  */
 
-import { type FC, type ReactNode, type CSSProperties } from 'react';
+import { type FC, type ReactNode } from 'react';
+import { Box } from '../ui/Box';
 
 export interface MyCardProps {
   children?: ReactNode;
@@ -13,9 +14,9 @@ export interface MyCardProps {
   elevation?: number;
   outlined?: boolean;
   className?: string;
-  sx?: CSSProperties;
+  sx?: Record<string, unknown>;
   onClick?: () => void;
-  style?: CSSProperties;
+  style?: React.CSSProperties;
 }
 
 export const MyCard: FC<MyCardProps> = ({
@@ -40,50 +41,48 @@ export const MyCard: FC<MyCardProps> = ({
     return shadows[Math.min(level, shadows.length - 1)] || shadows[1];
   };
 
-  const baseStyle: CSSProperties = {
-    backgroundColor: '#1e1e1e',
-    borderRadius: '12px',
-    padding: '20px',
-    transition: 'all 0.2s ease',
+  const cardSx = {
+    backgroundColor: 'var(--bg-elevated, #2d2d2d)',
+    borderRadius: 'var(--radius-lg, 10px)',
+    padding: '16px',
+    transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
     cursor: onClick ? 'pointer' : 'default',
     ...(variant === 'outlined' || outlined
       ? {
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid var(--separator, rgba(255, 255, 255, 0.08))',
           boxShadow: 'none',
         }
       : {
           boxShadow: getShadow(elevation),
         }),
     ...sx,
-    ...style,
   };
 
   return (
-    <div
+    <Box
       className={className}
-      style={baseStyle}
+      sx={cardSx}
+      style={style}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
       {children}
-    </div>
+    </Box>
   );
 };
 
-
-// MyCardContent - content wrapper for MyCard
 export interface MyCardContentProps {
   children: React.ReactNode;
-  sx?: object;
+  sx?: Record<string, unknown>;
   className?: string;
 }
 
-export const MyCardContent: FC<MyCardContentProps> = ({ children, sx, className = '' }) => {
+export const MyCardContent: FC<MyCardContentProps> = ({ children, sx = {}, className = '' }) => {
   return (
-    <div className={className} style={{ padding: '0 16px 16px', ...sx }}>
+    <Box className={className} sx={{ padding: '0 16px 16px', ...sx }}>
       {children}
-    </div>
+    </Box>
   );
 };
 

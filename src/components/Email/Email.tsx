@@ -1,53 +1,31 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useMemo, useState } from 'react';
 import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
 import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyTextField as TextField, MyCircularProgress as CircularProgress, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyPaper as Paper, MyIconButton as IconButton, MyDivider as Divider, MyChip as Chip, MyAlert as Alert } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
 import { Email as EmailIcon, Send as SendIcon, Refresh as RefreshIcon, ArrowBack } from '@mui/icons-material';
 import { useStore } from '../../store';
-import {
-  fetchGmailMessages, fetchGmailMessageDetail, sendGmailMessage,
-  parseGmailMessage, getGmailAuthUrl,
-} from '../../services/email/gmailAdapter';
-import type { EmailMessage } from '../../types';
+import { sendGmailMessage, getGmailAuthUrl } from '../../services/email/gmailAdapter';
+import { useGmailMessages } from '../../hooks/useGmailMessages';
+import { useMacSplitStore } from '../../stores/macSplitStore';
 
-export const Email: React.FC = () => {
+interface EmailProps {
+  splitLayout?: boolean;
+}
+
+export const Email: React.FC<EmailProps> = ({ splitLayout = false }) => {
   const { t } = useTranslation();
   const emailAccount = useStore((s) => s.emailAccount);
-
-  const [messages, setMessages] = useState<EmailMessage[]>([]);
-  const [selectedMessage, setSelectedMessage] = useState<EmailMessage | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const { messages, loading, error, setError, reload, isAuthenticated, accountEmail } = useGmailMessages();
+  const emailMessageId = useMacSplitStore((s) => s.emailMessageId);
+  const setEmailMessageId = useMacSplitStore((s) => s.setEmailMessageId);
+  const selectedMessage = useMemo(
+    () => messages.find((m) => m.id === emailMessageId) ?? null,
+    [messages, emailMessageId],
+  );
   const [composeOpen, setComposeOpen] = useState(false);
   const [composeData, setComposeData] = useState({ to: '', subject: '', body: '' });
   const [sending, setSending] = useState(false);
   const [clientIdInput, setClientIdInput] = useState('');
-
-  const loadMessages = useCallback(async () => {
-    if (!emailAccount?.accessToken) return;
-    setLoading(true);
-    setError('');
-    try {
-      const messageList = await fetchGmailMessages(emailAccount.accessToken, 20);
-      const detailedMessages: EmailMessage[] = [];
-      for (const msg of messageList.slice(0, 10) as Array<{ id: string }>) {
-        const detail = await fetchGmailMessageDetail(emailAccount.accessToken, msg.id);
-        const parsed = parseGmailMessage(detail as Record<string, unknown>);
-        detailedMessages.push(parsed);
-      }
-      setMessages(detailedMessages);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load emails');
-    } finally {
-      setLoading(false);
-    }
-  }, [emailAccount?.accessToken]);
-
-  useEffect(() => {
-    if (emailAccount?.accessToken) {
-      loadMessages();
-    }
-  }, [emailAccount?.accessToken, loadMessages]);
 
   const handleGmailAuth = () => {
     if (!clientIdInput.trim()) {
@@ -70,7 +48,7 @@ export const Email: React.FC = () => {
       await sendGmailMessage(emailAccount.accessToken, composeData.to, composeData.subject, composeData.body);
       setComposeOpen(false);
       setComposeData({ to: '', subject: '', body: '' });
-      loadMessages();
+      reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send email');
     } finally {
@@ -78,7 +56,7 @@ export const Email: React.FC = () => {
     }
   };
 
-  if (!emailAccount?.accessToken) {
+  if (!isAuthenticated) {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 2, gap: 2 }}>
         <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
@@ -119,13 +97,15 @@ export const Email: React.FC = () => {
     );
   }
 
-  if (selectedMessage) {
+  if (selectedMessage && (!splitLayout || emailMessageId)) {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <Box sx={{ p: 1.5, borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <IconButton size="small" onClick={() => setSelectedMessage(null)}>
+        <Box sx={{ p: 1.5, borderBottom: '1px solid var(--separator)', display: 'flex', alignItems: 'center', gap: 1 }}>
+          {!splitLayout && (
+          <IconButton size="small" onClick={() => setEmailMessageId(null)}>
             <ArrowBack sx={{ fontSize: 18 }} />
           </IconButton>
+          )}
           <Typography variant="body2" sx={{ fontSize: 13, fontWeight: 600, flex: 1 }} noWrap>
             {selectedMessage.subject}
           </Typography>
@@ -143,14 +123,34 @@ export const Email: React.FC = () => {
     );
   }
 
+  if (splitLayout && !emailMessageId) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', p: 3 }}>
+        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: 13, textAlign: 'center' }}>
+          {t('email.selectMessage', '从列表中选择一封邮件')}
+        </Typography>
+        <Button
+          size="small"
+          variant="contained"
+          startIcon={<SendIcon sx={{ fontSize: 14 }} />}
+          onClick={() => setComposeOpen(true)}
+          sx={{ mt: 2, fontSize: 11 }}
+        >
+          {t('email.compose')}
+        </Button>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {!splitLayout && (
       <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', gap: 1 }}>
         <Typography variant="h6" sx={{ fontSize: 15, fontWeight: 600, flex: 1 }}>
           📧 {t('email.title')}
         </Typography>
-        <Chip label={emailAccount.email} size="small" sx={{ fontSize: 10, height: 20 }} />
-        <IconButton size="small" onClick={loadMessages} disabled={loading}>
+        {accountEmail && <Chip label={accountEmail} size="small" sx={{ fontSize: 10, height: 20 }} />}
+        <IconButton size="small" onClick={reload} disabled={loading}>
           <RefreshIcon sx={{ fontSize: 16 }} />
         </IconButton>
         <Button
@@ -163,10 +163,11 @@ export const Email: React.FC = () => {
           {t('email.compose')}
         </Button>
       </Box>
+      )}
 
       {error && <Alert severity="error" sx={{ m: 1, fontSize: 12 }} onClose={() => setError('')}>{error}</Alert>}
 
-      {loading ? (
+      {!splitLayout && (loading ? (
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <CircularProgress size={20} />
         </Box>
@@ -175,7 +176,7 @@ export const Email: React.FC = () => {
           {messages.map((msg) => (
             <ListItem
               key={msg.id}
-              onClick={() => setSelectedMessage(msg)}
+              onClick={() => setEmailMessageId(msg.id)}
               sx={{
                 cursor: 'pointer',
                 borderBottom: '1px solid rgba(255,255,255,0.05)',
@@ -211,7 +212,7 @@ export const Email: React.FC = () => {
             </Box>
           )}
         </List>
-      )}
+      ))}
 
       {/* Compose Dialog */}
       <Dialog open={composeOpen} onClose={() => setComposeOpen(false)} maxWidth="xs" fullWidth>

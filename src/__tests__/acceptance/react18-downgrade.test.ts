@@ -161,12 +161,12 @@ describe('Core Page Rendering', () => {
     expect(appContent).toContain('BrowserRouter');
   });
 
-  it('should render Sidebar component without crashing', () => {
-    const sidebarPath = path.join(projectRoot, 'src/components/Layout/Sidebar.tsx');
-    expect(fs.existsSync(sidebarPath)).toBe(true);
-    
-    const sidebarContent = fs.readFileSync(sidebarPath, 'utf-8');
-    expect(sidebarContent).toContain('css`');
+  it('should render MacSourceList component without crashing', () => {
+    const sourceListPath = path.join(projectRoot, 'src/components/macos/MacSourceList.tsx');
+    expect(fs.existsSync(sourceListPath)).toBe(true);
+
+    const sourceListContent = fs.readFileSync(sourceListPath, 'utf-8');
+    expect(sourceListContent).toContain('role="navigation"');
   });
 
   it('should render BottomTabNav component without crashing', () => {

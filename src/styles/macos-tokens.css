@@ -151,6 +151,12 @@
   --z-popover: 500;
   --z-tooltip: 600;
   --z-toast: 700;
+
+  /* Chat & interactive surfaces */
+  --chat-user-bg: var(--system-blue);
+  --chat-ai-bg: var(--bg-elevated);
+  --chat-user-tint: color-mix(in srgb, var(--system-blue) 18%, transparent);
+  --surface-input: var(--bg-input);
 }
 
 /* ============================================
@@ -164,3 +170,29 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================
+ * P0: Layout tokens + light mode + preset hooks
+ * ============================================ */
+:root {
+  --titlebar-height: 52px;
+  --sidebar-width-source: 220px;
+  --sidebar-width-item: 280px;
+  --separator: rgba(255, 255, 255, 0.08);
+  --control-radius: 6px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]):not([data-theme="sunset"]):not([data-theme="forest"]) {
+    --bg-base: #FFFFFF;
+    --bg-elevated: #F5F5F7;
+    --bg-sidebar: rgba(246, 246, 246, 0.72);
+    --text-primary: #000000;
+    --text-secondary: rgba(0, 0, 0, 0.55);
+    --separator: rgba(0, 0, 0, 0.1);
+    --system-blue: #007AFF;
+  }
+}
+
+[data-theme="sunset"] { /* variables applied via JS */ }
+[data-theme="forest"] { /* variables applied via JS */ }

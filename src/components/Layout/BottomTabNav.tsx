@@ -43,7 +43,7 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
       setActivePanel('agent');
       navigate('/agent');
     } else {
-      setActivePanel(tab.id as any);
+      setActivePanel(tab.id as Parameters<typeof setActivePanel>[0]);
       navigate(tab.route);
     }
     onTabChange?.(tab.id);
@@ -57,8 +57,9 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
         left: 0,
         right: 0,
         height: spacing ? spacing(8) : 64,
-        bgcolor: 'var(--color-bg-primary, #0f1011)',
-        borderTop: '1px solid var(--color-border, rgba(255,255,255,0.05))',
+        bgcolor: 'var(--bg-sidebar)',
+        backdropFilter: 'blur(20px)',
+        borderTop: '1px solid var(--separator)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-around',
@@ -87,16 +88,16 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
                 border: 'none',
                 background: 'none',
                 cursor: 'pointer',
-                color: isActive ? 'primary.main' : 'var(--color-text-secondary, #d0d6e0)',
-                transform: isActive ? 'scale(1.05)' : 'scale(1)',
-                transition: 'all 0.2s ease',
+                color: isActive ? 'var(--system-blue)' : 'var(--text-secondary)',
+                transition: 'color var(--duration-short, 150ms) var(--ease-macOS, ease), background var(--duration-short, 150ms) var(--ease-macOS, ease)',
                 borderRadius: borderRadius ? borderRadius.sm : 4,
+                bgcolor: isActive ? 'var(--bg-active)' : 'transparent',
                 '&:hover': {
-                  color: isActive ? 'primary.main' : 'var(--color-text-primary, #f7f8f8)',
-                  bgcolor: isActive ? 'rgba(94, 106, 210, 0.08)' : 'transparent',
+                  color: isActive ? 'var(--system-blue)' : 'var(--text-primary)',
+                  bgcolor: 'var(--bg-hover)',
                 },
                 '&:active': {
-                  transform: 'scale(0.95)',
+                  opacity: 0.85,
                 },
               }}
             >
@@ -107,7 +108,7 @@ export const BottomTabNav: React.FC<BottomTabNavProps> = ({ onTabChange }) => {
                   fontSize: 10,
                   fontWeight: isActive ? 600 : 400,
                   lineHeight: 1,
-                  color: isActive ? 'primary.main' : 'inherit',
+                  color: isActive ? 'var(--system-blue)' : 'inherit',
                 }}
               >
                 {tab.label}

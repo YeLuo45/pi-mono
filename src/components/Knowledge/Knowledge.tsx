@@ -24,6 +24,7 @@ import {
   queryKnowledgeBase,
   getKnowledgeBaseStats,
   getIndexedDocuments,
+  getDocumentChunks,
   removeDocumentFromIndex,
   buildRAGContext,
   reindexAllDocuments,
@@ -31,10 +32,12 @@ import {
   type RAGStats,
 } from '../../services/rag';
 import { useTranslation } from 'react-i18next';
+import { useMacSplitStore } from '../../stores/macSplitStore';
 
-export const KnowledgePanel: React.FC = () => {
+export const KnowledgePanel: React.FC<{ splitLayout?: boolean }> = ({ splitLayout = false }) => {
   const { t } = useTranslation();
   const documents = useStore((s) => s.documents);
+  const knowledgeDocId = useMacSplitStore((s) => s.knowledgeDocId);
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<RAGQueryResult | null>(null);
@@ -62,7 +65,11 @@ export const KnowledgePanel: React.FC = () => {
     setError('');
 
     try {
-      const result = queryKnowledgeBase({ query: query.trim(), topK: 5 });
+      const result = queryKnowledgeBase({
+        query: query.trim(),
+        topK: 5,
+        docIds: splitLayout && knowledgeDocId ? [knowledgeDocId] : undefined,
+      });
       setResults(result);
     } catch (err) {
       setError(`Search failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -124,9 +131,16 @@ export const KnowledgePanel: React.FC = () => {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
+  const selectedDoc = splitLayout && knowledgeDocId
+    ? getIndexedDocuments().find((d) => d.id === knowledgeDocId)
+    : undefined;
+  const selectedDocStats = knowledgeDocId && stats?.byDocument[knowledgeDocId];
+  const selectedDocChunks = knowledgeDocId ? getDocumentChunks(knowledgeDocId) : [];
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
+      {!splitLayout && (
       <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box>
@@ -148,6 +162,7 @@ export const KnowledgePanel: React.FC = () => {
           </Tooltip>
         </Box>
       </Box>
+      )}
 
       {/* Settings Section */}
       {showSettings && (
@@ -184,6 +199,20 @@ export const KnowledgePanel: React.FC = () => {
         </Box>
       )}
 
+      {/* Selected document header (split layout) */}
+      {splitLayout && selectedDoc && (
+        <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid var(--separator)' }}>
+          <Typography variant="subtitle2" sx={{ fontSize: 14, fontWeight: 600 }}>
+            {selectedDoc.name}
+          </Typography>
+          {selectedDocStats && (
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
+              {selectedDocStats.chunks} {t('knowledge.stats.chunks')} · {formatFileSize(selectedDocStats.size)}
+            </Typography>
+          )}
+        </Box>
+      )}
+
       {/* Stats Bar */}
       {stats && stats.totalDocuments > 0 && (
         <Box sx={{ px: 2, py: 1, borderBottom: '1px solid rgba(255,255,255,0.06)', bgcolor: 'rgba(155,127,212,0.05)' }}>
@@ -217,7 +246,9 @@ export const KnowledgePanel: React.FC = () => {
         <TextField
           fullWidth
           size="small"
-          placeholder="Search your knowledge base..."
+          placeholder={splitLayout && selectedDoc
+            ? t('knowledge.searchInDoc', { name: selectedDoc.name, defaultValue: `在「${selectedDoc.name}」中搜索…` })
+            : t('knowledge.searchPlaceholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -331,6 +362,31 @@ export const KnowledgePanel: React.FC = () => {
               Try rephrasing your question
             </Typography>
           </Box>
+        ) : !results && splitLayout && selectedDoc && selectedDocChunks.length > 0 ? (
+          <Box sx={{ p: 1.5 }}>
+            <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', mb: 1, display: 'block' }}>
+              {t('knowledge.docPreview', '文档预览')} · {selectedDocChunks.length} {t('knowledge.stats.chunks')}
+            </Typography>
+            {selectedDocChunks.slice(0, 8).map((chunk, i) => (
+              <Paper
+                key={chunk.id}
+                sx={{
+                  p: 1.5,
+                  mb: 1,
+                  bgcolor: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: 1,
+                }}
+              >
+                <Typography variant="caption" sx={{ fontSize: 9, color: 'text.secondary' }}>
+                  #{i + 1}
+                </Typography>
+                <Typography variant="body2" sx={{ fontSize: 12, lineHeight: 1.5, mt: 0.5 }}>
+                  {chunk.content.slice(0, 280)}{chunk.content.length > 280 ? '…' : ''}
+                </Typography>
+              </Paper>
+            ))}
+          </Box>
         ) : !results && stats && stats.totalDocuments === 0 ? (
           <Box sx={{ textAlign: 'center', mt: 4, opacity: 0.5 }}>
             <Typography variant="body2" sx={{ fontSize: 13 }}>
@@ -343,8 +399,8 @@ export const KnowledgePanel: React.FC = () => {
         ) : null}
       </Box>
 
-      {/* Indexed Documents Quick View */}
-      {stats && stats.totalDocuments > 0 && !results && (
+      {/* Indexed Documents Quick View — middle column handles list in split layout */}
+      {stats && stats.totalDocuments > 0 && !results && !splitLayout && (
         <Box sx={{ p: 1.5, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', mb: 1, display: 'block' }}>
             INDEXED DOCUMENTS

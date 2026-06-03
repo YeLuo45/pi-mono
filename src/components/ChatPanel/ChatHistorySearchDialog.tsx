@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { MyDialog as Dialog , MyDialogContent as DialogContent, MyDialogTitle as DialogTitle } from '../MUI替代';
-import { MyBox as Box, MyTextField as TextField, MyTypography as Typography, MyIconButton as IconButton, MyPaper as Paper, MyList as List, MyListItem as ListItem, MyListItemText, MyChip as Chip, MyInputAdornment as InputAdornment, MyCircularProgress as CircularProgress } from '../MUI替代';
+import { MyBox as Box, MyTextField as TextField, MyTypography as Typography, MyIconButton as IconButton, MyPaper as Paper, MyList as List, MyListItem as ListItem, MyChip as Chip, MyInputAdornment as InputAdornment, MyCircularProgress as CircularProgress } from '../MUI替代';
 import {
   Search as SearchIcon,
   Close as CloseIcon,
@@ -162,17 +162,17 @@ export const ChatHistorySearchDialog: React.FC<ChatHistorySearchDialogProps> = (
             '& .MuiInputBase-root': {
               fontSize: 13,
               borderRadius: 1.5,
-              bgcolor: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              '&:hover': { borderColor: 'rgba(255, 255, 255, 0.15)' },
+              bgcolor: 'var(--bg-input)',
+              border: '1px solid var(--separator)',
+              '&:hover': { borderColor: 'var(--border-strong)' },
               '&.Mui-focused': {
-                boxShadow: '0 0 0 2px rgba(94, 106, 210, 0.3)',
-                borderColor: '#5e6ad2',
+                boxShadow: '0 0 0 2px color-mix(in srgb, var(--system-blue) 30%, transparent)',
+                borderColor: 'var(--system-blue)',
               },
             },
             '& .MuiInputBase-input': {
-              color: '#f7f8f8',
-              '&::placeholder': { color: '#62666d', opacity: 1 },
+              color: 'var(--text-primary)',
+              '&::placeholder': { color: 'var(--text-placeholder)', opacity: 1 },
             },
           }}
         />
@@ -180,7 +180,7 @@ export const ChatHistorySearchDialog: React.FC<ChatHistorySearchDialogProps> = (
         {/* Loading state */}
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress size={24} sx={{ color: 'rgba(155, 127, 212, 0.7)' }} />
+            <CircularProgress size={24} sx={{ color: 'var(--system-blue)' }} />
           </Box>
         )}
 
@@ -220,10 +220,10 @@ export const ChatHistorySearchDialog: React.FC<ChatHistorySearchDialogProps> = (
                       width: '100%',
                       p: 1.5,
                       borderRadius: 1.5,
-                      bgcolor: isUser ? 'rgba(94, 106, 210, 0.1)' : 'rgba(30, 30, 40, 0.8)',
-                      border: '1px solid rgba(255, 255, 255, 0.06)',
+                      bgcolor: isUser ? 'var(--chat-user-tint)' : 'var(--bg-elevated)',
+                      border: '1px solid var(--separator)',
                       '&:hover': {
-                        border: '1px solid rgba(155, 127, 212, 0.25)',
+                        borderColor: 'var(--system-blue)',
                       },
                     }}
                   >
@@ -236,8 +236,8 @@ export const ChatHistorySearchDialog: React.FC<ChatHistorySearchDialogProps> = (
                           height: 18,
                           fontSize: 10,
                           fontWeight: 600,
-                          bgcolor: isUser ? 'rgba(94, 106, 210, 0.3)' : 'rgba(155, 127, 212, 0.3)',
-                          color: isUser ? '#a8b3ff' : '#c4b0f0',
+                          bgcolor: isUser ? 'color-mix(in srgb, var(--system-blue) 30%, transparent)' : 'color-mix(in srgb, var(--system-purple, #AF52DE) 30%, transparent)',
+                          color: isUser ? 'var(--system-blue)' : 'var(--system-purple, #AF52DE)',
                           flexShrink: 0,
                         }}
                       />
@@ -248,7 +248,7 @@ export const ChatHistorySearchDialog: React.FC<ChatHistorySearchDialogProps> = (
                           variant="body2"
                           sx={{
                             fontSize: 13,
-                            color: '#f7f8f8',
+                            color: 'var(--text-primary)',
                             whiteSpace: 'pre-wrap',
                             wordBreak: 'break-word',
                             lineHeight: 1.5,
@@ -269,7 +269,7 @@ export const ChatHistorySearchDialog: React.FC<ChatHistorySearchDialogProps> = (
                             sx={{
                               height: 16,
                               fontSize: 9,
-                              bgcolor: 'rgba(94, 106, 210, 0.15)',
+                              bgcolor: 'var(--chat-user-tint)',
                               color: 'rgba(155, 127, 212, 0.9)',
                               '& .MuiChip-label': { px: 0.75 },
                             }}
@@ -285,7 +285,7 @@ export const ChatHistorySearchDialog: React.FC<ChatHistorySearchDialogProps> = (
                           color: 'text.secondary',
                           p: 0.5,
                           opacity: 0.6,
-                          '&:hover': { opacity: 1, color: '#f7f8f8' },
+                          '&:hover': { opacity: 1, color: 'var(--text-primary)' },
                         }}
                       >
                         <CopyIcon sx={{ fontSize: 14 }} />

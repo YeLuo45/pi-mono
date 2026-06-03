@@ -23,17 +23,29 @@ import { DocumentPreview } from '../components/Knowledge/DocumentPreview';
 import { initializeSampleKnowledge } from '../data/sampleKnowledge';
 import { getAllSources } from '../services/rag/sourceStorage';
 import type { KnowledgeSource } from '../services/rag/types';
+import { useMacSplitStore } from '../stores/macSplitStore';
 
 interface KnowledgePageProps {
   onMenuClick?: () => void;
+  splitLayout?: boolean;
 }
 
-export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onMenuClick }) => {
+export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onMenuClick, splitLayout = false }) => {
   const isMobile = useMediaQuery('(max-width: 900px)');
   
   const [selectedSource, setSelectedSource] = useState<KnowledgeSource | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
+  const knowledgeSourceId = useMacSplitStore((s) => s.knowledgeSourceId);
+  const setKnowledgeSourceId = useMacSplitStore((s) => s.setKnowledgeSourceId);
+
+  useEffect(() => {
+    if (!splitLayout || !knowledgeSourceId) return;
+    getAllSources().then((sources) => {
+      const found = sources.find((s) => s.id === knowledgeSourceId) ?? null;
+      setSelectedSource(found);
+    });
+  }, [splitLayout, knowledgeSourceId, refreshKey]);
 
   // Initialize sample data on first load
   useEffect(() => {
@@ -50,7 +62,8 @@ export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onMenuClick }) => 
 
   const handleSelectSource = useCallback((source: KnowledgeSource | null) => {
     setSelectedSource(source);
-  }, []);
+    setKnowledgeSourceId(source?.id ?? null);
+  }, [setKnowledgeSourceId]);
 
   const handleRefresh = useCallback(() => {
     setRefreshKey(k => k + 1);
@@ -71,6 +84,8 @@ export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onMenuClick }) => 
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', bgcolor: 'background.default' }}>
+      {!splitLayout && (
+      <>
       {/* Header */}
       <Box
         sx={{
@@ -99,6 +114,8 @@ export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onMenuClick }) => 
           </IconButton>
         </Tooltip>
       </Box>
+      </>
+      )}
 
       {/* Main Content */}
       <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
@@ -128,7 +145,7 @@ export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onMenuClick }) => 
         ) : (
           // Desktop: 3-column layout
           <>
-            {/* Left: Source List */}
+            {!splitLayout && (
             <Box
               sx={{
                 width: 280,
@@ -145,6 +162,7 @@ export const KnowledgePage: React.FC<KnowledgePageProps> = ({ onMenuClick }) => 
                 onSourceDeleted={handleSourceDeleted}
               />
             </Box>
+            )}
 
             {/* Center: Retrieval Panel */}
             <Box sx={{ flex: 1, overflow: 'auto', minWidth: 0 }}>

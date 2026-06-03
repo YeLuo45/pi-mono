@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MyMenu as Menu , MyDialog as Dialog, MyMenuItem as MenuItem , MyAvatar as Avatar } from '../MUI替代';
-import { MyBox as Box, MyTextField as TextField, MyIconButton as IconButton, MyTypography as Typography, MyPaper as Paper, MyDivider as Divider, MyTooltip as Tooltip, MyChip as Chip, MySelect, MyButton as Button } from '../MUI替代';
-import { Send as SendIcon, Mic as MicIcon, MicOff as MicOffIcon, VolumeUp as VolumeUpIcon, VolumeOff as VolumeOffIcon, Stop as StopIcon, Close as CloseIcon, Pause as PauseIcon, AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
+import { MyMenu as Menu , MyMenuItem as MenuItem , MyAvatar as Avatar } from '../MUI替代';
+import { MyBox as Box, MyTextField as TextField, MyIconButton as IconButton, MyTypography as Typography, MyPaper as Paper, MyDivider as Divider, MyTooltip as Tooltip, MyChip as Chip, MyButton as Button } from '../MUI替代';
+import { Send as SendIcon, VolumeUp as VolumeUpIcon, VolumeOff as VolumeOffIcon, Stop as StopIcon, Close as CloseIcon, Pause as PauseIcon, AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
 import { MemoPanel } from '../Memo/MemoPanel';
 import { CollaborationStatus } from '../Collaboration/CollaborationStatus';
@@ -10,7 +10,7 @@ import { injectCompanionContext, autoSummarizeChat, adjustMoodForInteraction } f
 import { queryKnowledgeBase, buildRAGContext, isDocumentIndexed, reindexAllDocuments } from '../../services/rag';
 import { buildRAGContext as buildKnowledgeRAGContext, retrieve as retrieveFromKnowledge } from '../../services/rag/knowledgeBase';
 import { voiceService } from '../../services/voice/voiceService';
-import { detectEmotion, type EmotionState } from '../../services/voice/emotionDetector';
+import { detectEmotion } from '../../services/voice/emotionDetector';
 import { addVoiceEmotionLog } from '../../services/emotion/emotionStorage';
 import { PluginService } from '../../plugins';
 import { pluginRegistry } from '../../services/plugins/pluginRegistry';
@@ -25,7 +25,7 @@ import { getAllPersonas, getPersonaSystemPrompt } from '../../services/persona';
 import { getIntimacyLevel } from '../../store';
 import { checkAndTagImportantMessage } from '../../services/summary/dailySummary';
 import { checkAndCreateMilestones } from '../../services/milestone/milestoneTracker';
-import { isGoalOriented, createTaskFromGoal, executeTask } from '../../services/agent/taskPlanner';
+import { isGoalOriented, createTaskFromGoal } from '../../services/agent/taskPlanner';
 import { shouldUsePlanningMode } from '../../services/agent/planningUtils';
 import { TaskConfirmDialog } from '../Agent/TaskConfirmDialog';
 import type { Task as AgentTask } from '../../services/agent/types';
@@ -58,7 +58,7 @@ const TypingIndicator: React.FC = () => {
             width: 6,
             height: 6,
             borderRadius: '50%',
-            bgcolor: '#5e6ad2',
+            bgcolor: 'var(--system-blue)',
             animation: 'bounce 1.2s infinite ease-in-out',
             animationDelay: `${i * 0.16}s`,
             '@keyframes bounce': {
@@ -91,9 +91,9 @@ const CollabBubble: React.FC<CollabBubbleProps> = ({ personaName, avatar, conten
         maxWidth: 680,
         p: 1.5,
         borderRadius: '16px',
-        bgcolor: isUser ? 'rgba(94, 106, 210, 0.15)' : '#191a1b',
+        bgcolor: isUser ? 'var(--chat-user-tint)' : 'var(--chat-ai-bg)',
         border: isUser ? 'none' : `1px solid ${color}40`,
-        color: '#f7f8f8',
+        color: 'var(--text-primary)',
         fontSize: { xs: 14, md: 13 },
         borderBottomRightRadius: isUser ? 4 : 16,
         borderBottomLeftRadius: isUser ? 16 : 4,
@@ -1362,7 +1362,7 @@ export const ChatPanel: React.FC = () => {
                 useStore.getState().setCollaborationMode(true);
                 setShowCollabSuggestion(false);
               }}
-              sx={{ fontSize: 11, py: 0.25, minWidth: 'auto', bgcolor: '#863bff', '&:hover': { bgcolor: '#6b2fe0' } }}
+              sx={{ fontSize: 11, py: 0.25, minWidth: 'auto', bgcolor: 'var(--system-blue)', '&:hover': { bgcolor: 'color-mix(in srgb, var(--system-blue) 85%, black)' } }}
             >
               开启
             </Button>
@@ -1382,7 +1382,7 @@ export const ChatPanel: React.FC = () => {
         <Box
           sx={{
             mx: 2, mt: 1, p: 1, borderRadius: 1,
-            bgcolor: 'rgba(94, 106, 210, 0.15)', color: '#f7f8f8',
+            bgcolor: 'var(--chat-user-tint)', color: 'var(--text-primary)',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             cursor: 'pointer', fontSize: 12,
           }}
@@ -1392,7 +1392,7 @@ export const ChatPanel: React.FC = () => {
             <Typography sx={{ fontSize: 14 }}>📬</Typography>
             <Typography sx={{ fontSize: 12 }}>{memoNotification}</Typography>
           </Box>
-          <Button size="small" sx={{ color: '#f7f8f8', minWidth: 'auto', fontSize: 11 }}>查看</Button>
+          <Button size="small" sx={{ color: 'var(--system-blue)', minWidth: 'auto', fontSize: 11 }}>查看</Button>
         </Box>
       )}
 
@@ -1470,18 +1470,19 @@ export const ChatPanel: React.FC = () => {
                 className="message-enter"
                 sx={{
                   maxWidth: 680,
-                  p: 1.5,
-                  borderRadius: '16px',
+                  py: 1.25,
+                  px: 1.75,
+                  borderRadius: '18px',
                   bgcolor: msg.role === 'user'
-                    ? 'var(--color-chat-user-bg, rgba(94, 106, 210, 0.15))'
-                    : 'var(--color-chat-ai-bg, #191a1b)',
-                  color: 'var(--color-text-primary, #f7f8f8)',
+                    ? 'var(--system-blue)'
+                    : 'var(--bg-elevated)',
+                  color: msg.role === 'user' ? '#ffffff' : 'var(--text-primary)',
                   fontSize: { xs: 14, md: 13 },
-                  borderBottomRightRadius: msg.role === 'user' ? 4 : 16,
-                  borderBottomLeftRadius: msg.role === 'assistant' ? 4 : 16,
+                  borderBottomRightRadius: msg.role === 'user' ? 4 : 18,
+                  borderBottomLeftRadius: msg.role === 'assistant' ? 4 : 18,
                   boxShadow: 'none',
                   border: msg.role === 'assistant'
-                    ? '1px solid var(--color-border, rgba(255, 255, 255, 0.08))'
+                    ? '1px solid var(--separator)'
                     : 'none',
                 }}
               >
@@ -1508,8 +1509,8 @@ export const ChatPanel: React.FC = () => {
                     onClick={() => handleMessageSpeak(msg.content)}
                     disabled={isSpeaking}
                     sx={{
-                      color: 'rgba(255,255,255,0.4)',
-                      '&:hover': { color: '#5e6ad2', bgcolor: 'rgba(94, 106, 210, 0.15)' },
+                      color: 'var(--text-tertiary)',
+                      '&:hover': { color: 'var(--system-blue)', bgcolor: 'var(--chat-user-tint)' },
                     }}
                   >
                     <VolumeUpIcon sx={{ fontSize: 16 }} />
@@ -1523,14 +1524,15 @@ export const ChatPanel: React.FC = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', gap: 0.5 }}>
             <Paper
               sx={{
-                p: 1.5,
-                borderRadius: 2,
-                bgcolor: 'rgba(30, 20, 55, 0.95)',
-                color: 'white',
-                border: '1px solid rgba(155, 127, 212, 0.2)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                py: 1.25,
+                px: 1.75,
+                borderRadius: '18px',
+                bgcolor: 'var(--bg-elevated)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--separator)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                 borderBottomLeftRadius: 4,
-                borderBottomRightRadius: 16,
+                borderBottomRightRadius: 18,
                 width: '100%',
               }}
             >
@@ -1575,8 +1577,8 @@ export const ChatPanel: React.FC = () => {
           position: { xs: 'sticky', md: 'relative' },
           bottom: { xs: 0, md: 'auto' },
           zIndex: { xs: 10, md: 0 },
-          bgcolor: { xs: '#0f1011', md: 'transparent' },
-          borderTop: { xs: '1px solid rgba(255,255,255,0.05)', md: 'none' },
+          bgcolor: { xs: 'var(--bg-elevated)', md: 'transparent' },
+          borderTop: { xs: '1px solid var(--separator)', md: 'none' },
         }}
       >
         <TextField
@@ -1601,34 +1603,6 @@ export const ChatPanel: React.FC = () => {
           }}
           onKeyDown={handleKeyDown}
           disabled={isAIThinking}
-          sx={{
-            '& .MuiInputBase-root': {
-              fontSize: 13,
-              borderRadius: 6,
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              transition: 'box-shadow 0.2s ease, border-color 0.2s ease',
-              '&:hover': {
-                borderColor: 'rgba(255, 255, 255, 0.15)',
-              },
-              '&.Mui-focused': {
-                boxShadow: '0 0 0 2px rgba(94, 106, 210, 0.3)',
-                borderColor: '#5e6ad2',
-              },
-            },
-            '& .MuiInputBase-input': {
-              color: '#f7f8f8',
-              '&::placeholder': {
-                color: '#62666d',
-                opacity: 1,
-              },
-            },
-            '& fieldset': { borderColor: 'transparent' },
-            '&:hover fieldset': { borderColor: 'transparent' },
-            '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'transparent',
-            },
-          }}
         />
 
         {/* Voice Input Button (Mic) - V63: Now uses SpeechButton for emotion detection */}
@@ -1656,8 +1630,8 @@ export const ChatPanel: React.FC = () => {
                 sx={{
                   alignSelf: 'flex-end',
                   flexShrink: 0,
-                  bgcolor: ttsEnabled ? 'rgba(155, 127, 212, 0.15)' : 'transparent',
-                  '&:hover': { bgcolor: ttsEnabled ? 'rgba(155, 127, 212, 0.25)' : 'rgba(255,255,255,0.08)' },
+                  bgcolor: ttsEnabled ? 'var(--chat-user-tint)' : 'transparent',
+                  '&:hover': { bgcolor: ttsEnabled ? 'color-mix(in srgb, var(--system-blue) 25%, transparent)' : 'var(--bg-hover)' },
                 }}
               >
                 {ttsEnabled ? <VolumeUpIcon sx={{ fontSize: 18 }} /> : <VolumeOffIcon sx={{ fontSize: 18 }} />}

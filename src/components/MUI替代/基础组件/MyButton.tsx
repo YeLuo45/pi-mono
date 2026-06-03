@@ -1,4 +1,4 @@
-import { type FC, type ReactNode, type CSSProperties } from 'react';
+import { type FC, type ReactNode, type CSSProperties, useState } from 'react';
 
 export interface MyButtonProps {
   children?: ReactNode;
@@ -29,51 +29,95 @@ export const MyButton: FC<MyButtonProps> = ({
   className = '',
   sx = {},
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+
   const sizeStyles: Record<string, CSSProperties> = {
-    small: { padding: '4px 12px', fontSize: '13px', minHeight: '32px' },
-    medium: { padding: '8px 20px', fontSize: '14px', minHeight: '40px' },
-    large: { padding: '12px 28px', fontSize: '16px', minHeight: '48px' },
+    small: { padding: '4px 10px', fontSize: '12px', minHeight: '28px', borderRadius: '5px' },
+    medium: { padding: '6px 14px', fontSize: '13px', minHeight: '32px', borderRadius: '6px' },
+    large: { padding: '10px 20px', fontSize: '14px', minHeight: '40px', borderRadius: '8px' },
   };
 
-  const colorMap: Record<string, { bg: string; text: string; border: string }> = {
-    primary: { bg: '#007AFF', text: '#fff', border: '#007AFF' },
-    secondary: { bg: '#7170ff', text: '#fff', border: '#7170ff' },
-    error: { bg: '#ef5350', text: '#fff', border: '#ef5350' },
-    warning: { bg: '#ff9800', text: '#fff', border: '#ff9800' },
-    success: { bg: '#4caf50', text: '#fff', border: '#4caf50' },
-    info: { bg: '#2196f3', text: '#fff', border: '#2196f3' },
-    inherit: { bg: 'transparent', text: 'currentColor', border: 'transparent' },
+  const colorMap: Record<string, { bg: string; text: string; border: string; accent: string }> = {
+    primary: { bg: 'var(--system-blue)', text: '#fff', border: 'var(--system-blue)', accent: 'var(--system-blue)' },
+    secondary: { bg: 'var(--system-purple)', text: '#fff', border: 'var(--system-purple)', accent: 'var(--system-purple)' },
+    error: { bg: 'var(--system-red)', text: '#fff', border: 'var(--system-red)', accent: 'var(--system-red)' },
+    warning: { bg: 'var(--system-orange)', text: '#fff', border: 'var(--system-orange)', accent: 'var(--system-orange)' },
+    success: { bg: 'var(--system-green)', text: '#fff', border: 'var(--system-green)', accent: 'var(--system-green)' },
+    info: { bg: 'var(--system-teal)', text: '#fff', border: 'var(--system-teal)', accent: 'var(--system-teal)' },
+    inherit: { bg: 'transparent', text: 'currentColor', border: 'transparent', accent: 'currentColor' },
   };
 
   const colors = colorMap[color] || colorMap.primary;
 
-  const baseStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    border: variant !== 'text' ? `1px solid ${colors.border}` : 'none',
-    borderRadius: '6px',
-    fontWeight: 500,
-    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    opacity: disabled ? 0.5 : 1,
-    transition: 'all 0.2s ease',
-    width: fullWidth ? '100%' : 'auto',
-    ...sizeStyles[size],
-    ...sx,
-  };
+  const getStyles = (): CSSProperties => {
+    const base: CSSProperties = {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '6px',
+      fontWeight: 500,
+      fontFamily: 'var(--font-stack, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif)',
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      opacity: disabled ? 0.5 : 1,
+      transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+      width: fullWidth ? '100%' : 'auto',
+      border: '1px solid transparent',
+      ...sizeStyles[size],
+    };
 
-  if (variant === 'contained') {
-    baseStyle.backgroundColor = colors.bg;
-    baseStyle.color = colors.text;
-  } else if (variant === 'outlined') {
-    baseStyle.backgroundColor = 'transparent';
-    baseStyle.color = colors.text;
-  } else {
-    baseStyle.backgroundColor = 'transparent';
-    baseStyle.color = colors.text;
-  }
+    if (disabled) {
+      if (variant === 'contained') {
+        base.backgroundColor = colors.bg;
+        base.color = colors.text;
+      } else if (variant === 'outlined') {
+        base.borderColor = 'var(--separator)';
+        base.color = 'var(--text-secondary)';
+      } else {
+        base.color = 'var(--text-secondary)';
+      }
+      return { ...base, ...sx };
+    }
+
+    // Active scale feedback
+    if (isActive) {
+      base.transform = 'scale(0.97)';
+    } else if (isHovered) {
+      base.transform = 'scale(1.01)';
+    }
+
+    if (variant === 'contained') {
+      base.backgroundColor = colors.bg;
+      base.color = colors.text;
+      base.borderColor = colors.bg;
+      base.boxShadow = isHovered 
+        ? '0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)' 
+        : '0 1px 3px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)';
+      
+      if (isHovered) {
+        base.filter = 'brightness(1.08)';
+      }
+      if (isActive) {
+        base.filter = 'brightness(0.92)';
+      }
+    } else if (variant === 'outlined') {
+      base.backgroundColor = isHovered ? 'var(--bg-hover, rgba(255, 255, 255, 0.04))' : 'transparent';
+      base.color = colors.accent;
+      base.borderColor = isHovered ? 'rgba(255, 255, 255, 0.2)' : 'var(--separator, rgba(255, 255, 255, 0.1))';
+      if (isActive) {
+        base.backgroundColor = 'var(--bg-active, rgba(255, 255, 255, 0.08))';
+      }
+    } else {
+      // Text variant
+      base.backgroundColor = isHovered ? 'var(--bg-hover, rgba(255, 255, 255, 0.04))' : 'transparent';
+      base.color = colors.accent;
+      if (isActive) {
+        base.backgroundColor = 'var(--bg-active, rgba(255, 255, 255, 0.08))';
+      }
+    }
+
+    return { ...base, ...sx };
+  };
 
   return (
     <button
@@ -81,31 +125,18 @@ export const MyButton: FC<MyButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
       className={className}
-      style={baseStyle}
-      onMouseEnter={(e) => {
-        if (!disabled) {
-          e.currentTarget.style.transform = 'scale(1.02)';
-          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
-        }
+      style={getStyles()}
+      onMouseEnter={() => !disabled && setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setIsActive(false);
       }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'scale(1)';
-        e.currentTarget.style.boxShadow = 'none';
-      }}
-      onMouseDown={(e) => {
-        if (!disabled) {
-          e.currentTarget.style.transform = 'scale(0.97)';
-        }
-      }}
-      onMouseUp={(e) => {
-        if (!disabled) {
-          e.currentTarget.style.transform = 'scale(1.02)';
-        }
-      }}
+      onMouseDown={() => !disabled && setIsActive(true)}
+      onMouseUp={() => !disabled && setIsActive(false)}
     >
-      {startIcon && <span style={{ display: 'flex' }}>{startIcon}</span>}
+      {startIcon && <span style={{ display: 'flex', alignItems: 'center' }}>{startIcon}</span>}
       {children}
-      {endIcon && <span style={{ display: 'flex' }}>{endIcon}</span>}
+      {endIcon && <span style={{ display: 'flex', alignItems: 'center' }}>{endIcon}</span>}
     </button>
   );
 };

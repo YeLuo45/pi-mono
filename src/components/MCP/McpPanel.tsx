@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Box } from '../ui/Box';
 import { MyTypography, MyPaper , MySwitch as Switch, MyTab as Tab } from '../MUI替代';
 import { useTranslation } from 'react-i18next';
+import { useMacSplitStore } from '../../stores/macSplitStore';
 import { NetworkIcon, TerminalIcon, ListIcon, TimeIcon } from '../ui/muiIconMap';
 
 interface CallLogEntry {
@@ -20,6 +21,7 @@ interface CallLogEntry {
 }
 
 interface McpPanelProps {
+  splitLayout?: boolean;
   // Optional: external tool list override
   tools?: Array<{
     name: string;
@@ -28,12 +30,16 @@ interface McpPanelProps {
   }>;
 }
 
-export const McpPanel: React.FC<McpPanelProps> = ({ tools: externalTools }) => {
+export const McpPanel: React.FC<McpPanelProps> = ({ tools: externalTools, splitLayout = false }) => {
   const { t } = useTranslation();
   const [connectedClients, setConnectedClients] = useState(0);
   const [callLog, setCallLog] = useState<CallLogEntry[]>([]);
   const [serverStatus, setServerStatus] = useState<'stopped' | 'running'>('stopped');
-  const [selectedTab, setSelectedTab] = useState<'clients' | 'tools' | 'logs'>('clients');
+  const storeTab = useMacSplitStore((s) => s.mcpTab);
+  const setStoreTab = useMacSplitStore((s) => s.setMcpTab);
+  const [localTab, setLocalTab] = useState<'clients' | 'tools' | 'logs'>('clients');
+  const selectedTab = splitLayout ? storeTab : localTab;
+  const setSelectedTab = splitLayout ? setStoreTab : setLocalTab;
 
   // Poll server status periodically when running
   useEffect(() => {
@@ -71,7 +77,7 @@ export const McpPanel: React.FC<McpPanelProps> = ({ tools: externalTools }) => {
         flexDirection: 'column',
         height: '100%',
         overflow: 'hidden',
-        bgcolor: '#08090a',
+        bgcolor: 'var(--bg-base)',
       }}
     >
       {/* Header */}
@@ -115,7 +121,7 @@ export const McpPanel: React.FC<McpPanelProps> = ({ tools: externalTools }) => {
         </Box>
       </Box>
 
-      {/* Tab Navigation */}
+      {!splitLayout && (
       <Box
         css={{
           display: 'flex',
@@ -155,6 +161,7 @@ export const McpPanel: React.FC<McpPanelProps> = ({ tools: externalTools }) => {
           </Box>
         ))}
       </Box>
+      )}
 
       {/* Content */}
       <Box css={{ flex: 1, overflow: 'auto', p: 2 }}>

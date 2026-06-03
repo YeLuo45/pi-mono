@@ -28,7 +28,7 @@ export class TelegramChannelAdapter implements ChannelAdapter {
     }
     this.token = config.token;
     
-    // Dynamic import — MUST NOT be static import
+    // Dynamic import — MUST NOT be static import (stubbed in web dev via vite alias)
     const { default: TelegramBot } = await import('node-telegram-bot-api');
     this.bot = new TelegramBot(this.token, { polling: true });
     

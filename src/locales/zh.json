@@ -15,6 +15,9 @@
     "mall": "商城",
     "team": "团队",
     "settings": "设置",
+    "groupWorkspace": "工作区",
+    "groupTools": "工具",
+    "groupOther": "其他",
     "plugins": "插件",
     "menu": "菜单",
     "close": "关闭",
@@ -40,6 +43,7 @@
     "highIntimacy": "高亲密度",
     "calculating": "布局计算中...",
     "execution": "执行日志",
+    "evolution": "进化引擎",
     "mcp": {
       "title": "MCP",
       "tabs": {
@@ -66,6 +70,7 @@
     "enableVoiceOutput": "启用语音输出",
     "disableVoiceOutput": "禁用语音输出",
     "emptyState": "👋 你好！我是 PixelPal。有什么想问的吗？",
+    "empty": "暂无消息",
     "errorPrefix": "⚠️ 错误"
   },
   "memory": {
@@ -114,7 +119,12 @@
     "description": "描述",
     "save": "保存",
     "cancel": "取消",
-    "delete": "删除"
+    "delete": "删除",
+    "views": "视图",
+    "events": "日程",
+    "filterMonth": "月历",
+    "filterToday": "今天",
+    "filterUpcoming": "即将到来"
   },
   "tasks": {
     "title": "任务",
@@ -137,11 +147,14 @@
     "cancel": "取消",
     "delete": "删除",
     "filterAll": "全部",
+    "filterToday": "今天",
+    "filterOverdue": "已逾期",
     "filterPending": "待完成",
     "filterCompleted": "已完成",
     "noTasks": "还没有任务。点击 + 添加一个！",
     "noTasksInColumn": "拖拽任务到此处",
     "overdue": "已逾期",
+    "filters": "筛选",
     "dragHint": "拖拽以移动任务"
   },
   "document": {
@@ -169,7 +182,13 @@
       "chunks": "分块",
       "indexed": "已索引"
     },
-    "useInChat": "用于聊天"
+    "useInChat": "用于聊天",
+    "searchSources": "搜索来源",
+    "searchDocs": "搜索文档",
+    "noSources": "暂无知识来源",
+    "noDocs": "暂无索引文档",
+    "docPreview": "文档预览",
+    "searchInDoc": "在「{{name}}」中搜索…"
   },
   "writing": {
     "title": "写作助手"
@@ -193,7 +212,28 @@
     "from": "发件人",
     "credentialsHint": "您的凭据仅存储在本地，不会发送到任何服务器。",
     "disconnect": "断开 Gmail 连接",
-    "noEmails": "暂无邮件"
+    "noEmails": "暂无邮件",
+    "searchMessages": "搜索邮件",
+    "loading": "加载中…",
+    "noMessages": "暂无邮件",
+    "selectMessage": "从列表中选择一封邮件"
+  },
+  "writing": {
+    "title": "AI 写作",
+    "subtitle": "生成、续写、润色或摘要",
+    "modes": "写作模式",
+    "modeGenerate": "生成",
+    "modeContinue": "续写",
+    "modePolish": "润色",
+    "modeSummarize": "摘要"
+  },
+  "document": {
+    "title": "文档问答",
+    "subtitle": "上传 PDF、DOCX、XLSX 或 TXT（≤20MB）并提问",
+    "searchDocs": "搜索文档",
+    "noDocs": "暂无上传文档",
+    "selectDoc": "从列表中选择文档，或上传新文件",
+    "uploadHint": "拖拽或点击上传"
   },
   "telegram": {
     "title": "Telegram",
@@ -369,6 +409,12 @@
     "chinese": "中文",
     "english": "English",
     "themeSettings": "主题设置",
+    "general": "通用",
+    "desktop": "桌面",
+    "analytics": "数据分析",
+    "agentOptimizer": "Agent 优化",
+    "providers": "AI 提供商",
+    "usage": "用量统计",
     "themeMode": "主题模式",
     "light": "明亮",
     "dark": "暗黑",
@@ -987,5 +1033,53 @@
     "success": "技能执行完成",
     "error": "技能执行失败",
     "steps": "执行步骤"
+  },
+  "evolution": {
+    "tabs": {
+      "dashboard": "总览",
+      "patterns": "模式",
+      "strategies": "策略",
+      "skills": "技能",
+      "timeline": "时间线"
+    },
+    "events": "事件",
+    "noEvents": "暂无事件",
+    "run": "运行进化"
+  },
+  "macos": {
+    "selectItem": "从列表中选择一项",
+    "memoryViews": "视图",
+    "timeRange": "时间范围",
+    "toolsRegistry": "工具注册表",
+    "toolsHistory": "调用历史",
+    "agentFilterAll": "全部",
+    "agentFilterRunning": "运行中",
+    "agentFilterPending": "等待中",
+    "agentFilterCompleted": "已完成",
+    "agentFilterFailed": "失败",
+    "noTasks": "暂无任务",
+    "openGraphHint": "在中间栏点击「关系图谱」打开"
+  },
+  "skillStore": {
+    "title": "技能商店",
+    "search": "搜索技能",
+    "sort": "排序",
+    "sortPopular": "最热门",
+    "sortRating": "评分最高",
+    "sortNewest": "最新",
+    "categories": "分类",
+    "skills": "技能",
+    "categoryAll": "全部",
+    "categoryProductivity": "效率工具",
+    "categoryDeveloper": "开发者",
+    "categoryLifestyle": "生活",
+    "categoryCreative": "创意",
+    "categoryAnalysis": "分析",
+    "categoryEntertainment": "娱乐"
+  },
+  "skillDev": {
+    "title": "技能开发",
+    "searchFiles": "搜索文件",
+    "noFiles": "暂无技能文件"
   }
 }

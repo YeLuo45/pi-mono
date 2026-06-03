@@ -124,7 +124,7 @@ interface AppState {
   updateLastActivity: () => void;
 
   // UI
-  activePanel: 'chat' | 'calendar' | 'tasks' | 'document' | 'knowledge' | 'email' | 'writing' | 'settings' | 'team' | 'plugin' | 'memory' | 'analytics' | 'scenes' | 'mall' | 'pluginStore' | 'agent' | 'tools' | 'execution' | 'mcp';
+  activePanel: 'chat' | 'calendar' | 'tasks' | 'document' | 'knowledge' | 'email' | 'writing' | 'settings' | 'team' | 'plugin' | 'memory' | 'analytics' | 'scenes' | 'mall' | 'pluginStore' | 'agent' | 'tools' | 'execution' | 'mcp' | 'evolution';
   setActivePanel: (panel: AppState['activePanel']) => void;
 
   // Active plugin (used when activePanel === 'plugin')
@@ -183,11 +183,11 @@ interface AppState {
   saveAsTemplate: (persona: Persona) => void;
   removeLocalTemplate: (templateId: string) => void;
 
-  // V33: App-Level Theme System
-  appThemeMode: 'light' | 'dark' | 'system' | 'minimax';
+  // V33: App-Level Theme System ('minimax' deprecated, kept for persisted users)
+  appThemeMode: AppThemeMode;
   appThemePresetId: string; // 'light' | 'dark' | 'sunset' | 'forest' | 'custom'
   customTheme: AppThemePreset | null;
-  setAppThemeMode: (mode: 'light' | 'dark' | 'system' | 'minimax') => void;
+  setAppThemeMode: (mode: AppThemeMode) => void;
   setAppThemePreset: (id: string) => void;
   setCustomTheme: (theme: AppThemePreset | null) => void;
 
@@ -244,6 +244,19 @@ export interface CollaborationProgress {
   emoji: string;
   status: 'pending' | 'running' | 'done';
   output?: string;
+}
+
+// Keep 'minimax' for persisted legacy users; treat it as light mode at runtime.
+type AppThemeMode = 'light' | 'dark' | 'system' | 'minimax';
+
+function resolveEffectiveThemePresetId(mode: AppThemeMode, presetId: string): string {
+  if (mode === 'system') {
+    return getSystemTheme();
+  }
+  if (mode === 'minimax') {
+    return 'light';
+  }
+  return presetId;
 }
 
 // Default model templates
@@ -548,10 +561,7 @@ export const useStore = create<AppState>()(
       setActivePersonaId: (id) => {
         // V33: First apply the current app theme (so persona theme overlays on top)
         const { appThemeMode, appThemePresetId, customTheme } = useStore.getState();
-        let effectivePresetId = appThemePresetId;
-        if (appThemeMode === 'system') {
-          effectivePresetId = getSystemTheme();
-        }
+        const effectivePresetId = resolveEffectiveThemePresetId(appThemeMode, appThemePresetId);
         if (effectivePresetId === 'custom' && customTheme) {
           applyCustomTheme(customTheme);
         } else {
@@ -610,10 +620,7 @@ export const useStore = create<AppState>()(
         set({ personaFollowTheme: v });
         // V33: Re-apply app theme first before persona theme
         const { appThemeMode, appThemePresetId, customTheme } = useStore.getState();
-        let effectivePresetId = appThemePresetId;
-        if (appThemeMode === 'system') {
-          effectivePresetId = getSystemTheme();
-        }
+        const effectivePresetId = resolveEffectiveThemePresetId(appThemeMode, appThemePresetId);
         if (effectivePresetId === 'custom' && customTheme) {
           applyCustomTheme(customTheme);
         } else {
@@ -865,10 +872,7 @@ export const useStore = create<AppState>()(
       onRehydrateStorage: () => async (state) => {
         // V33: Apply app theme after rehydration
         if (state) {
-          let effectivePresetId = state.appThemePresetId;
-          if (state.appThemeMode === 'system') {
-            effectivePresetId = getSystemTheme();
-          }
+          const effectivePresetId = resolveEffectiveThemePresetId(state.appThemeMode, state.appThemePresetId);
           if (effectivePresetId === 'custom' && state.customTheme) {
             applyCustomTheme(state.customTheme);
           } else {

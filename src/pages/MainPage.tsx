@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MyIconButton as IconButton , MyDialog as Dialog, MyDrawer as Drawer, MyTab as Tab } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import { MenuIcon } from '../components/ui/muiIconMap';
@@ -28,6 +29,8 @@ import { MobileDrawer } from '../components/Layout/MobileDrawer';
 import { useMobile } from '../hooks/useMobile';
 import { McpPanel } from '../components/MCP/McpPanel';
 import { EvolutionDashboard } from '../components/evolution';
+import { MacDetailPane } from '../components/macos';
+import { isMacSplitPanel } from '../stores/macSplitPanels';
 
 const PANEL_COMPONENTS = {
   chat: ChatPanel,
@@ -44,10 +47,32 @@ const PANEL_COMPONENTS = {
   analytics: AnalyticsPanel,
   pluginStore: PluginStore,
   agent: AgentPanel,
-  graph: () => null, // RelationGraph is rendered as a dialog at root level
+  graph: function GraphPanelPlaceholder({ splitLayout }: { splitLayout?: boolean }) {
+    const { t } = useTranslation();
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          p: 3,
+          color: 'text.secondary',
+          fontSize: 14,
+        }}
+      >
+        {splitLayout
+          ? t('macos.openGraphHint', '在中间栏点击「关系图谱」打开')
+          : t('nav.graph', '关系图谱')}
+      </Box>
+    );
+  },
   tools: ToolsPanel,
   execution: ExecutionLogPanel,
   mcp: McpPanel,
+  evolution: function EvolutionPanelRoute({ splitLayout }: { splitLayout?: boolean }) {
+    return <EvolutionDashboard embedded splitLayout={splitLayout} />;
+  },
 } as const;
 
 export const MainPage: React.FC = () => {
@@ -58,7 +83,7 @@ export const MainPage: React.FC = () => {
   const [relationGraphOpen, setRelationGraphOpen] = useState(false);
   const isMobile = useMobile();
 
-  // Listen for relation graph open event from Sidebar
+  // Listen for relation graph open event from source list
   useEffect(() => {
     const handleOpenRelationGraph = () => setRelationGraphOpen(true);
     window.addEventListener('pixelpal:openRelationGraph', handleOpenRelationGraph);
@@ -75,14 +100,18 @@ export const MainPage: React.FC = () => {
   const resolvePanelComponent = () => {
     if (activePanel === 'plugin') {
       if (activePluginId) {
-        return () => (
-          <PluginPanel
-            pluginId={activePluginId}
-            onBack={() => {
-              setActivePluginId(null);
-            }}
-          />
-        );
+        const pluginId = activePluginId;
+        return function PluginPanelRoute() {
+          return (
+            <PluginPanel
+              pluginId={pluginId}
+              splitLayout={isMacSplitPanel('plugin')}
+              onBack={() => {
+                setActivePluginId(null);
+              }}
+            />
+          );
+        };
       }
       return PluginHub;
     }
@@ -99,10 +128,11 @@ export const MainPage: React.FC = () => {
 
   // Cast to React.FC to handle cases where TypeScript can't infer the component props
   // The resolvePanelComponent function always handles pluginId correctly when needed
-  const ActivePanelComponent = resolvePanelComponent() as React.FC<Record<string, unknown>>;
+  const ActivePanelComponent = resolvePanelComponent() as React.FC<{ splitLayout?: boolean }>;
+  const useSplitLayout = isMacSplitPanel(activePanel);
 
   return (
-    <Box css={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: '#08090a' }}>
+    <>
       {/* Mobile Drawer - Left side swipe accessible */}
       <MobileDrawer
         open={mobileDrawerOpen}
@@ -130,34 +160,21 @@ export const MainPage: React.FC = () => {
         </IconButton>
       )}
 
-      {/* Main content */}
-      <Box
-        component="main"
-        css={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          ml: isMobile ? 0 : '0 !important',
-        }}
-      >
-        {/* Panel */}
+      <MacDetailPane>
         <Box
+          component="main"
           css={{
             flex: 1,
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
             width: '100%',
-            bgcolor: '#08090a',
             pb: isMobile ? '64px' : 0, // Space for bottom tab nav on mobile
           }}
         >
-          {/* Top divider line */}
-          <Box sx={{ height: 1, bgcolor: 'rgba(255,255,255,0.05)' }} />
-          <ActivePanelComponent />
+          <ActivePanelComponent splitLayout={useSplitLayout} />
         </Box>
-      </Box>
+      </MacDetailPane>
 
       {/* Bottom Tab Navigation for Mobile */}
       {isMobile && <BottomTabNav />}
@@ -165,9 +182,7 @@ export const MainPage: React.FC = () => {
       {/* Relation Graph Dialog — rendered at root level */}
       <RelationGraph open={relationGraphOpen} onClose={() => setRelationGraphOpen(false)} />
 
-      {/* Evolution Dashboard — rendered at root level */}
-      <EvolutionDashboard />
-    </Box>
+    </>
   );
 };
 

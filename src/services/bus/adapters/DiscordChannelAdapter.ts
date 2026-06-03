@@ -28,7 +28,7 @@ export class DiscordChannelAdapter implements ChannelAdapter {
     }
     this.token = config.token;
     
-    // Dynamic import — MUST NOT be static import
+    // Dynamic import — MUST NOT be static import (stubbed in web dev via vite alias)
     const { Client, GatewayIntentBits } = await import('discord.js');
     this.client = new Client({
       intents: [

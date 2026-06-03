@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { MyDialog as Dialog , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../MUI替代';
 import { MyBox as Box, MyTypography as Typography, MyIconButton as IconButton, MyButton as Button, MyTextField as TextField, MySelect as Select, MyChip as Chip } from '../MUI替代';
 import { Delete as DeleteIcon } from '@mui/icons-material';
@@ -14,6 +14,25 @@ import { useStore } from '../../store';
 import type { Task, TaskStatus } from '../../types';
 import { format, parseISO, isPast, isSameDay } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { useMacSplitStore, type TasksFilter } from '../../stores/macSplitStore';
+
+function applyTasksFilter(tasks: Task[], filter: TasksFilter): Task[] {
+  const now = new Date();
+  if (filter === 'all') return tasks;
+  if (filter === 'today') {
+    return tasks.filter((t) => t.dueDate && isSameDay(parseISO(t.dueDate), now));
+  }
+  if (filter === 'overdue') {
+    return tasks.filter(
+      (t) =>
+        t.status !== 'done' &&
+        t.dueDate &&
+        isPast(parseISO(t.dueDate)) &&
+        !isSameDay(parseISO(t.dueDate), now),
+    );
+  }
+  return tasks.filter((t) => t.status === filter);
+}
 
 const COLUMNS: { id: TaskStatus; labelKey: string }[] = [
   { id: 'ai_suggestion', labelKey: 'tasks.aiSuggestion' },
@@ -228,9 +247,18 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ columnId, tasks, labelKey, 
 };
 
 // ---------- Root Tasks Component ----------
-export const Tasks: React.FC = () => {
+interface TasksProps {
+  splitLayout?: boolean;
+}
+
+export const Tasks: React.FC<TasksProps> = ({ splitLayout = false }) => {
   const { t } = useTranslation();
   const tasks = useStore((s) => s.tasks);
+  const tasksFilter = useMacSplitStore((s) => s.tasksFilter);
+  const filteredTasks = useMemo(
+    () => (splitLayout ? applyTasksFilter(tasks, tasksFilter) : tasks),
+    [tasks, tasksFilter, splitLayout],
+  );
   const addTask = useStore((s) => s.addTask);
   const updateTask = useStore((s) => s.updateTask);
   const deleteTask = useStore((s) => s.deleteTask);
@@ -299,7 +327,7 @@ export const Tasks: React.FC = () => {
   };
 
   const tasksByColumn = (columnId: TaskStatus) =>
-    tasks
+    filteredTasks
       .filter((t) => t.status === columnId)
       .sort((a, b) => {
         const priorityOrder = { high: 0, medium: 1, low: 2 };
@@ -309,12 +337,12 @@ export const Tasks: React.FC = () => {
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       });
 
-  const totalCount = tasks.length;
-  const doneCount = tasks.filter((t) => t.status === 'done').length;
+  const totalCount = filteredTasks.length;
+  const doneCount = filteredTasks.filter((t) => t.status === 'done').length;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
-      {/* Header */}
+      {!splitLayout && (
       <Box
         sx={{
           p: 2,
@@ -341,6 +369,18 @@ export const Tasks: React.FC = () => {
           <AddIcon sx={{ fontSize: 18 }} />
         </IconButton>
       </Box>
+      )}
+      {splitLayout && (
+        <Box sx={{ p: 1.5, borderBottom: '1px solid var(--separator)', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="body2" sx={{ flex: 1, fontSize: 13, color: 'var(--text-secondary)' }}>
+            {t(`tasks.filter${tasksFilter === 'all' ? 'All' : tasksFilter === 'today' ? 'Today' : tasksFilter === 'overdue' ? 'Overdue' : ''}`, tasksFilter)}
+            {' · '}{doneCount}/{totalCount}
+          </Typography>
+          <IconButton size="small" color="primary" onClick={() => handleOpenDialog()}>
+            <AddIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Box>
+      )}
 
       {/* Kanban Board */}
       <Box sx={{ flex: 1, overflow: 'auto', p: 1 }}>

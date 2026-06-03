@@ -78,10 +78,10 @@ export const MyTextField: FC<MyTextFieldProps> = ({
 
   const currentSize = sizeStyles[size];
   const borderColor = error
-    ? '#ef5350'
+    ? 'var(--system-red)'
     : isFocused
-    ? '#007AFF'
-    : theme.palette.divider || 'rgba(255,255,255,0.1)';
+    ? 'var(--system-blue)'
+    : 'var(--separator)';
 
   const getOutlinedStyles = () => ({
     container: {
@@ -95,11 +95,9 @@ export const MyTextField: FC<MyTextFieldProps> = ({
       width: '100%',
       border: `1px solid ${borderColor}`,
       borderRadius: borderRadius.md,
-      backgroundColor: disabled
-        ? 'rgba(255,255,255,0.04)'
-        : theme.palette.background?.paper || '#0f1011',
-      transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-      boxShadow: isFocused ? '0 0 0 3px rgba(0,122,255,0.15)' : 'none',
+      backgroundColor: disabled ? 'var(--bg-hover)' : 'var(--bg-input)',
+      transition: 'border-color var(--duration-short) var(--ease-macOS), box-shadow var(--duration-short) var(--ease-macOS)',
+      boxShadow: isFocused ? '0 0 0 3px color-mix(in srgb, var(--system-blue) 25%, transparent)' : 'none',
       ...currentSize,
     },
     input: {
@@ -107,11 +105,11 @@ export const MyTextField: FC<MyTextFieldProps> = ({
       border: 'none',
       outline: 'none',
       background: 'transparent',
-      color: theme.palette.text?.primary || '#f7f8f8',
+      color: 'var(--text-primary)',
       fontSize: currentSize.fontSize,
       width: '100%',
       '&::placeholder': {
-        color: theme.palette.text?.disabled || '#62666d',
+        color: 'var(--text-placeholder)',
         opacity: 1,
       },
     },
@@ -130,9 +128,7 @@ export const MyTextField: FC<MyTextFieldProps> = ({
       border: `1px solid transparent`,
       borderBottomColor: borderColor,
       borderRadius: `${borderRadius.md} ${borderRadius.md} 0 0`,
-      backgroundColor: disabled
-        ? 'rgba(255,255,255,0.04)'
-        : 'rgba(255,255,255,0.08)',
+      backgroundColor: disabled ? 'var(--bg-hover)' : 'var(--bg-input)',
       transition: 'border-color 0.2s ease',
       ...currentSize,
     },
@@ -141,11 +137,11 @@ export const MyTextField: FC<MyTextFieldProps> = ({
       border: 'none',
       outline: 'none',
       background: 'transparent',
-      color: theme.palette.text?.primary || '#f7f8f8',
+      color: 'var(--text-primary)',
       fontSize: currentSize.fontSize,
       width: '100%',
       '&::placeholder': {
-        color: theme.palette.text?.disabled || '#62666d',
+        color: 'var(--text-placeholder)',
         opacity: 1,
       },
     },
@@ -173,11 +169,11 @@ export const MyTextField: FC<MyTextFieldProps> = ({
       border: 'none',
       outline: 'none',
       background: 'transparent',
-      color: theme.palette.text?.primary || '#f7f8f8',
+      color: 'var(--text-primary)',
       fontSize: currentSize.fontSize,
       width: '100%',
       '&::placeholder': {
-        color: theme.palette.text?.disabled || '#62666d',
+        color: 'var(--text-placeholder)',
         opacity: 1,
       },
     },
@@ -199,7 +195,7 @@ export const MyTextField: FC<MyTextFieldProps> = ({
   const endAdornment = InputProps.endAdornment;
 
   return (
-    <div className={className} style={styles.container}>
+    <div className={className} style={{ ...styles.container, ...sx }}>
       <div
         style={{
           ...styles.inputWrapper,
@@ -218,6 +214,8 @@ export const MyTextField: FC<MyTextFieldProps> = ({
             onChange={handleChange}
             placeholder={placeholder}
             disabled={disabled}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             {...rest}
             rows={rows}
             style={{
@@ -255,7 +253,7 @@ export const MyTextField: FC<MyTextFieldProps> = ({
             display: 'block',
             marginTop: theme.spacing(0.5),
             fontSize: '12px',
-            color: error ? '#ef5350' : theme.palette.text?.secondary || '#d0d6e0',
+            color: error ? 'var(--system-red)' : 'var(--text-secondary)',
             lineHeight: 1.4,
           }}
         >

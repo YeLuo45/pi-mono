@@ -15,6 +15,9 @@
     "mall": "Mall",
     "team": "Team",
     "settings": "Settings",
+    "groupWorkspace": "Workspace",
+    "groupTools": "Tools",
+    "groupOther": "Other",
     "plugins": "Plugins",
     "menu": "Menu",
     "close": "Close",
@@ -40,6 +43,7 @@
     "highIntimacy": "High",
     "calculating": "Calculating layout...",
     "execution": "Execution Log",
+    "evolution": "Evolution",
     "mcp": {
       "title": "MCP",
       "tabs": {
@@ -66,6 +70,7 @@
     "enableVoiceOutput": "Enable voice output",
     "disableVoiceOutput": "Disable voice output",
     "emptyState": "👋 Hi! I'm PixelPal. Ask me anything!",
+    "empty": "No messages yet",
     "errorPrefix": "⚠️ Error"
   },
   "memory": {
@@ -114,7 +119,12 @@
     "description": "Description",
     "save": "Save",
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "views": "Views",
+    "events": "Events",
+    "filterMonth": "Month",
+    "filterToday": "Today",
+    "filterUpcoming": "Upcoming"
   },
   "tasks": {
     "title": "Tasks",
@@ -137,11 +147,14 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "filterAll": "All",
+    "filterToday": "Today",
+    "filterOverdue": "Overdue",
     "filterPending": "Pending",
     "filterCompleted": "Completed",
     "noTasks": "No tasks yet. Click + to add one!",
     "noTasksInColumn": "Drop tasks here",
     "overdue": "Overdue",
+    "filters": "Filters",
     "dragHint": "Drag to move between columns"
   },
   "document": {
@@ -169,7 +182,13 @@
       "chunks": "Chunks",
       "indexed": "Indexed"
     },
-    "useInChat": "Use in Chat"
+    "useInChat": "Use in Chat",
+    "searchSources": "Search sources",
+    "searchDocs": "Search documents",
+    "noSources": "No knowledge sources",
+    "noDocs": "No indexed documents",
+    "docPreview": "Document preview",
+    "searchInDoc": "Search in \"{{name}}\"…"
   },
   "writing": {
     "title": "Writing Assistant"
@@ -193,7 +212,28 @@
     "from": "From",
     "credentialsHint": "Your credentials are stored locally and never sent to any server.",
     "disconnect": "Disconnect Gmail",
-    "noEmails": "No emails loaded"
+    "noEmails": "No emails loaded",
+    "searchMessages": "Search messages",
+    "loading": "Loading…",
+    "noMessages": "No messages",
+    "selectMessage": "Select a message from the list"
+  },
+  "writing": {
+    "title": "AI Writing",
+    "subtitle": "Generate, continue, polish, or summarize",
+    "modes": "Writing modes",
+    "modeGenerate": "Generate",
+    "modeContinue": "Continue",
+    "modePolish": "Polish",
+    "modeSummarize": "Summarize"
+  },
+  "document": {
+    "title": "Document Q&A",
+    "subtitle": "Upload PDF, DOCX, XLSX or TXT (≤20MB) and ask questions",
+    "searchDocs": "Search documents",
+    "noDocs": "No uploaded documents",
+    "selectDoc": "Select a document from the list, or upload a new file",
+    "uploadHint": "Drag and drop or click to upload"
   },
   "telegram": {
     "title": "Telegram",
@@ -369,6 +409,12 @@
     "chinese": "中文",
     "english": "English",
     "themeSettings": "Theme Settings",
+    "general": "General",
+    "desktop": "Desktop",
+    "analytics": "Analytics",
+    "agentOptimizer": "Agent Optimizer",
+    "providers": "AI Providers",
+    "usage": "Usage Statistics",
     "themeMode": "Theme Mode",
     "light": "Light",
     "dark": "Dark",
@@ -1002,5 +1048,53 @@
     "success": "Skill completed",
     "error": "Skill failed",
     "steps": "Steps"
+  },
+  "evolution": {
+    "tabs": {
+      "dashboard": "Dashboard",
+      "patterns": "Patterns",
+      "strategies": "Strategies",
+      "skills": "Skills",
+      "timeline": "Timeline"
+    },
+    "events": "Events",
+    "noEvents": "No events yet",
+    "run": "Run evolution"
+  },
+  "macos": {
+    "selectItem": "Select an item from the list",
+    "memoryViews": "Views",
+    "timeRange": "Time range",
+    "toolsRegistry": "Registry",
+    "toolsHistory": "Call history",
+    "agentFilterAll": "All",
+    "agentFilterRunning": "Running",
+    "agentFilterPending": "Pending",
+    "agentFilterCompleted": "Completed",
+    "agentFilterFailed": "Failed",
+    "noTasks": "No tasks",
+    "openGraphHint": "Open Relation Graph from the item list"
+  },
+  "skillStore": {
+    "title": "Skill Store",
+    "search": "Search skills",
+    "sort": "Sort",
+    "sortPopular": "Popular",
+    "sortRating": "Top rated",
+    "sortNewest": "Newest",
+    "categories": "Categories",
+    "skills": "Skills",
+    "categoryAll": "All",
+    "categoryProductivity": "Productivity",
+    "categoryDeveloper": "Developer",
+    "categoryLifestyle": "Lifestyle",
+    "categoryCreative": "Creative",
+    "categoryAnalysis": "Analysis",
+    "categoryEntertainment": "Entertainment"
+  },
+  "skillDev": {
+    "title": "Skill Dev",
+    "searchFiles": "Search files",
+    "noFiles": "No skill files"
   }
 }

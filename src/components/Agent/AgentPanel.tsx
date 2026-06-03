@@ -1,6 +1,6 @@
 /**
  * AgentPanel - Main task center panel for the Agent system
- * Displayed as a tab in the Sidebar. Shows agent task queue, stats, and controls.
+ * Agent task center: queue, stats, and controls (macOS split layout uses MacItemList + detail).
  */
 
 import React, { useState, useEffect } from 'react';
@@ -13,15 +13,19 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { TaskQueue } from './TaskQueue';
+import { TaskCard } from './TaskCard';
 import { taskQueue } from '../../services/agent/taskQueue';
+import { useMacSplitStore } from '../../stores/macSplitStore';
 import { agentExecutor } from '../../services/agent/agentExecutor';
 import { memoryManager } from '../../services/agent/memory/memoryManager';
 import { saveTaskQueue } from '../../services/storage/taskStorage';
 import type { Task, TaskPriority } from '../../services/agent/types';
 import { useSceneAwareness } from '../../hooks/useSceneAwareness';
 
-export const AgentPanel: React.FC = () => {
+export const AgentPanel: React.FC<{ splitLayout?: boolean }> = ({ splitLayout = false }) => {
   const { t } = useTranslation();
+  const agentTaskId = useMacSplitStore((s) => s.agentTaskId);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [newGoal, setNewGoal] = useState('');
   const [newPriority, setNewPriority] = useState<TaskPriority>('normal');
@@ -83,6 +87,16 @@ export const AgentPanel: React.FC = () => {
     const interval = setInterval(updateMemoryStats, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!splitLayout) return;
+    const refresh = () => setTasks([...taskQueue.getAllTasks()]);
+    refresh();
+    const interval = setInterval(refresh, 2000);
+    return () => clearInterval(interval);
+  }, [splitLayout]);
+
+  const selectedTask = splitLayout ? tasks.find((t) => t.id === agentTaskId) : undefined;
 
   const handleClearMemory = () => {
     memoryManager.clear();
@@ -275,9 +289,26 @@ export const AgentPanel: React.FC = () => {
         </IconButton>
       </Box>
 
-      {/* Task queue */}
+      {/* Task queue / selected task detail */}
       <Box sx={{ flex: 1, overflow: 'hidden' }}>
-        <TaskQueue />
+        {splitLayout ? (
+          <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+            {selectedTask ? (
+              <TaskCard
+                task={selectedTask}
+                onPause={() => taskQueue.pauseCurrent()}
+                onResume={() => taskQueue.resume(selectedTask.id)}
+                onCancel={() => taskQueue.dequeue(selectedTask.id)}
+              />
+            ) : (
+              <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center', mt: 4 }}>
+                {t('macos.selectItem', '选择一项以查看详情')}
+              </Typography>
+            )}
+          </Box>
+        ) : (
+          <TaskQueue />
+        )}
       </Box>
     </Box>
   );

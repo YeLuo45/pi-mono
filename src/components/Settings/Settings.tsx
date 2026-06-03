@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MyDialog as Dialog, MySlider as Slider , MyCard as Card, MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem, MyTab as Tab } from '../MUI替代';
+import { MyDialog as Dialog, MySlider as Slider , MyDialogActions as DialogActions, MyDialogContent as DialogContent, MyDialogTitle as DialogTitle, MyFormControl as FormControl, MyInputLabel as InputLabel, MyMenuItem as MenuItem } from '../MUI替代';
 import { MyBox as Box, MyTypography as Typography, MyTextField as TextField, MyButton as Button, MyPaper as Paper, MySelect as Select, MyAlert as Alert, MyDivider as Divider, MyStack as Stack, MyIconButton as IconButton, MyChip as Chip, MyTooltip as Tooltip, MyCollapse as Collapse, MySwitch as Switch, MyList as List, MyListItem as ListItem } from '../MUI替代';
 import {
   Visibility, VisibilityOff, Save as SaveIcon,
   Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon,
   DragIndicator as DragIcon, ExpandMore as ExpandIcon, ExpandLess as CollapseIcon,
   Download as DownloadIcon, Upload as UploadIcon,
-  Share as ShareIcon, Keyboard as KeyboardIcon,
+  Keyboard as KeyboardIcon,
   OpenInNew as OpenInNewIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -19,16 +19,19 @@ import { getMemoryStats, clearAllMemories, compactMemory } from '../../services/
 import { voiceService } from '../../services/voice/voiceService';
 import { WebhookSettings } from './WebhookSettings';
 import { VersionInfo } from './VersionInfo';
-import { decodeTemplate, templateToPersonaData, copyToClipboard } from '../../services/template/templateShare';
+import { decodeTemplate, templateToPersonaData } from '../../services/template/templateShare';
 import { ONLINE_TEMPLATES, type OnlineTemplate } from '../../services/template/onlineTemplates';
 import { createPersona, type PersonaVoice, type PersonaAppearance } from '../../services/persona/personaStorage';
 import type { ModelConfig } from '../../services/ai/model-registry';
 import type { PersonaId, PersonaRole } from '../../types';
-import { APP_THEME_PRESETS, createCustomPreset, applyAppTheme, applyCustomTheme, getPresetById, getSystemTheme, resetToDefault } from '../../utils/appTheme';
+import { createCustomPreset, applyCustomTheme } from '../../utils/appTheme';
+import { MAC_THEME_PRESETS, applyMacThemePreset } from '../../utils/macThemePresets';
 import { AnalyticsDashboard } from '../Analytics/AnalyticsDashboard';
 import { PerformanceDashboard, OptimizationPanel, AgentLeaderboard } from '../AgentOptimizer';
 import { BotChannelsSettings } from './BotChannelsSettings';
-import { EvolutionDashboard } from '../evolution';
+import { useMacSplitStore } from '../../stores/macSplitStore';
+import { ProvidersPage } from '../../pages/ProvidersPage';
+import { UsageStatsPanel } from '../Usage/UsageStatsPanel';
 import { useEvolutionStore } from '../../stores/evolutionStore';
 
 const PROVIDER_LABELS: Record<string, string> = {
@@ -45,7 +48,11 @@ const PROVIDER_LABELS: Record<string, string> = {
   custom: 'Custom Endpoint',
 };
 
-export const Settings: React.FC = () => {
+interface SettingsProps {
+  splitLayout?: boolean;
+}
+
+export const Settings: React.FC<SettingsProps> = ({ splitLayout = false }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const aiConfig = useStore((s) => s.aiConfig);
@@ -105,6 +112,12 @@ export const Settings: React.FC = () => {
 
   // V94: Desktop settings tab
   const [activeSettingsTab, setActiveSettingsTab] = useState<'general' | 'desktop' | 'analytics' | 'agentOptimizer'>('general');
+  const settingsSection = useMacSplitStore((s) => s.settingsSection);
+  const effectiveTab = splitLayout
+    ? (settingsSection === 'appearance' ? 'general' : settingsSection)
+    : activeSettingsTab;
+  const showGeneralBody = !splitLayout || settingsSection === 'general';
+  const showThemeBlock = !splitLayout || settingsSection === 'general' || settingsSection === 'appearance';
 
   // V94: Update status state
   const [updateStatus, setUpdateStatus] = useState<{
@@ -128,9 +141,6 @@ export const Settings: React.FC = () => {
   const appThemeMode = useStore((s) => s.appThemeMode);
   const appThemePresetId = useStore((s) => s.appThemePresetId);
   const customTheme = useStore((s) => s.customTheme);
-  const setAppThemeMode = useStore((s) => s.setAppThemeMode);
-  const setAppThemePreset = useStore((s) => s.setAppThemePreset);
-  const setCustomTheme = useStore((s) => s.setCustomTheme);
   const [customExpanded, setCustomExpanded] = useState(false);
   const [customColors, setCustomColors] = useState({
     background: '#121212',
@@ -485,14 +495,16 @@ export const Settings: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
+      {!splitLayout && (
       <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <Typography variant="h6" sx={{ fontSize: 15, fontWeight: 600 }}>
           ⚙️ Settings
         </Typography>
       </Box>
+      )}
 
       {/* V94: Settings Tab Navigation (Desktop only) */}
-      {isElectron && (
+      {!splitLayout && isElectron && (
         <Box sx={{ px: 2, pt: 2, pb: 1, display: 'flex', gap: 1 }}>
           <Button
             size="small"
@@ -532,10 +544,10 @@ export const Settings: React.FC = () => {
       <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
 
         {/* V94: Desktop Settings Tab */}
-        {isElectron && activeSettingsTab === 'desktop' && (
+        {isElectron && effectiveTab === 'desktop' && (
           <>
             {/* V94: System Integration */}
-            <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+            <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
               <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
                 🖥️ System Integration
               </Typography>
@@ -591,7 +603,7 @@ export const Settings: React.FC = () => {
             </Paper>
 
             {/* V94: Notifications */}
-            <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+            <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
               <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
                 🔔 Notifications
               </Typography>
@@ -624,7 +636,7 @@ export const Settings: React.FC = () => {
             </Paper>
 
             {/* V94: Auto Update */}
-            <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+            <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
               <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
                 🔄 Auto Update
               </Typography>
@@ -706,7 +718,7 @@ export const Settings: React.FC = () => {
             </Paper>
 
             {/* V94: Data Directory */}
-            <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+            <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
               <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
                 📁 Data Directory
               </Typography>
@@ -729,7 +741,7 @@ export const Settings: React.FC = () => {
             </Paper>
 
             {/* V94: Keyboard Shortcuts Info */}
-            <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+            <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
               <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
                 ⌨️ Global Shortcuts
               </Typography>
@@ -741,16 +753,35 @@ export const Settings: React.FC = () => {
         )}
 
         {/* V97: Analytics Tab */}
-        {activeSettingsTab === 'analytics' && (
+        {effectiveTab === 'analytics' && (
           <Box sx={{ height: 'calc(100vh - 180px)', overflow: 'auto' }}>
             <AnalyticsDashboard />
           </Box>
         )}
 
+        {effectiveTab === 'agentOptimizer' && (
+          <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <PerformanceDashboard />
+            <OptimizationPanel />
+            <AgentLeaderboard />
+          </Box>
+        )}
+
+        {effectiveTab === 'providers' && (
+          <ProvidersPage splitLayout />
+        )}
+
+        {effectiveTab === 'usage' && (
+          <Box sx={{ height: '100%', overflow: 'auto' }}>
+            <UsageStatsPanel />
+          </Box>
+        )}
+
         {/* Only show general settings when on general tab */}
-        {activeSettingsTab === 'general' && (
+        {effectiveTab === 'general' && showGeneralBody && (
           <>
         {/* V81: AI Providers Card */}
+        {!splitLayout && (
         <Paper
           sx={{
             p: 2,
@@ -777,8 +808,10 @@ export const Settings: React.FC = () => {
             <OpenInNewIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
           </Stack>
         </Paper>
+        )}
 
         {/* V88: Usage Statistics Card */}
+        {!splitLayout && (
         <Paper
           sx={{
             p: 2,
@@ -805,6 +838,7 @@ export const Settings: React.FC = () => {
             <OpenInNewIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
           </Stack>
         </Paper>
+        )}
 
         {/* V154: Evolution Engine Card */}
         <Paper
@@ -837,7 +871,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* Pet Interaction Settings */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             🐾 Pet Interaction
           </Typography>
@@ -897,7 +931,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* V48: Collaboration Role Icons */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             {t('settings.collabRoleIcons', '🤝 协作角色图标')}
           </Typography>
@@ -963,9 +997,11 @@ export const Settings: React.FC = () => {
         </Paper>
 
         <Divider sx={{ opacity: 0.1 }} />
+          </>
+        )}
 
-        {/* V33: App Theme Settings */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        {effectiveTab === 'general' && showThemeBlock && (
+        <Paper id="macos-theme-settings" sx={{ p: 2, bgcolor: 'var(--bg-elevated)', borderRadius: 'var(--radius-lg, 10px)', border: '1px solid var(--separator)' }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             {t('settings.themeSettings')}
           </Typography>
@@ -975,44 +1011,31 @@ export const Settings: React.FC = () => {
 <Typography variant="body2" sx={{ fontSize: 12, mb: 1, color: 'text.secondary' }}>
                 {t('settings.themeMode')}
               </Typography>
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
-              {(['light', 'dark', 'minimax', 'system'] as const).map((mode) => {
-                const isActive = appThemeMode === mode;
-                const labels = { light: t('settings.light'), dark: t('settings.dark'), minimax: 'MiniMax', system: t('settings.followSystem') };
+            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+              {(['system', 'light', 'dark'] as const).map((mode) => {
+                const isActive = appThemeMode === mode || (mode === 'light' && appThemeMode === 'minimax');
+                const labels = { light: t('settings.light'), dark: t('settings.dark'), system: t('settings.followSystem') };
                 return (
                   <Box
                     key={mode}
                     onClick={() => {
-                      const { setAppThemeMode, appThemePresetId, customTheme, appThemeMode } = useStore.getState();
+                      const { setAppThemeMode } = useStore.getState();
                       setAppThemeMode(mode);
-                      // Immediately apply the new theme
-                      const { getPresetById, getSystemTheme, applyAppTheme, resetToDefault, applyCustomTheme } = require('../../utils/appTheme');
-                      let effectiveId = appThemePresetId;
-                      if (mode === 'system') {
-                        effectiveId = getSystemTheme();
-                      }
-                      if (effectiveId === 'custom' && customTheme) {
-                        applyCustomTheme(customTheme);
-                      } else {
-                        const preset = getPresetById(effectiveId);
-                        if (preset) applyAppTheme(preset);
-                        else resetToDefault();
-                      }
                     }}
                     sx={{
                       px: 2,
                       py: 1,
-                      borderRadius: 1,
+                      borderRadius: 'var(--control-radius, 6px)',
                       cursor: 'pointer',
-                      border: `1px solid ${isActive ? 'var(--accent-color)' : 'rgba(255,255,255,0.15)'}`,
-                      bgcolor: isActive ? 'rgba(99,102,241,0.15)' : 'transparent',
-                      color: isActive ? 'var(--accent-color)' : 'text.secondary',
+                      border: `1px solid ${isActive ? 'var(--system-blue)' : 'var(--separator)'}`,
+                      bgcolor: isActive ? 'color-mix(in srgb, var(--system-blue) 12%, transparent)' : 'transparent',
+                      color: isActive ? 'var(--system-blue)' : 'text.secondary',
                       fontSize: 12,
                       fontWeight: isActive ? 600 : 400,
-                      transition: 'all 0.2s',
+                      transition: 'all var(--duration-short, 150ms) var(--ease-macOS, ease)',
                       display: 'flex',
                       alignItems: 'center',
-                      '&:hover': { borderColor: 'var(--accent-color)' },
+                      '&:hover': { borderColor: 'var(--system-blue)' },
                     }}
                   >
                     {labels[mode]}
@@ -1028,29 +1051,29 @@ export const Settings: React.FC = () => {
               {t('settings.themeStyle')}
             </Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1 }}>
-              {APP_THEME_PRESETS.map((preset) => {
+              {MAC_THEME_PRESETS.map((preset) => {
                 const isActive = appThemePresetId === preset.id;
-                const previewBg = preset.variables['--bg-primary'];
+                const previewBg = preset.variables['--bg-base'];
                 const previewText = preset.variables['--text-primary'];
-                const previewAccent = preset.variables['--accent-color'];
+                const previewAccent = preset.variables['--system-blue'];
                 return (
                   <Box
                     key={preset.id}
                     onClick={() => {
-                      const { setAppThemePreset, setCustomTheme } = useStore.getState();
+                      const { setAppThemePreset, setAppThemeMode } = useStore.getState();
                       setAppThemePreset(preset.id);
-                      setCustomTheme(null);
-                      const { applyAppTheme } = require('../../utils/appTheme');
-                      applyAppTheme(preset);
+                      if (preset.id === 'light') setAppThemeMode('light');
+                      else if (preset.id === 'dark') setAppThemeMode('dark');
+                      applyMacThemePreset(preset);
                     }}
                     sx={{
                       p: 1,
-                      borderRadius: 1,
+                      borderRadius: 'var(--control-radius, 6px)',
                       cursor: 'pointer',
-                      border: `2px solid ${isActive ? previewAccent : 'rgba(255,255,255,0.1)'}`,
+                      border: `2px solid ${isActive ? previewAccent : 'var(--separator)'}`,
                       bgcolor: previewBg,
-                      transition: 'all 0.2s',
-                      '&:hover': { borderColor: previewAccent, transform: 'scale(1.02)' },
+                      transition: 'all var(--duration-short, 150ms) var(--ease-macOS, ease)',
+                      '&:hover': { borderColor: previewAccent },
                     }}
                   >
                     {/* Color preview */}
@@ -1184,11 +1207,14 @@ export const Settings: React.FC = () => {
             </Collapse>
           </Box>
         </Paper>
+        )}
 
+        {effectiveTab === 'general' && showGeneralBody && (
+          <>
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* Companion Personality Settings */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             🐾 Companion Personality
           </Typography>
@@ -1355,7 +1381,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* V103: Plan Review Settings */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600 }}>
               🔍 Plan Review
@@ -1387,7 +1413,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* V104: Loop Detection Settings */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600 }}>
               🔄 Loop Detection
@@ -1435,7 +1461,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* V105: Checkpoint Settings */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
             <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600 }}>
               💾 Checkpoint
@@ -1458,7 +1484,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* Data Backup & Restore */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             💾 {t('settings.dataBackup')}
           </Typography>
@@ -1551,7 +1577,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* Template Management — V31 */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             🎭 {t('settings.personaTemplateManagement')}
           </Typography>
@@ -1753,7 +1779,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* Voice Settings */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             🎙️ Voice Settings
           </Typography>
@@ -1873,7 +1899,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* Language Settings */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             {t('settings.languageLabel')}
           </Typography>
@@ -1901,7 +1927,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* Desktop App Settings (Electron only) */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }} id="desktop-settings">
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }} id="desktop-settings">
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             🖥️ Desktop App
           </Typography>
@@ -1987,7 +2013,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* AI Models Configuration */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
             <Box>
               <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600 }}>
@@ -2107,7 +2133,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* Legacy AI Configuration (for backward compatibility) */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
             <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600 }}>
               ⚙️ Legacy AI Config
@@ -2216,7 +2242,7 @@ export const Settings: React.FC = () => {
         <Divider sx={{ opacity: 0.1 }} />
 
         {/* Gmail Settings */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             📧 Gmail Integration
           </Typography>
@@ -2246,7 +2272,7 @@ export const Settings: React.FC = () => {
         </Paper>
 
         {/* V52: Keyboard Shortcuts */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <KeyboardIcon sx={{ fontSize: 16 }} />
             <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600 }}>
@@ -2311,7 +2337,7 @@ export const Settings: React.FC = () => {
         <WebhookSettings />
 
         {/* About */}
-        <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+        <Paper sx={{ p: 2, bgcolor: 'var(--bg-input)', borderRadius: 2 }}>
           <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 2 }}>
             ℹ️ About PixelPal
           </Typography>

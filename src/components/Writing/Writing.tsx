@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MyBox as Box, MyTypography as Typography, MyTextField as TextField, MyButton as Button, MyCircularProgress as CircularProgress, MyTabs as Tabs, MyAlert as Alert, MyDivider as Divider , MyTab as Tab } from '../MUI替代';
 import { AutoAwesome as SparkIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
 import { writingChatCompletion, initModelRegistry } from '../../services/ai/model-registry-adapter';
-
-type WritingMode = 'generate' | 'continue' | 'polish' | 'summarize';
+import { useMacSplitStore, type WritingMode } from '../../stores/macSplitStore';
+import { useTranslation } from 'react-i18next';
 
 const MODE_LABELS: Record<WritingMode, { label: string; desc: string; placeholder: string }> = {
   generate: {
@@ -29,14 +29,35 @@ const MODE_LABELS: Record<WritingMode, { label: string; desc: string; placeholde
   },
 };
 
-export const Writing: React.FC = () => {
+interface WritingProps {
+  splitLayout?: boolean;
+}
+
+export const Writing: React.FC<WritingProps> = ({ splitLayout = false }) => {
+  const { t } = useTranslation();
   const aiConfig = useStore((s) => s.aiConfig);
   const models = useStore((s) => s.models);
-  const [mode, setMode] = useState<WritingMode>('generate');
+  const storeWritingMode = useMacSplitStore((s) => s.writingMode);
+  const setStoreWritingMode = useMacSplitStore((s) => s.setWritingMode);
+  const [localMode, setLocalMode] = useState<WritingMode>('generate');
+  const mode = splitLayout ? storeWritingMode : localMode;
+  const setMode = (m: WritingMode) => {
+    if (splitLayout) setStoreWritingMode(m);
+    else setLocalMode(m);
+  };
+
   const [outline, setOutline] = useState('');
   const [result, setResult] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (splitLayout) {
+      setResult('');
+      setError('');
+      setOutline('');
+    }
+  }, [storeWritingMode, splitLayout]);
 
   // Initialize model registry when models change
   React.useEffect(() => {
@@ -83,16 +104,29 @@ export const Writing: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {!splitLayout && (
       <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
         <Typography variant="h6" sx={{ fontSize: 15, fontWeight: 600 }}>
-          ✍️ AI Writing
+          ✍️ {t('writing.title', 'AI 写作')}
         </Typography>
         <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
-          Generate, continue, polish, or summarize content with AI
+          {t('writing.subtitle', '生成、续写、润色或摘要')}
         </Typography>
       </Box>
+      )}
+      {splitLayout && (
+        <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid var(--separator)' }}>
+          <Typography variant="subtitle2" sx={{ fontSize: 14, fontWeight: 600 }}>
+            {t(`writing.mode${mode.charAt(0).toUpperCase()}${mode.slice(1)}`, MODE_LABELS[mode].label)}
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
+            {MODE_LABELS[mode].desc}
+          </Typography>
+        </Box>
+      )}
 
       {/* Mode tabs */}
+      {!splitLayout && (
       <Tabs
         value={mode}
         onChange={(_, v) => { setMode(v); setResult(''); setError(''); }}
@@ -107,6 +141,7 @@ export const Writing: React.FC = () => {
           <Tab key={m} value={m} label={MODE_LABELS[m].label} />
         ))}
       </Tabs>
+      )}
 
       {error && (
         <Alert severity="error" sx={{ m: 1.5, fontSize: 12 }} onClose={() => setError('')}>

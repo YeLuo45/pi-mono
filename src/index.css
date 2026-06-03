@@ -11,176 +11,50 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-stack, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #08090a;
-  color: #f7f8f8;
+  background: var(--bg-base);
+  color: var(--text-primary);
   font-feature-settings: "cv01", "ss03";
   font-variation-settings: "wght" 400;
-}
-
-/* Prevent pull-to-refresh on mobile */
-body {
   overscroll-behavior: none;
 }
 
-/* Smooth animations */
 * {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 
-/* Selection color */
 ::selection {
-  background: rgba(94, 106, 210, 0.4);
-  color: #f7f8f8;
+  background: color-mix(in srgb, var(--system-blue) 40%, transparent);
+  color: var(--text-primary);
 }
 
-/* ============================================
-   V50: Linear Dark Mode Design System
-   Based on Linear.app design language
-   ============================================ */
-
-/* ============================================
-   V51: MiniMax Light Theme Design System
-   Fresh, bright visual style with MiniMax brand
-   ============================================ */
-
-/* MiniMax Color Palette */
-:root[data-theme="minimax"] {
-  /* Marketing & Background */
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f0f0f0;
-  --color-surface: #ffffff;
-  --color-surface-2: #f5f5f5;
-  --color-surface-3: #fafafa;
-
-  /* Text */
-  --color-text-primary: #222222;
-  --color-text-secondary: #45515e;
-  --color-text-tertiary: #8e8e93;
-  --color-text-disabled: #b8b8b8;
-
-  /* Brand */
-  --color-brand-blue: #1456f0;
-  --color-brand-blue-light: #3daeff;
-  --color-brand-pink: #ea5ec1;
-  --color-accent-sky: #3daeff;
-
-  /* Borders */
-  --color-border: #e5e7eb;
-  --color-border-light: #f2f3f5;
-
-  /* Button */
-  --color-button-bg: #f0f0f0;
-  --color-button-hover: #e5e5e5;
-  --color-button-active: #d9d9d9;
-
-  /* Chat bubbles (MiniMax light) */
-  --color-chat-ai-bg: #ffffff;
-  --color-chat-user-bg: rgba(20, 86, 240, 0.08);
-
-  /* Persona overlay (MiniMax light) */
-  --persona-primary: #1456f0;
-  --persona-secondary: #3daeff;
-  --persona-accent: #ea5ec1;
-  --persona-bg: rgba(20, 86, 240, 0.08);
-  --persona-text: #222222;
-
-  /* Border radii (MiniMax style) */
-  --radius-micro: 2px;
-  --radius-standard: 4px;
-  --radius-comfortable: 8px;
-  --radius-card: 12px;
-  --radius-panel: 16px;
-  --radius-pill: 9999px;
-
-  /* Spacing */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-
-  /* Typography */
-  --font-weight-reading: 400;
-  --font-weight-nav: 510;
-  --font-weight-strong: 590;
-
-  /* Shadows (MiniMax style) */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: rgba(0, 0, 0, 0.08) 0px 4px 6px;
-  --shadow-lg: rgba(0, 0, 0, 0.1) 0px 8px 16px;
-  --shadow-brand-glow: rgba(44, 30, 116, 0.16) 0px 0px 15px;
-}
-
-/* Linear Color Palette */
+/* Legacy aliases — map old Linear tokens to macOS semantic tokens */
 :root {
-  /* Marketing & Background */
-  --color-marketing-black: #08090a;
-  --color-panel-dark: #0f1011;
-  --color-surface-3: #191a1b;
-  --color-surface-4: #28282c;
-
-  /* Text */
-  --color-text-primary: #f7f8f8;
-  --color-text-secondary: #d0d6e0;
-  --color-text-tertiary: #8a8f98;
-  --color-text-quaternary: #62666d;
-
-  /* Brand */
-  --color-brand-indigo: #5e6ad2;
-  --color-accent-violet: #7170ff;
-
-  /* Borders */
-  --color-border-subtle: rgba(255, 255, 255, 0.05);
-  --color-border-standard: rgba(255, 255, 255, 0.08);
-
-  /* Button */
-  --color-button-ghost-bg: rgba(255, 255, 255, 0.02);
-  --color-button-ghost-border: rgba(255, 255, 255, 0.08);
-
-  /* Chat bubbles */
-  --color-chat-ai-bg: #191a1b;
-  --color-chat-user-bg: rgba(94, 106, 210, 0.15);
-
-  /* Persona overlay */
-  --persona-primary: #5e6ad2;
-  --persona-secondary: #7170ff;
-  --persona-accent: #7170ff;
-  --persona-bg: rgba(94, 106, 210, 0.1);
-  --persona-text: #f7f8f8;
-
-  /* Border radii (Linear style) */
-  --radius-micro: 2px;
-  --radius-standard: 4px;
-  --radius-comfortable: 6px;
-  --radius-card: 8px;
-  --radius-panel: 12px;
-  --radius-pill: 9999px;
-
-  /* Spacing */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-
-  /* Typography */
-  --font-weight-reading: 400;
-  --font-weight-nav: 510;
-  --font-weight-strong: 590;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --color-marketing-black: var(--bg-base);
+  --color-panel-dark: var(--bg-elevated);
+  --color-surface-3: var(--bg-elevated);
+  --color-surface-4: var(--bg-elevated);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-quaternary: var(--text-tertiary);
+  --color-brand-indigo: var(--system-blue);
+  --color-accent-violet: var(--system-blue);
+  --color-border-subtle: var(--separator);
+  --color-border-standard: var(--separator);
+  --color-chat-ai-bg: var(--bg-elevated);
+  --color-chat-user-bg: color-mix(in srgb, var(--system-blue) 18%, transparent);
+  --accent-color: var(--system-blue);
+  --persona-primary: var(--system-blue);
+  --persona-secondary: var(--system-blue);
+  --persona-accent: var(--system-blue);
+  --persona-bg: color-mix(in srgb, var(--system-blue) 10%, transparent);
+  --persona-text: var(--text-primary);
 }
 
-/* Scrollbar styling (WebKit) */
 *::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -189,22 +63,18 @@ body {
   background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-default, rgba(255, 255, 255, 0.1));
   border-radius: 3px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--border-strong, rgba(255, 255, 255, 0.15));
 }
 
-/* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  scrollbar-color: var(--border-default, rgba(255, 255, 255, 0.1)) transparent;
 }
 
-/* ============================================
- * MESSAGE ANIMATIONS (macOS HIG Motion)
- * ============================================ */
 @keyframes messageFadeIn {
   from {
     opacity: 0;
@@ -217,10 +87,9 @@ body {
 }
 
 .message-enter {
-  animation: messageFadeIn 200ms ease-out forwards;
+  animation: messageFadeIn var(--duration-normal, 250ms) var(--ease-macOS, ease-out) forwards;
 }
 
-/* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .message-enter {
     animation: none;

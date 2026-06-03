@@ -10,9 +10,10 @@ interface PluginPanelProps {
   pluginId: string;
   onBack?: () => void;
   onSettings?: () => void;
+  splitLayout?: boolean;
 }
 
-export const PluginPanel: React.FC<PluginPanelProps> = ({ pluginId, onBack, onSettings }) => {
+export const PluginPanel: React.FC<PluginPanelProps> = ({ pluginId, onBack, onSettings, splitLayout = false }) => {
   const { t } = useTranslation();
   const plugin = PluginService.getPlugin(pluginId);
 
@@ -30,7 +31,7 @@ export const PluginPanel: React.FC<PluginPanelProps> = ({ pluginId, onBack, onSe
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Plugin panel header */}
+      {!splitLayout && (
       <Box
         sx={{
           p: 1.5,
@@ -61,6 +62,7 @@ export const PluginPanel: React.FC<PluginPanelProps> = ({ pluginId, onBack, onSe
           <SettingsIcon sx={{ fontSize: 16 }} />
         </IconButton>
       </Box>
+      )}
 
       {/* Plugin content */}
       <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>

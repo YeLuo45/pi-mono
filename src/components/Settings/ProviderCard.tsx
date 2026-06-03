@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyButton as Button, MyChip as Chip, MyStack as Stack, MyIconButton as IconButton, MyTooltip as Tooltip , MyCard as Card } from '../MUI替代';
+import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyButton as Button, MyChip as Chip, MyStack as Stack, MyIconButton as IconButton, MyTooltip as Tooltip } from '../MUI替代';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -29,7 +29,6 @@ interface ProviderCardProps {
 }
 
 export const ProviderCard: React.FC<ProviderCardProps> = ({
-  providerId,
   providerName,
   providerIcon,
   providerDescription,
@@ -38,7 +37,6 @@ export const ProviderCard: React.FC<ProviderCardProps> = ({
   isDefault,
   onConfigure,
   onSetDefault,
-  onToggleEnabled,
   onTest,
   onDelete,
 }) => {
@@ -54,7 +52,7 @@ export const ProviderCard: React.FC<ProviderCardProps> = ({
     <Paper
       sx={{
         p: 2,
-        bgcolor: 'rgba(255,255,255,0.05)',
+        bgcolor: 'var(--bg-input)',
         borderRadius: 2,
         border: isDefault ? '1px solid rgba(94, 106, 210, 0.5)' : '1px solid rgba(255,255,255,0.08)',
       }}
@@ -79,7 +77,7 @@ export const ProviderCard: React.FC<ProviderCardProps> = ({
                       height: 20,
                       fontSize: 10,
                       bgcolor: 'rgba(94, 106, 210, 0.2)',
-                      color: '#7170ff',
+                      color: 'var(--system-blue)',
                     }}
                   />
                 )}

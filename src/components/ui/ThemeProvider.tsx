@@ -6,9 +6,14 @@
  */
 
 import { Global, css } from '@emotion/react';
-import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import { ReactNode, createContext, useContext } from 'react';
-import { borderRadius, shadows, spacing } from './design-tokens';
+import {
+  createTheme,
+  ThemeProvider as MuiThemeProvider,
+  type Theme as MuiTheme,
+} from '@mui/material/styles';
+import { ReactNode, createContext, useContext, useMemo } from 'react';
+import { createMacMuiTheme } from '../../theme/createMacMuiTheme';
+import { borderRadius, shadows } from './design-tokens';
 
 // ============================================================================
 // Theme Types (compatible with MUI theme structure)
@@ -122,158 +127,55 @@ export interface Theme {
   mode?: 'light' | 'dark';
 }
 
-// ============================================================================
-// Default Dark Theme (linearDarkTheme) — uses MUI createTheme for full compatibility
-// ============================================================================
+function isMuiTheme(theme: Theme | MuiTheme): theme is MuiTheme {
+  return typeof (theme as MuiTheme).breakpoints?.up === 'function';
+}
 
-const darkMuiTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#5e6ad2',
-      light: '#7170ff',
-      dark: '#4a52b8',
-      contrastText: '#ffffff',
+function toLegacyTheme(muiTheme: MuiTheme): Theme {
+  const mode = muiTheme.palette.mode === 'light' ? 'light' : 'dark';
+  return {
+    palette: muiTheme.palette as Palette,
+    typography: muiTheme.typography as Typography,
+    shape: muiTheme.shape as Shape,
+    mode,
+    tokens: {
+      spacing: muiTheme.spacing as unknown as Spacing,
+      borderRadius: borderRadius as BorderRadius,
+      shadows: mode === 'light' ? shadows.light : shadows.dark,
     },
-    secondary: {
-      main: '#7170ff',
-      contrastText: '#ffffff',
-    },
-    background: {
-      default: '#08090a',
-      paper: '#0f1011',
-    },
-    text: {
-      primary: '#f7f8f8',
-      secondary: '#d0d6e0',
-      disabled: '#62666d',
-    },
-    divider: 'rgba(255, 255, 255, 0.05)',
-    error: { main: '#f26875' },
-    warning: { main: '#f5c542' },
-    success: { main: '#52c775' },
-    info: { main: '#5e6ad2' },
-  },
-  typography: {
-    fontFamily: '"Inter", "Segoe UI", system-ui, sans-serif',
-    fontSize: 14,
-    h1: { fontWeight: 590, letterSpacing: '-0.056em' },
-    h2: { fontWeight: 590, letterSpacing: '-0.048em' },
-    h3: { fontWeight: 590, letterSpacing: '-0.04em' },
-    h4: { fontWeight: 510, letterSpacing: '-0.032em' },
-    h5: { fontWeight: 510, letterSpacing: '-0.024em' },
-    h6: { fontWeight: 510, letterSpacing: '-0.016em' },
-    subtitle1: { fontWeight: 510 },
-    subtitle2: { fontWeight: 510 },
-    body1: { fontWeight: 400 },
-    body2: { fontWeight: 400 },
-    button: { fontWeight: 510, textTransform: 'none', letterSpacing: 0 },
-    caption: { fontWeight: 400 },
-    overline: { fontWeight: 510, letterSpacing: '0.08em' },
-  },
-  shape: { borderRadius: borderRadius.md },
-  spacing: 8,
-  tokens: { spacing, borderRadius, shadows: shadows.dark },
-});
-
-export const darkTheme: Theme = darkMuiTheme as unknown as Theme;
+    spacing: muiTheme.spacing as unknown as Spacing,
+    borderRadius: borderRadius as BorderRadius,
+    shadows: mode === 'light' ? shadows.light : shadows.dark,
+  };
+}
 
 // ============================================================================
-// Default Light Theme (minimaxLightTheme) — uses MUI createTheme for full compatibility
-// ============================================================================
-
-const lightMuiTheme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#1456f0',
-      light: '#3daeff',
-      dark: '#0d44c7',
-      contrastText: '#ffffff',
-    },
-    secondary: {
-      main: '#ea5ec1',
-      contrastText: '#ffffff',
-    },
-    background: {
-      default: '#ffffff',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: '#222222',
-      secondary: '#45515e',
-      disabled: '#b8b8b8',
-    },
-    divider: '#e5e7eb',
-    error: { main: '#dc2626' },
-    warning: { main: '#d97706' },
-    success: { main: '#16a34a' },
-    info: { main: '#1456f0' },
-    // Extended light theme palette
-    shop: {
-      bgPage: '#F8FAFC',
-      border: '#E5E7EB',
-      borderLight: '#F1F5F9',
-      textMuted: '#64748B',
-      textLight: '#94A3B8',
-      textDark: '#1E293B',
-      accent: '#6366F1',
-      accentHover: '#4F46E5',
-      star: '#F59E0B',
-      success: '#10B981',
-    },
-  },
-  typography: {
-    fontFamily: '"DM Sans", "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif',
-    fontSize: 14,
-    h1: { fontWeight: 590, letterSpacing: '-0.056em' },
-    h2: { fontWeight: 590, letterSpacing: '-0.048em' },
-    h3: { fontWeight: 590, letterSpacing: '-0.04em' },
-    h4: { fontWeight: 510, letterSpacing: '-0.032em' },
-    h5: { fontWeight: 510, letterSpacing: '-0.024em' },
-    h6: { fontWeight: 510, letterSpacing: '-0.016em' },
-    subtitle1: { fontWeight: 510 },
-    subtitle2: { fontWeight: 510 },
-    body1: { fontWeight: 400 },
-    body2: { fontWeight: 400 },
-    button: { fontWeight: 510, textTransform: 'none', letterSpacing: 0 },
-    caption: { fontWeight: 400 },
-    overline: { fontWeight: 510, letterSpacing: '0.08em' },
-  },
-  shape: { borderRadius: borderRadius.md },
-  spacing: 8,
-  tokens: { spacing, borderRadius, shadows: shadows.light },
-});
-
-export const lightTheme: Theme = lightMuiTheme as unknown as Theme;
-
-// ============================================================================
-// CssBaseline Global Styles
+// CssBaseline Global Styles (scrollbar + body via CSS variables)
 // ============================================================================
 
 const darkCssBaseline = css`
   body {
     margin: 0;
     padding: 0;
-    background-color: #08090a;
-    color: #f7f8f8;
-    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-stack, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif);
     scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,0.1) transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
   }
   *::-webkit-scrollbar {
-    width: 6;
-    height: 6;
+    width: 6px;
+    height: 6px;
   }
   *::-webkit-scrollbar-track {
     background: transparent;
   }
   *::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.1);
-    border-radius: 3;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
   }
   *::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.15);
   }
   *, *::before, *::after {
     box-sizing: border-box;
@@ -284,25 +186,25 @@ const lightCssBaseline = css`
   body {
     margin: 0;
     padding: 0;
-    background-color: #ffffff;
-    color: #222222;
-    font-family: "DM Sans", "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-stack, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif);
     scrollbar-width: thin;
-    scrollbar-color: rgba(0,0,0,0.1) transparent;
+    scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
   }
   *::-webkit-scrollbar {
-    width: 6;
-    height: 6;
+    width: 6px;
+    height: 6px;
   }
   *::-webkit-scrollbar-track {
     background: transparent;
   }
   *::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.1);
-    border-radius: 3;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
   }
   *::-webkit-scrollbar-thumb:hover {
-    background: rgba(0,0,0,0.15);
+    background: rgba(0, 0, 0, 0.15);
   }
   *, *::before, *::after {
     box-sizing: border-box;
@@ -315,30 +217,45 @@ const lightCssBaseline = css`
 
 interface AppThemeProviderProps {
   children: ReactNode;
-  theme?: Theme;
+  /** MUI Theme from createMacMuiTheme/createTheme, or legacy app theme object */
+  theme?: Theme | MuiTheme;
+  /** When theme is omitted, build from macOS CSS tokens */
+  mode?: 'light' | 'dark';
 }
 
-export const ThemeProvider = ({ children, theme }: AppThemeProviderProps) => {
-  const activeTheme = theme || darkTheme;
-  const globalCss = activeTheme.palette.mode === 'light' ? lightCssBaseline : darkCssBaseline;
+export const ThemeProvider = ({ children, theme, mode }: AppThemeProviderProps) => {
+  const muiTheme = useMemo(() => {
+    if (theme) {
+      if (isMuiTheme(theme)) return theme;
+      return createTheme({
+        palette: theme.palette,
+        typography: theme.typography,
+        shape: theme.shape,
+        components: theme.components,
+        // @ts-expect-error extended app theme fields
+        tokens: theme.tokens,
+        spacing: theme.spacing,
+        borderRadius: theme.borderRadius,
+        shadows: theme.shadows,
+      });
+    }
+    return createMacMuiTheme(mode ?? 'dark');
+  }, [theme, mode]);
 
-  // Create MUI-compatible theme using createTheme to ensure full compatibility
-  const muiTheme = createTheme({
-    palette: activeTheme.palette,
-    typography: activeTheme.typography,
-    shape: activeTheme.shape,
-    components: activeTheme.components,
-    tokens: activeTheme.tokens,
-    spacing: activeTheme.spacing,
-    borderRadius: activeTheme.borderRadius,
-    shadows: activeTheme.shadows,
-  });
+  const contextTheme = useMemo(() => {
+    if (theme && !isMuiTheme(theme)) return theme;
+    return toLegacyTheme(muiTheme);
+  }, [theme, muiTheme]);
+
+  const globalCss = muiTheme.palette.mode === 'light' ? lightCssBaseline : darkCssBaseline;
 
   return (
-    <MuiThemeProvider theme={muiTheme}>
-      <Global styles={globalCss} />
-      {children}
-    </MuiThemeProvider>
+    <ThemeContext.Provider value={contextTheme}>
+      <MuiThemeProvider theme={muiTheme}>
+        <Global styles={globalCss} />
+        {children}
+      </MuiThemeProvider>
+    </ThemeContext.Provider>
   );
 };
 
@@ -360,5 +277,6 @@ const ThemeContext = createContext<Theme | null>(null);
 // Alias for compatibility
 export { ThemeContext as MUIThemeContext };
 
-// Re-export types
-export type { Theme };
+/** Back-compat for tests and legacy imports — prefer createMacMuiTheme() */
+export const darkTheme = createMacMuiTheme('dark') as unknown as Theme;
+export const lightTheme = createMacMuiTheme('light') as unknown as Theme;

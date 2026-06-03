@@ -10,7 +10,7 @@ const buildTime = typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : new D
 window.__APP_VERSION__ = version
 window.__BUILD_HASH__ = hash
 window.__BUILD_TIME__ = buildTime
-console.log(`%c PixelPal v${version} (${hash}) `, 'background:#7170ff;color:#fff;padding:2px 8px;border-radius:4px', `built at ${buildTime}`)
+console.log(`%c PixelPal v${version} (${hash}) `, 'background:var(--system-blue,#007AFF);color:#fff;padding:2px 8px;border-radius:4px', `built at ${buildTime}`)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

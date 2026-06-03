@@ -7,7 +7,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { MyTypography as Typography, MyStack as Stack, MyGrid as Grid, MyChip, MySnackbar as Snackbar, MyAlert as Alert, MyCircularProgress as CircularProgress , MyDialog as Dialog, MyTabs as Tabs } from '../components/MUI替代';
 import { Box } from '../components/ui/Box';
 import { useTheme } from '../components/ui/ThemeProvider';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useMacSplitStore } from '../stores/macSplitStore';
 import { SkillStoreHeader } from '../components/SkillStore/SkillStoreHeader';
 import { CategoryTabs } from '../components/SkillStore/CategoryTabs';
 import { SkillCard } from '../components/SkillStore/SkillCard';
@@ -26,14 +27,28 @@ import {
 import { getAverageRating, getRatingsCount, getCallCount, incrementCallCount } from '../services/marketplace/SkillRatingService';
 import { useStore } from '../store';
 
-export const SkillStorePage: React.FC = () => {
+interface SkillStorePageProps {
+  splitLayout?: boolean;
+}
+
+export const SkillStorePage: React.FC<SkillStorePageProps> = ({ splitLayout = false }) => {
   const navigate = useNavigate();
+  const { category: routeCategory } = useParams<{ category?: string }>();
+  const storeCategory = useMacSplitStore((s) => s.skillStoreCategory);
+  const storeSort = useMacSplitStore((s) => s.skillStoreSort);
+  const skillStoreSkillId = useMacSplitStore((s) => s.skillStoreSkillId);
+  const skillStoreQuery = useMacSplitStore((s) => s.skillStoreQuery);
+  const setStoreCategory = useMacSplitStore((s) => s.setSkillStoreCategory);
+  const setStoreSort = useMacSplitStore((s) => s.setSkillStoreSort);
+
   const [loading, setLoading] = useState(true);
   const [skills, setSkills] = useState<MarketplaceSkill[]>([]);
   const [filteredSkills, setFilteredSkills] = useState<MarketplaceSkill[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState<SkillCategory | 'all'>('all');
-  const [sortBy, setSortBy] = useState<'popular' | 'rating' | 'newest'>('popular');
+  const [localCategory, setLocalCategory] = useState<SkillCategory | 'all'>('all');
+  const [localSort, setLocalSort] = useState<'popular' | 'rating' | 'newest'>('popular');
+  const activeCategory = splitLayout ? storeCategory : localCategory;
+  const sortBy = splitLayout ? storeSort : localSort;
   const [installedSkillIds, setInstalledSkillIds] = useState<Set<string>>(new Set());
 
   // Dialogs
@@ -47,6 +62,21 @@ export const SkillStorePage: React.FC = () => {
     message: '',
     severity: 'success',
   });
+
+  useEffect(() => {
+    if (splitLayout && routeCategory) {
+      setStoreCategory(routeCategory as SkillCategory | 'all');
+    }
+  }, [splitLayout, routeCategory, setStoreCategory]);
+
+  useEffect(() => {
+    if (!splitLayout || !skillStoreSkillId) return;
+    const skill = skills.find((s) => s.id === skillStoreSkillId);
+    if (skill) {
+      setSelectedSkill(skill);
+      setDetailDialogOpen(true);
+    }
+  }, [splitLayout, skillStoreSkillId, skills]);
 
   // Load skills on mount
   useEffect(() => {
@@ -73,12 +103,14 @@ export const SkillStorePage: React.FC = () => {
     void loadData();
   }, []);
 
+  const effectiveSearch = splitLayout ? skillStoreQuery : searchQuery;
+
   // Filter and sort skills when search/category/sort changes
   useEffect(() => {
-    let result = searchCommunitySkills(searchQuery, activeCategory);
+    let result = searchCommunitySkills(effectiveSearch, activeCategory);
     result = sortCommunitySkills(result, sortBy);
     setFilteredSkills(result);
-  }, [searchQuery, activeCategory, sortBy, skills]);
+  }, [effectiveSearch, activeCategory, sortBy, skills]);
 
   const handleInstall = useCallback(async (skill: MarketplaceSkill) => {
     const result = await installMarketplaceSkill(skill);
@@ -119,12 +151,14 @@ export const SkillStorePage: React.FC = () => {
   }, []);
 
   const handleCategoryChange = useCallback((category: SkillCategory | 'all') => {
-    setActiveCategory(category);
-  }, []);
+    if (splitLayout) setStoreCategory(category);
+    else setLocalCategory(category);
+  }, [splitLayout, setStoreCategory]);
 
   const handleSortChange = useCallback((sort: 'popular' | 'rating' | 'newest') => {
-    setSortBy(sort);
-  }, []);
+    if (splitLayout) setStoreSort(sort);
+    else setLocalSort(sort);
+  }, [splitLayout, setStoreSort]);
 
   // Reload skills after version change (rollback, etc.)
   const handleVersionChange = useCallback(() => {
@@ -155,13 +189,15 @@ export const SkillStorePage: React.FC = () => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        minHeight: splitLayout ? '100%' : '100vh',
+        height: splitLayout ? '100%' : undefined,
         bgcolor: shop.bgPage || '#F8FAFC',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
       {/* Header */}
+      {!splitLayout && (
       <Box sx={{ bgcolor: '#FFFFFF', borderBottom: `1px solid ${shop.border || '#E5E7EB'}` }}>
         <SkillStoreHeader
           searchQuery={searchQuery}
@@ -205,6 +241,7 @@ export const SkillStorePage: React.FC = () => {
         {/* Category Tabs */}
         <CategoryTabs activeCategory={activeCategory} onCategoryChange={handleCategoryChange} />
       </Box>
+      )}
 
       {/* Content */}
       <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>

@@ -1,7 +1,11 @@
 import { app, BrowserWindow, Tray, globalShortcut, ipcMain, shell } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { createTray, restoreWindow, showNotification, setAlwaysOnTopState, destroyTray, setOnlineStatus } from './tray';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import { initUpdater, destroyUpdater } from './updater';
 import { initFileHandlers, destroyFileHandlers, handleFileAssociation } from './fileHandler';
 
@@ -63,6 +67,9 @@ function createWindow(): void {
     minHeight: 600,
     show: false,
     autoHideMenuBar: true,
+    frame: false,
+    transparent: process.platform === 'darwin',
+    backgroundColor: '#00000000',
     webPreferences: {
       preload: preloadPath,
       contextIsolation: true,

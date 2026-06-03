@@ -31,7 +31,7 @@ export const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({
         border: '1px solid var(--color-border, rgba(255,255,255,0.08))',
         borderRadius: 2,
         overflow: 'hidden',
-        bgcolor: 'var(--color-bg-paper, #0f1011)',
+        bgcolor: 'var(--bg-elevated)',
       }}
     >
       {/* Header */}
@@ -51,7 +51,7 @@ export const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({
           color: 'var(--color-text-primary, #f7f8f8)',
           transition: 'background-color 0.15s ease',
           '&:hover': {
-            bgcolor: 'var(--color-button-hover, rgba(255,255,255,0.05))',
+            bgcolor: 'var(--bg-hover)',
           },
         }}
       >

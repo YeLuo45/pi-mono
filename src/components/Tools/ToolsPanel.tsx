@@ -4,9 +4,11 @@ import { MyBox as Box, MyTypography as Typography, MyPaper as Paper, MyChip as C
 import { useTranslation } from 'react-i18next';
 import { ToolRegistry } from '../../services/tools/registry';
 import { ToolExecutionLogger, type ToolCallLog } from '../../services/tools/logger';
+import { useMacSplitStore } from '../../stores/macSplitStore';
 
-export const ToolsPanel: React.FC = () => {
+export const ToolsPanel: React.FC<{ splitLayout?: boolean }> = ({ splitLayout = false }) => {
   const { t } = useTranslation();
+  const toolsView = useMacSplitStore((s) => s.toolsView);
   const [tools, setTools] = useState<ReturnType<typeof ToolRegistry.prototype.list>>([]);
   const [history, setHistory] = useState<ToolCallLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,13 +31,18 @@ export const ToolsPanel: React.FC = () => {
     }
   };
 
+  const showRegistry = !splitLayout || toolsView === 'registry';
+  const showHistory = !splitLayout || toolsView === 'history';
+
   return (
     <Box sx={{ height: '100%', overflow: 'auto', p: 2 }}>
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-        {t('nav.tools')}
-      </Typography>
+      {!splitLayout && (
+        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+          {t('nav.tools')}
+        </Typography>
+      )}
 
-      {/* Registered Tools */}
+      {showRegistry && (
       <Paper sx={{ p: 2, mb: 2 }}>
         <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
           Registered Tools ({tools.length})
@@ -76,8 +83,9 @@ export const ToolsPanel: React.FC = () => {
           )}
         </List>
       </Paper>
+      )}
 
-      {/* Call History */}
+      {showHistory && (
       <Paper sx={{ p: 2 }}>
         <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
           Recent Calls ({history.length})
@@ -125,6 +133,7 @@ export const ToolsPanel: React.FC = () => {
           </List>
         )}
       </Paper>
+      )}
     </Box>
   );
 };

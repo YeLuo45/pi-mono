@@ -7,7 +7,6 @@
 
 import { type FC, type ReactNode, useState, useRef, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { borderRadius } from '../ui/design-tokens';
 
 export interface MyTabProps {
   label: string;
@@ -28,6 +27,74 @@ export interface MyTabsProps {
   sx?: Record<string, string | number>;
 }
 
+interface TabButtonProps {
+  value: string;
+  activeValue: string;
+  label: string;
+  disabled?: boolean;
+  icon?: ReactNode;
+  onClick: (value: string) => void;
+}
+
+const TabButton: FC<TabButtonProps> = ({
+  value,
+  activeValue,
+  label,
+  disabled = false,
+  icon,
+  onClick,
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+
+  const isSelected = value === activeValue;
+
+  return (
+    <button
+      role="tab"
+      aria-selected={isSelected}
+      disabled={disabled}
+      onClick={() => onClick(value)}
+      onMouseEnter={() => !disabled && setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setIsActive(false);
+      }}
+      onMouseDown={() => !disabled && setIsActive(true)}
+      onMouseUp={() => !disabled && setIsActive(false)}
+      style={{
+        padding: '6px 12px',
+        border: 'none',
+        borderRadius: 'var(--control-radius, 6px)',
+        background: isSelected
+          ? 'var(--bg-elevated, #2d2d2d)'
+          : isHovered
+          ? 'var(--bg-hover, rgba(255, 255, 255, 0.04))'
+          : 'transparent',
+        color: isSelected
+          ? 'var(--text-primary, #ffffff)'
+          : isHovered
+          ? 'var(--text-primary, #ffffff)'
+          : 'var(--text-secondary, rgba(255, 255, 255, 0.6))',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        fontSize: '12px',
+        fontWeight: isSelected ? 600 : 400,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+        whiteSpace: 'nowrap',
+        boxShadow: isSelected ? 'var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.1))' : 'none',
+        transform: isActive ? 'scale(0.97)' : isHovered ? 'scale(1.02)' : 'scale(1)',
+      }}
+    >
+      {icon && <span style={{ display: 'flex', fontSize: '14px' }}>{icon}</span>}
+      {label}
+    </button>
+  );
+};
+
 export const MyTabs: FC<MyTabsProps> = ({
   value,
   onChange,
@@ -40,32 +107,8 @@ export const MyTabs: FC<MyTabsProps> = ({
 }) => {
   const theme = useTheme();
   const tabsRef = useRef<HTMLDivElement>(null);
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(false);
-
-  // Find all tab elements and calculate indicator position
-  useEffect(() => {
-    const updateIndicator = () => {
-      if (!tabsRef.current) return;
-      const tabs = tabsRef.current.querySelectorAll('[data-tab]');
-      tabs.forEach((tab) => {
-        const tabElement = tab as HTMLButtonElement;
-        if (tabElement.dataset.value === value) {
-          const rect = tabElement.getBoundingClientRect();
-          const parentRect = tabsRef.current!.getBoundingClientRect();
-          setIndicatorStyle({
-            left: rect.left - parentRect.left,
-            width: rect.width,
-          });
-        }
-      });
-    };
-
-    updateIndicator();
-    window.addEventListener('resize', updateIndicator);
-    return () => window.removeEventListener('resize', updateIndicator);
-  }, [value, children]);
 
   // Handle scroll buttons visibility
   useEffect(() => {
@@ -113,37 +156,15 @@ export const MyTabs: FC<MyTabsProps> = ({
           const childProps = child.props as { value?: string; label?: string; disabled?: boolean; icon?: ReactNode };
           if (childProps.value !== undefined && childProps.label !== undefined) {
             tabs.push(
-              <button
+              <TabButton
                 key={childProps.value}
-                data-tab
-                data-value={childProps.value}
-                role="tab"
-                aria-selected={childProps.value === value}
+                value={childProps.value}
+                activeValue={value}
+                label={childProps.label}
                 disabled={childProps.disabled}
-                onClick={() => handleTabClick(childProps.value!)}
-                style={{
-                  padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
-                  border: 'none',
-                  background: 'transparent',
-                  color: childProps.value === value
-                    ? theme.palette.primary?.main || '#5e6ad2'
-                    : theme.palette.text?.secondary || '#d0d6e0',
-                  cursor: childProps.disabled ? 'not-allowed' : 'pointer',
-                  opacity: childProps.disabled ? 0.5 : 1,
-                  fontSize: '14px',
-                  fontWeight: childProps.value === value ? 600 : 400,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: theme.spacing(0.5),
-                  transition: 'color 0.2s ease',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {childProps.icon && (
-                  <span style={{ display: 'flex', fontSize: '18px' }}>{childProps.icon}</span>
-                )}
-                {childProps.label}
-              </button>
+                icon={childProps.icon}
+                onClick={handleTabClick}
+              />
             );
           }
         }
@@ -161,13 +182,17 @@ export const MyTabs: FC<MyTabsProps> = ({
       className={className}
       role="tablist"
       style={{
-        display: 'flex',
+        display: 'inline-flex',
         position: 'relative',
         overflowX: variant === 'scrollable' ? 'auto' : 'hidden',
         scrollbarWidth: 'none' as const,
         msOverflowStyle: 'none' as const,
         justifyContent: centered ? 'center' : 'flex-start',
-        borderBottom: `1px solid ${theme.palette.divider || 'rgba(255,255,255,0.05)'}`,
+        alignItems: 'center',
+        gap: 'var(--space-1)',
+        padding: 'var(--space-1)',
+        backgroundColor: 'var(--bg-input, rgba(255, 255, 255, 0.04))',
+        borderRadius: 'var(--control-radius, 6px)',
         ...sx,
       }}
     >
@@ -179,7 +204,7 @@ export const MyTabs: FC<MyTabsProps> = ({
             left: 0,
             zIndex: 2,
             border: 'none',
-            background: theme.palette.background?.paper || '#0f1011',
+            background: 'var(--bg-elevated)',
             cursor: 'pointer',
             padding: theme.spacing(0.5),
             display: 'flex',
@@ -192,22 +217,9 @@ export const MyTabs: FC<MyTabsProps> = ({
         </button>
       )}
 
-      <div style={{ display: 'flex', position: 'relative' }}>
+      <div style={{ display: 'flex', position: 'relative', gap: 'var(--space-1)' }}>
         {tabsContent}
       </div>
-
-      {/* Tab indicator */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: indicatorStyle.left,
-          width: indicatorStyle.width,
-          height: '2px',
-          backgroundColor: theme.palette.primary?.main || '#5e6ad2',
-          transition: 'left 0.2s ease, width 0.2s ease',
-        }}
-      />
 
       {scrollButtons !== false && showRightScroll && (
         <button
@@ -217,7 +229,7 @@ export const MyTabs: FC<MyTabsProps> = ({
             right: 0,
             zIndex: 2,
             border: 'none',
-            background: theme.palette.background?.paper || '#0f1011',
+            background: 'var(--bg-elevated)',
             cursor: 'pointer',
             padding: theme.spacing(0.5),
             display: 'flex',

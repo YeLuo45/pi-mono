@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { MyBox as Box, MyTypography as Typography, MyButton as Button, MyLinearProgress as LinearProgress, MyList as List, MyListItem as ListItem, MyListItemText as ListItemText, MyIconButton as IconButton, MyTextField as TextField, MyCircularProgress as CircularProgress, MyAlert as Alert } from '../MUI替代';
 import { Upload as UploadIcon, Delete as DeleteIcon, QuestionAnswer as AskIcon, Article as ArticleIcon } from '@mui/icons-material';
 import { useStore } from '../../store';
@@ -6,9 +6,18 @@ import { parseDocument, formatFileSize, isFileSizeValid } from '../../utils/docu
 import { documentChatCompletion, initModelRegistry } from '../../services/ai/model-registry-adapter';
 import { indexDocumentFromContent } from '../../services/rag';
 import type { DocumentFile } from '../../types';
+import { useMacSplitStore } from '../../stores/macSplitStore';
+import { useTranslation } from 'react-i18next';
 
-export const DocumentUpload: React.FC = () => {
+interface DocumentUploadProps {
+  splitLayout?: boolean;
+}
+
+export const DocumentUpload: React.FC<DocumentUploadProps> = ({ splitLayout = false }) => {
+  const { t } = useTranslation();
   const documents = useStore((s) => s.documents);
+  const documentId = useMacSplitStore((s) => s.documentId);
+  const setDocumentId = useMacSplitStore((s) => s.setDocumentId);
   const models = useStore((s) => s.models);
   const addDocument = useStore((s) => s.addDocument);
   const removeDocument = useStore((s) => s.removeDocument);
@@ -21,7 +30,24 @@ export const DocumentUpload: React.FC = () => {
 
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [selectedDoc, setSelectedDoc] = useState<DocumentFile | null>(null);
+  const [localSelectedDoc, setLocalSelectedDoc] = useState<DocumentFile | null>(null);
+  const selectedDoc = useMemo(() => {
+    if (splitLayout && documentId) {
+      return documents.find((d) => d.id === documentId) ?? null;
+    }
+    return localSelectedDoc;
+  }, [splitLayout, documentId, documents, localSelectedDoc]);
+
+  useEffect(() => {
+    if (splitLayout && documents.length > 0 && !documentId) {
+      setDocumentId(documents[0].id);
+    }
+  }, [splitLayout, documents, documentId, setDocumentId]);
+
+  const selectDoc = (doc: DocumentFile | null) => {
+    if (splitLayout) setDocumentId(doc?.id ?? null);
+    else setLocalSelectedDoc(doc);
+  };
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [isAsking, setIsAsking] = useState(false);
@@ -72,7 +98,7 @@ export const DocumentUpload: React.FC = () => {
         uploadedAt: new Date().toISOString(),
       };
       addDocument(doc);
-      setSelectedDoc(doc);
+      selectDoc(doc);
 
       // Auto-index for RAG Knowledge Base
       try {
@@ -177,7 +203,7 @@ export const DocumentUpload: React.FC = () => {
         uploadedAt: new Date().toISOString(),
       };
       addDocument(doc);
-      setSelectedDoc(doc);
+      selectDoc(doc);
 
       // Auto-index for RAG Knowledge Base
       try {
@@ -194,16 +220,49 @@ export const DocumentUpload: React.FC = () => {
     }
   };
 
+  if (splitLayout && !selectedDoc) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 2, gap: 2 }}>
+        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: 13, textAlign: 'center', mt: 4 }}>
+          {t('document.selectDoc', '从列表中选择文档，或上传新文件')}
+        </Typography>
+        <Box
+          ref={dropZoneRef}
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          sx={{
+            p: 2,
+            border: '2px dashed var(--separator)',
+            borderRadius: 2,
+            textAlign: 'center',
+            cursor: 'pointer',
+          }}
+          onClick={() => !uploading && fileInputRef.current?.click()}
+        >
+          <input ref={fileInputRef} type="file" accept=".pdf,.docx,.xlsx,.txt" style={{ display: 'none' }} onChange={handleFileUpload} />
+          <UploadIcon sx={{ fontSize: 24, opacity: 0.5 }} />
+          <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+            {t('document.uploadHint', '拖拽或点击上传')}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {!splitLayout && (
       <Box sx={{ p: 2, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
         <Typography variant="h6" sx={{ fontSize: 15, fontWeight: 600 }}>
-          📄 Document Q&A
+          📄 {t('document.title', '文档问答')}
         </Typography>
         <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: 11 }}>
-          Upload PDF, DOCX, XLSX or TXT (≤ 20MB) and ask questions
+          {t('document.subtitle', '上传 PDF、DOCX、XLSX 或 TXT（≤20MB）并提问')}
         </Typography>
       </Box>
+      )}
 
       {/* Upload area with Drag & Drop */}
       <Box
@@ -251,7 +310,8 @@ export const DocumentUpload: React.FC = () => {
         </Alert>
       )}
 
-      {/* Document list */}
+      {/* Document list — middle column in split layout */}
+      {!splitLayout && (
       <Box sx={{ flex: selectedDoc ? 0 : 1, overflow: 'auto', p: 1 }}>
         <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', px: 1 }}>
           UPLOADED DOCUMENTS
@@ -261,7 +321,7 @@ export const DocumentUpload: React.FC = () => {
             <ListItem
               key={doc.id}
               selected={selectedDoc?.id === doc.id}
-              onClick={() => setSelectedDoc(doc)}
+              onClick={() => selectDoc(doc)}
               sx={{
                 borderRadius: 1,
                 mb: 0.5,
@@ -269,7 +329,7 @@ export const DocumentUpload: React.FC = () => {
                 '&.Mui-selected': { bgcolor: 'rgba(255,255,255,0.08)' },
               }}
               secondaryAction={
-                <IconButton edge="end" size="small" onClick={(e) => { e.stopPropagation(); removeDocument(doc.id); if (selectedDoc?.id === doc.id) setSelectedDoc(null); }}>
+                <IconButton edge="end" size="small" onClick={(e) => { e.stopPropagation(); removeDocument(doc.id); if (selectedDoc?.id === doc.id) selectDoc(null); }}>
                   <DeleteIcon sx={{ fontSize: 14 }} />
                 </IconButton>
               }
@@ -288,6 +348,7 @@ export const DocumentUpload: React.FC = () => {
           )}
         </List>
       </Box>
+      )}
 
       {/* Q&A area */}
       {selectedDoc && (

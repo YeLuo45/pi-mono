@@ -30,14 +30,17 @@ import {
   type SkillFile,
 } from '../services/skilldev/fileService';
 import { SKILL_CODE_TEMPLATES } from '../data/skillCodeTemplates';
+import { useMacSplitStore } from '../stores/macSplitStore';
 
 interface SkillDevPageProps {
-  // Optional prop for direct skill testing
   initialSkillId?: string;
+  splitLayout?: boolean;
 }
 
-export const SkillDevPage: React.FC<SkillDevPageProps> = ({ initialSkillId }) => {
+export const SkillDevPage: React.FC<SkillDevPageProps> = ({ initialSkillId, splitLayout = false }) => {
   const navigate = useNavigate();
+  const skillDevFileId = useMacSplitStore((s) => s.skillDevFileId);
+  const setSkillDevFileId = useMacSplitStore((s) => s.setSkillDevFileId);
   const [activeFileId, setActiveFileId] = useState<string | null>(null);
   const [activeCode, setActiveCode] = useState('');
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
@@ -55,14 +58,21 @@ export const SkillDevPage: React.FC<SkillDevPageProps> = ({ initialSkillId }) =>
   }, []);
 
   // Load file when selected
-  const handleFileSelect = useCallback((id: string, path: string) => {
+  const handleFileSelect = useCallback((id: string, _path?: string) => {
     const file = getFileById(id);
     if (file) {
       setActiveFileId(id);
+      if (splitLayout) setSkillDevFileId(id);
       setActiveCode(file.code);
       setValidationErrors([]);
     }
-  }, []);
+  }, [splitLayout, setSkillDevFileId]);
+
+  useEffect(() => {
+    if (splitLayout && skillDevFileId && skillDevFileId !== activeFileId) {
+      handleFileSelect(skillDevFileId);
+    }
+  }, [splitLayout, skillDevFileId, activeFileId, handleFileSelect]);
 
   // Create new file
   const handleFileCreate = useCallback((name: string, folder: 'custom' | 'chains') => {
@@ -256,24 +266,26 @@ export const SkillDevPage: React.FC<SkillDevPageProps> = ({ initialSkillId }) =>
   const hasErrors = validationErrors.some(e => e.severity === 'error');
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
+    <Box sx={{ height: splitLayout ? '100%' : '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
       {/* Header */}
       <Box
         sx={{
           px: 2,
           py: 1,
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          borderBottom: '1px solid var(--separator)',
           display: 'flex',
           alignItems: 'center',
           gap: 1.5,
-          bgcolor: 'rgba(0,0,0,0.2)',
+          bgcolor: splitLayout ? 'transparent' : 'rgba(0,0,0,0.2)',
         }}
       >
+        {!splitLayout && (
         <Tooltip title="Back">
           <IconButton size="small" onClick={() => navigate('/')} sx={{ color: 'text.secondary' }}>
             <BackIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>
+        )}
         <Typography variant="subtitle1" sx={{ fontSize: 14, fontWeight: 700 }}>
           Skill Dev Tools
         </Typography>
@@ -333,7 +345,7 @@ export const SkillDevPage: React.FC<SkillDevPageProps> = ({ initialSkillId }) =>
 
       {/* Main Content */}
       <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* Left: FileTree */}
+        {!splitLayout && (
         <FileTree
           tree={tree}
           activeFileId={activeFileId}
@@ -343,6 +355,7 @@ export const SkillDevPage: React.FC<SkillDevPageProps> = ({ initialSkillId }) =>
           onFileRename={handleFileRename}
           onFileDuplicate={handleFileDuplicate}
         />
+        )}
 
         {/* Center: CodeEditor + DebugPanel */}
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

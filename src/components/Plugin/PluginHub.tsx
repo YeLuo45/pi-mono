@@ -8,7 +8,7 @@ import { PluginService } from '../../services/plugin/PluginService';
 import { useStore } from '../../store';
 import { ALL_PLUGINS, BUILTIN_PLUGIN_IDS, installPlugin } from '../../plugins';
 
-export const PluginHub: React.FC = () => {
+export const PluginHub: React.FC<{ splitLayout?: boolean }> = ({ splitLayout = false }) => {
   const { t } = useTranslation();
   const setActivePluginId = useStore((s) => s.setActivePluginId);
   const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
@@ -41,6 +41,16 @@ export const PluginHub: React.FC = () => {
     installPlugin(pluginId);
     forceUpdate();
   };
+
+  if (splitLayout) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', p: 3 }}>
+        <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center' }}>
+          {t('plugin.clickToOpen', '从左侧列表选择插件')}
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>

@@ -1,6 +1,10 @@
 import { Tray, Menu, nativeImage, Notification, app, shell } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Tray instance
 let tray: Tray | null = null;

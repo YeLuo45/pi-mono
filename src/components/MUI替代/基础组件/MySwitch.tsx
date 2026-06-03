@@ -21,18 +21,19 @@ export const MySwitch: FC<MySwitchProps> = ({
   sx = {},
 }) => {
   const colorMap: Record<string, { on: string; off: string }> = {
-    primary: { on: '#5e6ad2', off: 'rgba(255,255,255,0.38)' },
-    secondary: { on: '#7170ff', off: 'rgba(255,255,255,0.38)' },
-    error: { on: '#ef5350', off: 'rgba(255,255,255,0.38)' },
-    warning: { on: '#ff9800', off: 'rgba(255,255,255,0.38)' },
-    success: { on: '#4caf50', off: 'rgba(255,255,255,0.38)' },
-    info: { on: '#2196f3', off: 'rgba(255,255,255,0.38)' },
+    primary: { on: 'var(--system-green)', off: 'var(--system-gray)' },
+    secondary: { on: 'var(--system-purple)', off: 'var(--system-gray)' },
+    error: { on: 'var(--system-red)', off: 'var(--system-gray)' },
+    warning: { on: 'var(--system-orange)', off: 'var(--system-gray)' },
+    success: { on: 'var(--system-green)', off: 'var(--system-gray)' },
+    info: { on: 'var(--system-teal)', off: 'var(--system-gray)' },
   };
 
   const colors = colorMap[color] || colorMap.primary;
-  const trackHeight = size === 'small' ? 14 : 20;
-  const thumbSize = size === 'small' ? 12 : 20;
-  const trackWidth = size === 'small' ? 30 : 40;
+  const trackHeight = size === 'small' ? 22 : 31;
+  const thumbSize = size === 'small' ? 18 : 27;
+  const trackWidth = size === 'small' ? 40 : 51;
+  const thumbInset = 2;
 
   const handleChange = () => {
     if (disabled) return;
@@ -63,9 +64,9 @@ export const MySwitch: FC<MySwitchProps> = ({
         position: 'relative',
         width: trackWidth,
         height: trackHeight,
-        borderRadius: trackHeight / 2,
+        borderRadius: 'var(--radius-full)',
         backgroundColor: checked ? colors.on : colors.off,
-        transition: 'background-color 0.2s ease',
+        transition: 'background-color var(--duration-short) var(--ease-macOS)',
         flexShrink: 0,
         ...sx,
       }}
@@ -76,12 +77,12 @@ export const MySwitch: FC<MySwitchProps> = ({
           width: thumbSize,
           height: thumbSize,
           borderRadius: '50%',
-          backgroundColor: 'currentColor',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-          transition: 'transform 0.2s ease',
+          backgroundColor: '#fff',
+          boxShadow: 'var(--shadow-sm)',
+          transition: 'transform var(--duration-short) var(--ease-macOS)',
           transform: checked
-            ? `translateX(${trackWidth - thumbSize}px)`
-            : 'translateX(0)',
+            ? `translateX(${trackWidth - thumbSize - thumbInset * 2}px)`
+            : `translateX(${thumbInset}px)`,
           left: 0,
           top: (trackHeight - thumbSize) / 2,
         }}

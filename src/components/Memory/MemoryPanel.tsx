@@ -78,6 +78,7 @@ import {
 } from '../../services/emotion';
 import { getAllPersonas, type Persona } from '../../services/persona';
 import { useStore } from '../../store';
+import { useMacSplitStore } from '../../stores/macSplitStore';
 import { RelationGraph } from '../Graph/RelationGraph';
 
 const MEMORY_TYPE_COLORS: Record<MemoryType, string> = {
@@ -117,17 +118,21 @@ function formatDate(timestamp: number): string {
   });
 }
 
-export const MemoryPanel: React.FC = () => {
+export const MemoryPanel: React.FC<{ splitLayout?: boolean }> = ({ splitLayout = false }) => {
   const { t } = useTranslation();
 
   // Active persona from store
   const activePersonaId = useStore((s) => s.activePersonaId);
+  const memoryTabStore = useMacSplitStore((s) => s.memoryTab);
+  const setMemoryTabStore = useMacSplitStore((s) => s.setMemoryTab);
 
   // Personas list (loaded once)
   const [personas, setPersonas] = useState<Persona[]>([]);
 
   // Tab state
-  const [tab, setTab] = useState(0);
+  const [localTab, setLocalTab] = useState(0);
+  const tab = splitLayout ? memoryTabStore : localTab;
+  const setTab = splitLayout ? setMemoryTabStore : setLocalTab;
 
   // Emotion state
   const [emotionLogs, setEmotionLogs] = useState<EmotionLogEntry[]>([]);
@@ -356,6 +361,17 @@ export const MemoryPanel: React.FC = () => {
     };
   }, [loadEmotionLogs]);
 
+  useEffect(() => {
+    const onRefresh = () => {
+      void loadMemories();
+      loadStats();
+      loadInsights();
+      loadEmotionLogs();
+    };
+    window.addEventListener('pixelpal:refreshMemoryPanel', onRefresh);
+    return () => window.removeEventListener('pixelpal:refreshMemoryPanel', onRefresh);
+  }, [loadMemories, loadStats, loadInsights, loadEmotionLogs]);
+
   // Sort memories
   const sortedMemories = [...memories].sort((a, b) => {
     if (pinnedIds.has(a.id) && !pinnedIds.has(b.id)) return -1;
@@ -569,17 +585,18 @@ export const MemoryPanel: React.FC = () => {
         </Stack>
       </Box>
 
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="scrollable" scrollButtons="auto">
-          <Tab icon={<MemoryIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.all')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
-          <Tab icon={<GraphIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.entities')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
-          <Tab icon={<TimelineIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.timeline')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
-          <Tab icon={<InsightIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.insights')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
-          <Tab icon={<EmotionIcon sx={{ fontSize: 16 }} />} label={t('emotionPanel.title')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
-          <Tab icon={<SummarizeIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.weeklyReport')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
-        </Tabs>
-      </Box>
+      {!splitLayout && (
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="scrollable" scrollButtons="auto">
+            <Tab icon={<MemoryIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.all')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
+            <Tab icon={<GraphIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.entities')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
+            <Tab icon={<TimelineIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.timeline')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
+            <Tab icon={<InsightIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.insights')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
+            <Tab icon={<EmotionIcon sx={{ fontSize: 16 }} />} label={t('emotionPanel.title')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
+            <Tab icon={<SummarizeIcon sx={{ fontSize: 16 }} />} label={t('memoryPanel.weeklyReport')} iconPosition="start" sx={{ minHeight: 48, fontSize: 12 }} />
+          </Tabs>
+        </Box>
+      )}
 
       {/* Tab Content */}
       <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
@@ -683,7 +700,7 @@ export const MemoryPanel: React.FC = () => {
             {searchResults.map(({ memory, score }) => (
               <ListItem
                 key={memory.id}
-                sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' } }}
+                sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'var(--bg-hover)' } }}
                 onClick={() => { openDetail(memory.id); setSearchResults([]); }}
               >
                 <ListItemText
@@ -1128,8 +1145,8 @@ function AllMemoriesTab({
               sx={{
                 fontSize: 9,
                 height: 16,
-                bgcolor: 'rgba(255,255,255,0.05)',
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
+                bgcolor: 'var(--bg-input)',
+                '&:hover': { bgcolor: 'var(--bg-hover)' },
               }}
             />
           ))}
@@ -1288,7 +1305,7 @@ function AllMemoriesTab({
                 border: '1px solid',
                 borderColor: pinnedIds.has(memory.id) ? 'primary.main' : 'transparent',
                 cursor: 'pointer',
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
+                '&:hover': { bgcolor: 'var(--bg-hover)' },
               }}
               onClick={() => onOpen(memory.id)}
             >
@@ -1963,7 +1980,7 @@ function EmotionTimelineTab({ logs, warning, onRefresh }: EmotionTimelineTabProp
                     <Typography variant="caption" sx={{ fontSize: 10, width: 60 }}>
                       {getTextEmotionEmoji(emotion as TextEmotion)} {t('emotion.' + emotion)}
                     </Typography>
-                    <Box sx={{ flex: 1, height: 8, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 1, overflow: 'hidden' }}>
+                    <Box sx={{ flex: 1, height: 8, bgcolor: 'var(--bg-input)', borderRadius: 1, overflow: 'hidden' }}>
                       <Box
                         sx={{
                           width: `${percentage}%`,

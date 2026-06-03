@@ -13,6 +13,7 @@ const CSS_VARS = [
   '--persona-accent',
   '--persona-bg',
   '--persona-text',
+  '--system-blue',
 ] as const;
 
 /**
@@ -26,6 +27,11 @@ export function applyPersonaTheme(theme: PersonaTheme): void {
   root.style.setProperty('--persona-accent', theme.accentColor);
   root.style.setProperty('--persona-bg', theme.backgroundColor);
   root.style.setProperty('--persona-text', theme.textColor);
+  // Tint macOS accent without replacing semantic tokens
+  const accent = theme.accentColor || theme.primaryColor;
+  if (accent) {
+    root.style.setProperty('--system-blue', accent);
+  }
 }
 
 /**

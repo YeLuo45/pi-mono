@@ -1,11 +1,12 @@
 /**
  * MyPaper.tsx — MUI Paper replacement
  * 
- * Replaces MUI Paper component with custom styling.
+ * Replaces MUI Paper component with custom styling using design tokens.
  * Supports: children, variant, elevation, outlined, square
  */
 
-import { type FC, type ReactNode, type CSSProperties } from 'react';
+import { type FC, type ReactNode } from 'react';
+import { Box } from '../ui/Box';
 
 export interface MyPaperProps {
   children?: ReactNode;
@@ -14,8 +15,8 @@ export interface MyPaperProps {
   outlined?: boolean;
   square?: boolean;
   className?: string;
-  sx?: CSSProperties;
-  style?: CSSProperties;
+  sx?: Record<string, unknown>;
+  style?: React.CSSProperties;
 }
 
 export const MyPaper: FC<MyPaperProps> = ({
@@ -40,27 +41,26 @@ export const MyPaper: FC<MyPaperProps> = ({
     return shadows[Math.min(level, shadows.length - 1)] || shadows[1];
   };
 
-  const baseStyle: CSSProperties = {
-    backgroundColor: '#1e1e1e',
-    borderRadius: square ? '0px' : '12px',
-    padding: '20px',
-    transition: 'all 0.2s ease',
+  const paperSx = {
+    backgroundColor: 'var(--bg-elevated, #2d2d2d)',
+    borderRadius: square ? '0px' : 'var(--radius-lg, 10px)',
+    padding: '16px',
+    transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
     ...(variant === 'outlined' || outlined
       ? {
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid var(--separator, rgba(255, 255, 255, 0.08))',
           boxShadow: 'none',
         }
       : {
           boxShadow: getShadow(elevation),
         }),
     ...sx,
-    ...style,
   };
 
   return (
-    <div className={className} style={baseStyle}>
+    <Box className={className} sx={paperSx} style={style}>
       {children}
-    </div>
+    </Box>
   );
 };
 

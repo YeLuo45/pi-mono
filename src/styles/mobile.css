@@ -80,7 +80,7 @@
     margin-bottom: 12px;
   }
 
-  /* Sidebar Hidden on Mobile */
+  /* Source list in drawer on mobile; MacSplitView hides first column */
   .sidebar-desktop {
     display: none !important;
   }
