@@ -33,7 +33,10 @@ import './styles/macos-tokens.css';
 function resolveShellTitle(pathname: string, activePanel: string, t: (key: string, fallback?: string) => string) {
   if (pathname.startsWith('/skill-store')) return `PixelPal — ${t('skillStore.title', '技能商店')}`;
   if (pathname.startsWith('/skill-dev')) return `PixelPal — ${t('skillDev.title', '技能开发')}`;
-  return `PixelPal — ${t(`nav.${activePanel}`, activePanel)}`;
+  // mcp is the only nav item whose value is an object (nav.mcp.title/tabs/...)
+  // instead of a plain string, so it needs a dedicated key path.
+  const navKey = activePanel === 'mcp' ? 'nav.mcp.title' : `nav.${activePanel}`;
+  return `PixelPal — ${t(navKey, activePanel)}`;
 }
 
 function AppShell() {
