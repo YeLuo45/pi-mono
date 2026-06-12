@@ -1,0 +1,99 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-stack, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-feature-settings: "cv01", "ss03";
+  font-variation-settings: "wght" 400;
+  overscroll-behavior: none;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--system-blue) 40%, transparent);
+  color: var(--text-primary);
+}
+
+/* Legacy aliases — map old Linear tokens to macOS semantic tokens */
+:root {
+  --color-marketing-black: var(--bg-base);
+  --color-panel-dark: var(--bg-elevated);
+  --color-surface-3: var(--bg-elevated);
+  --color-surface-4: var(--bg-elevated);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-quaternary: var(--text-tertiary);
+  --color-brand-indigo: var(--system-blue);
+  --color-accent-violet: var(--system-blue);
+  --color-border-subtle: var(--separator);
+  --color-border-standard: var(--separator);
+  --color-chat-ai-bg: var(--bg-elevated);
+  --color-chat-user-bg: color-mix(in srgb, var(--system-blue) 18%, transparent);
+  --accent-color: var(--system-blue);
+  --persona-primary: var(--system-blue);
+  --persona-secondary: var(--system-blue);
+  --persona-accent: var(--system-blue);
+  --persona-bg: color-mix(in srgb, var(--system-blue) 10%, transparent);
+  --persona-text: var(--text-primary);
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-default, rgba(255, 255, 255, 0.1));
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong, rgba(255, 255, 255, 0.15));
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default, rgba(255, 255, 255, 0.1)) transparent;
+}
+
+@keyframes messageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-enter {
+  animation: messageFadeIn var(--duration-normal, 250ms) var(--ease-macOS, ease-out) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message-enter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

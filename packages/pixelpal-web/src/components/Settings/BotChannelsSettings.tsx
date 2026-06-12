@@ -1,0 +1,226 @@
+/**
+ * BotChannelsSettings
+ * V102: Settings panel for Telegram and Discord bot configurations
+ */
+
+import React, { useState, useEffect } from 'react';
+import { MyBox as Box, MyTypography as Typography, MyTextField as TextField, MyButton as Button, MyPaper as Paper, MyStack as Stack, MySwitch as Switch, MyCollapse as Collapse, MyIconButton as IconButton } from '../MUI替代';
+import {
+  Send as TelegramIcon,
+  Games as DiscordIcon,
+  ExpandMore as ExpandIcon,
+  ExpandLess as CollapseIcon,
+  Visibility, VisibilityOff,
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { botConfigManager, type BotChannelConfig } from '../../services/bus/BotConfigManager';
+
+/** Individual channel config row */
+const ChannelConfigRow: React.FC<{
+  channel: 'telegram' | 'discord' | 'whatsapp' | 'feishu' | 'slack' | 'dingtalk' | 'email' | 'qq';
+  icon: React.ReactNode;
+  label: string;
+  config: BotChannelConfig;
+  onUpdate: (updates: Partial<BotChannelConfig>) => void;
+}> = ({ channel, icon, label, config, onUpdate }) => {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const [showToken, setShowToken] = useState(false);
+  const [localToken, setLocalToken] = useState(config.token);
+
+  useEffect(() => {
+    setLocalToken(config.token);
+  }, [config.token]);
+
+  const handleSaveToken = () => {
+    onUpdate({ token: localToken });
+  };
+
+  return (
+    <Paper
+      sx={{
+        p: 1.5,
+        bgcolor: 'rgba(255,255,255,0.03)',
+        borderRadius: 1.5,
+        border: '1px solid rgba(255,255,255,0.06)',
+      }}
+    >
+      {/* Header row */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <Box sx={{ fontSize: 18 }}>{icon}</Box>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="body2" sx={{ fontSize: 12, fontWeight: 500 }}>
+            {label}
+          </Typography>
+          <Typography variant="caption" sx={{ fontSize: 10, color: 'text.disabled' }}>
+            {config.enabled ? '✅ Connected' : 'Disabled'}
+          </Typography>
+        </Box>
+        <Switch
+          size="small"
+          checked={config.enabled}
+          onChange={(e) => onUpdate({ enabled: e.target.checked })}
+        />
+        <IconButton
+          size="small"
+          onClick={() => setExpanded(!expanded)}
+          sx={{ p: 0.5 }}
+        >
+          {expanded ? <CollapseIcon sx={{ fontSize: 16 }} /> : <ExpandIcon sx={{ fontSize: 16 }} />}
+        </IconButton>
+      </Box>
+
+      {/* Expanded settings */}
+      <Collapse in={expanded}>
+        <Box sx={{ mt: 1.5, pl: 4 }}>
+          {/* Token input */}
+          <Box sx={{ mb: 1.5 }}>
+            <Typography variant="caption" sx={{ fontSize: 10, color: 'text.secondary', mb: 0.5, display: 'block' }}>
+              Bot Token
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <TextField
+                size="small"
+                type={showToken ? 'text' : 'password'}
+                placeholder={channel === 'telegram' ? '123456789:ABCdefGHI...' : channel === 'discord' ? 'MTIz...' : channel === 'whatsapp' ? 'whatsapp-token...' : channel === 'feishu' ? 'feishu-app-id:secret' : channel === 'slack' ? 'xoxb-xxx...' : channel === 'dingtalk' ? 'dingtalk-token-xxx' : channel === 'email' ? 'smtp@example.com' : 'qq-bot-id-xxx'}
+                value={localToken}
+                onChange={(e) => setLocalToken(e.target.value)}
+                sx={{
+                  flex: 1,
+                  '& .MuiInputBase-input': { fontSize: 11, py: 0.75, px: 1 },
+                }}
+              />
+              <IconButton
+                size="small"
+                onClick={() => setShowToken(!showToken)}
+                sx={{ p: 0.5 }}
+              >
+                {showToken ? <VisibilityOff sx={{ fontSize: 16 }} /> : <Visibility sx={{ fontSize: 16 }} />}
+              </IconButton>
+            </Box>
+          </Box>
+
+          {/* Save button */}
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={handleSaveToken}
+            disabled={!localToken || localToken === config.token}
+            sx={{ fontSize: 10, py: 0.5 }}
+          >
+            {t('settings.save', 'Save')}
+          </Button>
+
+          {/* Info note */}
+          <Typography variant="caption" sx={{ fontSize: 9, color: 'text.disabled', display: 'block', mt: 1 }}>
+            {channel === 'telegram'
+              ? 'Get token from @BotFather'
+              : channel === 'discord'
+              ? 'Get token from Discord Developer Portal'
+              : channel === 'whatsapp'
+              ? 'Get token from WhatsApp Business API'
+              : channel === 'feishu'
+              ? 'Get token from Feishu Open Platform'
+              : channel === 'slack'
+              ? 'Get token from Slack App Credentials'
+              : channel === 'dingtalk'
+              ? 'Get token from DingTalk Open Platform'
+              : channel === 'email'
+              ? 'Configure SMTP credentials'
+              : 'Get QQ bot ID from OneBot adapter'}
+          </Typography>
+        </Box>
+      </Collapse>
+    </Paper>
+  );
+};
+
+/** Main component */
+export const BotChannelsSettings: React.FC = () => {
+  const { t } = useTranslation();
+  const [config, setConfig] = useState(botConfigManager.getConfig());
+
+  useEffect(() => {
+    return botConfigManager.subscribe((newConfig) => {
+      setConfig(newConfig);
+    });
+  }, []);
+
+  const handleUpdate = (channel: 'telegram' | 'discord' | 'whatsapp' | 'feishu' | 'slack' | 'dingtalk' | 'email' | 'qq', updates: Partial<BotChannelConfig>) => {
+    botConfigManager.updateChannel(channel, updates);
+  };
+
+  return (
+    <Box>
+      <Typography variant="subtitle2" sx={{ fontSize: 13, fontWeight: 600, mb: 1.5 }}>
+        📡 Bot Channels
+      </Typography>
+      <Typography variant="caption" sx={{ fontSize: 10, color: 'text.disabled', mb: 2, display: 'block' }}>
+        Connect Telegram or Discord bots to chat via those channels
+      </Typography>
+
+      <Stack gap={1}>
+        <ChannelConfigRow
+          channel="telegram"
+          icon={<TelegramIcon sx={{ fontSize: 18, color: '#229ED9' }} />}
+          label="Telegram Bot"
+          config={config.telegram}
+          onUpdate={(u) => handleUpdate('telegram', u)}
+        />
+        <ChannelConfigRow
+          channel="discord"
+          icon={<DiscordIcon sx={{ fontSize: 18, color: '#5865F2' }} />}
+          label="Discord Bot"
+          config={config.discord}
+          onUpdate={(u) => handleUpdate('discord', u)}
+        />
+        <ChannelConfigRow
+          channel="whatsapp"
+          icon={<Box sx={{ fontSize: 18 }}>📱</Box>}
+          label="WhatsApp Bot"
+          config={config.whatsapp}
+          onUpdate={(u) => handleUpdate('whatsapp', u)}
+        />
+        <ChannelConfigRow
+          channel="feishu"
+          icon={<Box sx={{ fontSize: 18 }}>✈️</Box>}
+          label="Feishu Bot"
+          config={config.feishu}
+          onUpdate={(u) => handleUpdate('feishu', u)}
+        />
+        <ChannelConfigRow
+          channel="slack"
+          icon={<Box sx={{ fontSize: 18 }}>⚡</Box>}
+          label="Slack Bot"
+          config={config.slack}
+          onUpdate={(u) => handleUpdate('slack', u)}
+        />
+        <ChannelConfigRow
+          channel="dingtalk"
+          icon={<Box sx={{ fontSize: 18 }}>🔔</Box>}
+          label="DingTalk Bot"
+          config={config.dingtalk}
+          onUpdate={(u) => handleUpdate('dingtalk', u)}
+        />
+        <ChannelConfigRow
+          channel="email"
+          icon={<Box sx={{ fontSize: 18 }}>📧</Box>}
+          label="Email Bot"
+          config={config.email}
+          onUpdate={(u) => handleUpdate('email', u)}
+        />
+        <ChannelConfigRow
+          channel="qq"
+          icon={<Box sx={{ fontSize: 18 }}>🐧</Box>}
+          label="QQ Bot"
+          config={config.qq}
+          onUpdate={(u) => handleUpdate('qq', u)}
+        />
+      </Stack>
+
+      <Typography variant="caption" sx={{ fontSize: 9, color: 'text.disabled', display: 'block', mt: 1.5 }}>
+        ⚠️ Bot tokens are stored locally. Phase 2 enables actual bot connections.
+      </Typography>
+    </Box>
+  );
+};

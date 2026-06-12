@@ -1,0 +1,91 @@
+/**
+ * V153: Self-Evolution Engine - Main Export
+ * 
+ * Provides pattern analysis, strategy optimization, and skill crystallization
+ * for continuous self-improvement based on user interactions.
+ */
+
+// Types
+export type {
+  InteractionPattern,
+  OptimizationStrategy,
+  CrystallizedSkill,
+  CreatePatternInput,
+  CreateStrategyInput,
+  CreateCrystallizedSkillInput,
+  PatternAnalysisResult,
+  StrategyOptimizationResult,
+  SkillCrystallizationResult,
+} from './types';
+
+// PatternAnalyzer
+export { PatternAnalyzer, getPatternAnalyzer } from './PatternAnalyzer';
+
+// StrategyOptimizer
+export { StrategyOptimizer, getStrategyOptimizer, type StrategyType } from './StrategyOptimizer';
+
+// SkillCrystallizer
+export { SkillCrystallizer, getSkillCrystallizer } from './SkillCrystallizer';
+
+// EvolutionEngine
+export { 
+  EvolutionEngine, 
+  getEvolutionEngine, 
+  type EvolutionConfig, 
+  type EvolutionState 
+} from './EvolutionEngine';
+
+// SkillHealthChecker
+export { skillHealthChecker, type HealthStatus } from './SkillHealthChecker';
+
+// EvolutionTimeoutController
+export { EvolutionTimeoutController, type TimeoutConfig } from './EvolutionTimeoutController';
+
+// CircuitBreaker
+export { CircuitBreaker, type CircuitState, type CircuitBreakerConfig } from './CircuitBreaker';
+
+// Evolution Rules Engine (V156)
+export {
+  ruleRegistry,
+  ruleEngine,
+  ruleScheduler,
+  type EvolutionRule,
+  type EvolutionContext,
+  type TriggerType,
+  type ActionType,
+} from './rules';
+
+// V157: Evolution Event Persistence & Analytics
+export { evolutionEventStore } from './persistence/EvolutionEventStore';
+export { evolutionAnalytics, type EvolutionReport } from './analytics/EvolutionAnalytics';
+
+// V158: Evolution Integration Hub
+export {
+  EvolutionIntegrationHub,
+  type EvolutionResult,
+  type IntegratedHealthStatus,
+  type StrategyAdaptation,
+  type FallbackEvent,
+} from './integration/EvolutionIntegrationHub';
+
+// V159: Evolution API
+export {
+  EvolutionAPIServer,
+  type EvolutionAPIRequest,
+  type EvolutionAPIResponse,
+} from './api/EvolutionAPIServer';
+export { EvolutionAPIClient } from './api/EvolutionAPIClient';
+// V160: Multi-Personality Comparison
+export {
+  PersonalityComparisonEngine,
+  type PersonalityMetrics,
+  type ComparisonResult,
+} from './comparison/PersonalityComparisonEngine';
+export { PersonalityRadarChart } from './comparison/PersonalityRadarChart';
+
+// V161: Evolution Scheduler Dashboard
+export { SchedulerDashboard } from './scheduler/SchedulerDashboard';
+export { RuleTimeline } from './scheduler/RuleTimeline';
+export type { TimelineEvent } from './scheduler/RuleTimeline';
+export { TriggerConfigModal } from './scheduler/TriggerConfigModal';
+export type { RuleConfig } from './scheduler/TriggerConfigModal';

@@ -1,0 +1,55 @@
+{
+  "council": {
+    "title": "Agent Council",
+    "description": "Multi-Agent Collaboration Decision System",
+    "agents": {
+      "proposer": "Proposer",
+      "critic": "Critic",
+      "synthesizer": "Synthesizer",
+      "voter": "Voter"
+    },
+    "roles": {
+      "proposer": "Proposer",
+      "critic": "Critic",
+      "synthesizer": "Synthesizer",
+      "voter": "Voter"
+    },
+    "messageTypes": {
+      "proposal": "Proposal",
+      "critique": "Critique",
+      "synthesis": "Synthesis",
+      "vote": "Vote",
+      "broadcast": "Broadcast"
+    },
+    "votes": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "abstain": "Abstain"
+    },
+    "consensus": {
+      "title": "Consensus Result",
+      "reached": "Consensus Reached",
+      "notReached": "No Consensus",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "method": {
+        "majority": "Majority Vote",
+        "weighted": "Weighted Vote",
+        "unanimous": "Unanimous"
+      }
+    },
+    "actions": {
+      "propose": "Make Proposal",
+      "critique": "Critique",
+      "synthesize": "Synthesize",
+      "vote": "Vote",
+      "broadcast": "Broadcast",
+      "reachConsensus": "Reach Consensus"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending"
+    }
+  }
+}

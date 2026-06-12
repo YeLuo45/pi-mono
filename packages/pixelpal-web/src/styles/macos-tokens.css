@@ -1,0 +1,198 @@
+/**
+ * macOS Human Interface Guidelines (HIG) Design Tokens
+ * PixelPal Web - Iteration 1: Design Foundation
+ * 
+ * These tokens follow macOS visual language:
+ * - System colors (SF Pro palette)
+ * - 8pt spacing grid
+ * - macOS-appropriate border radii
+ * - SF Pro typography system
+ */
+
+:root {
+  /* ============================================
+   * BACKGROUND COLORS (macOS Window Chrome)
+   * ============================================ */
+  --bg-base: #1e1e1e;
+  --bg-elevated: #2d2d2d;
+  --bg-overlay: rgba(45, 45, 45, 0.72);
+  --bg-sidebar: rgba(30, 30, 30, 0.72);
+  --bg-surface: #1e1e1e;
+  --bg-surface-elevated: #2d2d2d;
+  --bg-input: rgba(255, 255, 255, 0.04);
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.08);
+
+  /* ============================================
+   * SYSTEM COLORS (SF Pro Color Palette)
+   * ============================================ */
+  --system-blue: #007AFF;
+  --system-green: #34C759;
+  --system-orange: #FF9500;
+  --system-red: #FF3B30;
+  --system-yellow: #FFCC00;
+  --system-purple: #AF52DE;
+  --system-pink: #FF2D55;
+  --system-teal: #5AC8FA;
+  --system-gray: #8E8E93;
+  --system-gray-2: #AEAEB2;
+  --system-gray-3: #C7C7CC;
+  --system-gray-4: #D1D1D6;
+  --system-gray-5: #E5E5EA;
+  --system-gray-6: #F2F2F7;
+
+  /* ============================================
+   * TEXT COLORS
+   * ============================================ */
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.3);
+  --text-placeholder: rgba(255, 255, 255, 0.3);
+
+  /* ============================================
+   * TYPOGRAPHY (SF Pro Display)
+   * ============================================ */
+  --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+  --font-size: 13px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-lg: 15px;
+  --text-xl: 17px;
+  --text-2xl: 20px;
+  --text-3xl: 22px;
+  --text-4xl: 28px;
+  
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+
+  /* ============================================
+   * SPACING (8pt Grid System)
+   * ============================================ */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ============================================
+   * BORDER RADII (macOS Standard)
+   * ============================================ */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  /* ============================================
+   * BORDERS
+   * ============================================ */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-focus: var(--system-blue);
+
+  /* ============================================
+   * SHADOWS
+   * ============================================ */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --shadow-floating: 0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  /* ============================================
+   * ANIMATION / MOTION (macOS Timing)
+   * ============================================ */
+  --duration-instant: 50ms;
+  --duration-micro: 80ms;
+  --duration-short: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+  
+  --ease-macOS: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ============================================
+   * LAYOUT DIMENSIONS
+   * ============================================ */
+  --sidebar-collapsed-width: 43px;
+  --sidebar-expanded-width: 144px;
+  --content-max-width: 680px;
+  --input-height: 32px;
+  --button-height: 32px;
+  --icon-size-sm: 16px;
+  --icon-size-md: 20px;
+  --icon-size-lg: 24px;
+
+  /* ============================================
+   * Z-INDEX SCALE
+   * ============================================ */
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-popover: 500;
+  --z-tooltip: 600;
+  --z-toast: 700;
+
+  /* Chat & interactive surfaces */
+  --chat-user-bg: var(--system-blue);
+  --chat-ai-bg: var(--bg-elevated);
+  --chat-user-tint: color-mix(in srgb, var(--system-blue) 18%, transparent);
+  --surface-input: var(--bg-input);
+}
+
+/* ============================================
+ * ACCESSIBILITY: Reduced Motion
+ * ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+ * P0: Layout tokens + light mode + preset hooks
+ * ============================================ */
+:root {
+  --titlebar-height: 52px;
+  --sidebar-width-source: 220px;
+  --sidebar-width-item: 280px;
+  --separator: rgba(255, 255, 255, 0.08);
+  --control-radius: 6px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]):not([data-theme="sunset"]):not([data-theme="forest"]) {
+    --bg-base: #FFFFFF;
+    --bg-elevated: #F5F5F7;
+    --bg-sidebar: rgba(246, 246, 246, 0.72);
+    --text-primary: #000000;
+    --text-secondary: rgba(0, 0, 0, 0.55);
+    --separator: rgba(0, 0, 0, 0.1);
+    --system-blue: #007AFF;
+  }
+}
+
+[data-theme="sunset"] { /* variables applied via JS */ }
+[data-theme="forest"] { /* variables applied via JS */ }

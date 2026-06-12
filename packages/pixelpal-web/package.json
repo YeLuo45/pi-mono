@@ -1,0 +1,129 @@
+{
+  "name": "pixel-pal-web",
+  "productName": "PixelPal",
+  "version": "1.0.0",
+  "description": "AI Companion Desktop App",
+  "author": "YeLuo45",
+  "homepage": "https://YeLuo45.github.io/pixel-pal-web",
+  "private": true,
+  "type": "module",
+  "npmRebuild": false,
+  "buildDependenciesFromSource": false,
+  "main": "dist/main/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:electron": "npx vite build",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:macos": "vitest run src/utils/macThemePresets.test.ts src/utils/personaTheme.test.ts src/hooks/useMacTheme.test.ts src/theme/createMacMuiTheme.test.ts src/stores/macSplitPanels.test.ts src/components/macos/__tests__/MacSourceList.test.ts",
+    "preview": "vite preview",
+    "prepackage": "node -e \"const fs=require('fs');['node_modules/canvas','node_modules/@nut.tree'].forEach(p=>{try{fs.rmSync(p,{recursive:true,force:true});console.log('Removed',p)}catch(e){}})\"",
+    "package": "npm run prepackage && npm run build:electron && electron-builder --win --x64",
+    "package:dir": "npm run prepackage && npm run build:electron && electron-builder --win --x64 --dir"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.95.2",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@google/generative-ai": "^0.24.1",
+    "@monaco-editor/react": "^4.7.0",
+    "@mui/icons-material": "5.17.0",
+    "@mui/material": "5.17.0",
+    "@mui/styled-engine": "5.16.14",
+    "@mui/system": "5.17.1",
+    "@types/flexsearch": "^0.7.6",
+    "cron-parser": "^5.5.0",
+    "date-fns": "^4.1.0",
+    "drizzle-orm": "^0.45.2",
+    "flexsearch": "^0.8.212",
+    "i18next": "^24.2.3",
+    "idb": "^8.0.3",
+    "lucide-react": "^1.16.0",
+    "mammoth": "^1.12.0",
+    "openai": "^6.37.0",
+    "pdfjs-dist": "^3.11.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-i18next": "^15.5.1",
+    "react-router-dom": "^7.14.1",
+    "recharts": "^3.8.1",
+    "rss-parser": "^3.13.0",
+    "uuid": "^13.0.0",
+    "wa-sqlite": "^1.0.0",
+    "wordcloud": "^1.2.3",
+    "xlsx": "^0.18.5",
+    "zustand": "^5.0.13"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^24.12.2",
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.0",
+    "@types/uuid": "^10.0.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-c8": "^0.33.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "@vitest/ui": "^2.0.0",
+    "drizzle-kit": "^0.31.10",
+    "electron": "^36.9.5",
+    "electron-builder": "^26.8.1",
+    "electron-log": "^5.4.3",
+    "electron-updater": "^6.8.3",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "happy-dom": "^20.9.0",
+    "jsdom": "^29.1.1",
+    "png-to-ico": "^3.0.1",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.58.0",
+    "vite": "^8.0.4",
+    "vite-plugin-electron": "^0.29.1",
+    "vite-plugin-electron-renderer": "^0.14.6",
+    "vitest": "^2.0.0"
+  },
+  "build": {
+    "appId": "com.pixel-pal.app",
+    "productName": "PixelPal",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "publish": null,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "public/icon.ico",
+      "uninstallerIcon": "public/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

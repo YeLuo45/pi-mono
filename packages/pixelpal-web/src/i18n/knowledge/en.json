@@ -1,0 +1,33 @@
+{
+  "knowledge": {
+    "title": "Knowledge Graph",
+    "noData": "No knowledge entries yet",
+    "type": "Type",
+    "relations": "relations",
+    "shared": "Shared",
+    "personaOwned": "Persona",
+    "entityTypes": {
+      "person": "Person",
+      "place": "Place",
+      "event": "Event",
+      "concept": "Concept",
+      "object": "Object",
+      "topic": "Topic",
+      "fact": "Fact"
+    },
+    "actions": {
+      "addEntity": "Add Entity",
+      "addRelation": "Add Relation",
+      "deleteEntity": "Delete Entity",
+      "deleteRelation": "Delete Relation",
+      "shareFact": "Share Fact",
+      "propagateFact": "Propagate Fact"
+    },
+    "labels": {
+      "name": "Name",
+      "entityType": "Entity Type",
+      "relationType": "Relation Type",
+      "properties": "Properties"
+    }
+  }
+}

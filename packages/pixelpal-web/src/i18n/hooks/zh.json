@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "registered": "Hook 已注册",
+    "unregistered": "Hook 已取消注册",
+    "triggered": "Hook 已触发",
+    "error": "Hook 执行错误",
+    "notFound": "Hook 未找到",
+    "disabled": "Hook 已禁用",
+    "enabled": "Hook 已启用",
+    "priority": "优先级",
+    "name": "名称",
+    "metadata": "元数据",
+    "noHooks": "暂无 Hooks",
+    "clearAll": "清除全部",
+    "trigger": "触发",
+    "register": "注册",
+    "unregister": "取消注册",
+    "plugin": "插件",
+    "lifecycle": "生命周期",
+    "system": "系统",
+    "chat": "聊天",
+    "agent": "智能体",
+    "pipeline": "流水线"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "name": "PixelPal — AI Companion",
+  "short_name": "PixelPal",
+  "description": "Your personal AI companion with memory, personality, and proactive assistance",
+  "start_url": "/pixel-pal-web/",
+  "scope": "/pixel-pal-web/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#0A0514",
+  "theme_color": "#1a0a2e",
+  "orientation": "any",
+  "prefer_related_applications": false,
+  "iarc_rating_id": "",
+  "categories": ["productivity", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Chat",
+      "short_name": "Chat",
+      "description": "Open chat with PixelPal",
+      "url": "/pixel-pal-web/#/chat",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "description": "Open settings",
+      "url": "/pixel-pal-web/#/settings",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr"
+}

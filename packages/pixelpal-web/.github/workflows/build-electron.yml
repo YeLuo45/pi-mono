@@ -1,0 +1,65 @@
+name: Build Electron (Windows)
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Remove problematic native modules
+        run: |
+          Remove-Item -Recurse -Force node_modules/canvas -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Force node_modules/@nut.tree -ErrorAction SilentlyContinue
+
+      - name: Build renderer and electron
+        run: npm run build:electron
+
+      - name: Build Windows exe
+        run: npm run package
+
+      - name: Upload Windows exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixel-pal-windows-exe
+          path: |
+            release/**/*.exe
+            release/**/*.nupkg
+          if-no-files-found: error
+
+  verify:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pixel-pal-windows-exe
+          path: ./dist
+
+      - name: List downloaded files
+        run: ls -la ./dist
+
+      - name: Verify exe exists
+        run: |
+          if ls ./dist/*.exe 2>/dev/null || ls ./dist/**/*.exe 2>/dev/null; then
+            echo "SUCCESS: Windows exe found"
+            exit 0
+          else
+            echo "ERROR: No exe found in artifacts"
+            exit 1
+          fi

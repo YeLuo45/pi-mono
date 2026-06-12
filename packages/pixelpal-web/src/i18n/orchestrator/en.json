@@ -1,0 +1,27 @@
+{
+  "orchestrator": {
+    "pipeline": "Pipeline",
+    "manager": "Manager",
+    "coder": "Coder",
+    "reviewer": "Reviewer",
+    "pending": "Pending",
+    "running": "Running",
+    "completed": "Completed",
+    "failed": "Failed",
+    "stage": "Stage",
+    "start": "Start",
+    "advance": "Advance",
+    "reset": "Reset",
+    "status": "Status",
+    "progress": "Progress",
+    "error": "Error",
+    "noPipeline": "No pipeline",
+    "createNew": "Create new pipeline",
+    "pipelineId": "Pipeline ID",
+    "currentStage": "Current Stage",
+    "startedAt": "Started At",
+    "completedAt": "Completed At",
+    "input": "Input",
+    "output": "Output"
+  }
+}

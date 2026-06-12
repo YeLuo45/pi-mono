@@ -1,0 +1,55 @@
+{
+  "council": {
+    "title": "代理委员会",
+    "description": "多代理协作决策系统",
+    "agents": {
+      "proposer": "提议者",
+      "critic": "批评者",
+      "synthesizer": "综合者",
+      "voter": "投票者"
+    },
+    "roles": {
+      "proposer": "提议者",
+      "critic": "批评者",
+      "synthesizer": "综合者",
+      "voter": "投票者"
+    },
+    "messageTypes": {
+      "proposal": "提案",
+      "critique": "批评",
+      "synthesis": "综合",
+      "vote": "投票",
+      "broadcast": "广播"
+    },
+    "votes": {
+      "approve": "赞成",
+      "reject": "反对",
+      "abstain": "弃权"
+    },
+    "consensus": {
+      "title": "共识结果",
+      "reached": "达成共识",
+      "notReached": "未达成共识",
+      "approved": "已批准",
+      "rejected": "已拒绝",
+      "method": {
+        "majority": "多数决",
+        "weighted": "加权投票",
+        "unanimous": "全票通过"
+      }
+    },
+    "actions": {
+      "propose": "提出提案",
+      "critique": "提出批评",
+      "synthesize": "综合观点",
+      "vote": "投票",
+      "broadcast": "广播消息",
+      "reachConsensus": "达成共识"
+    },
+    "status": {
+      "active": "活跃",
+      "inactive": "非活跃",
+      "pending": "待处理"
+    }
+  }
+}
