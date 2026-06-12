@@ -1,8 +1,8 @@
 {
-  "name": "pixel-pal-web",
+  "name": "@earendil-works/pixelpal-web",
   "productName": "PixelPal",
-  "version": "1.0.0",
-  "description": "AI Companion Desktop App",
+  "version": "0.1.0",
+  "description": "AI Companion Desktop App (merged from YeLuo45/pixel-pal-web master, V211)",
   "author": "YeLuo45",
   "homepage": "https://YeLuo45.github.io/pixel-pal-web",
   "private": true,

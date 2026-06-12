@@ -4,14 +4,19 @@ import { join } from "node:path";
 const dependencySections = ["dependencies", "devDependencies", "optionalDependencies"];
 const exactVersionPattern = /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 const ignoredDirectories = new Set([".git", "dist", "node_modules"]);
+// Packages with their own dependency policy (e.g. pixelpal-web uses caret ranges and is
+// built standalone via Vite). They are excluded from the monorepo pinned-deps gate.
+const excludedPackages = new Set(["packages/pixelpal-web"]);
 const packageJsonFiles = [];
 
 function collectPackageJsonFiles(directory) {
 	for (const entry of readdirSync(directory, { withFileTypes: true })) {
 		if (entry.isDirectory()) {
-			if (!ignoredDirectories.has(entry.name)) {
-				collectPackageJsonFiles(join(directory, entry.name));
-			}
+			if (ignoredDirectories.has(entry.name)) continue;
+			// Skip excluded package directories entirely.
+			const subPath = join(directory, entry.name);
+			if ([...excludedPackages].some((p) => subPath === p || subPath.startsWith(p + "/"))) continue;
+			collectPackageJsonFiles(subPath);
 			continue;
 		}
 
