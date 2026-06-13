@@ -3,14 +3,16 @@ import { join } from "node:path";
 import ts from "typescript";
 
 const ignoredDirectories = new Set([".git", "coverage", "dist", "node_modules"]);
+const excludedPackages = new Set(["packages/aigameagent"]);
 const files = [];
 
 function collectTypescriptFiles(directory) {
 	for (const entry of readdirSync(directory, { withFileTypes: true })) {
 		if (entry.isDirectory()) {
-			if (!ignoredDirectories.has(entry.name)) {
-				collectTypescriptFiles(join(directory, entry.name));
-			}
+			if (ignoredDirectories.has(entry.name)) continue;
+			const subPath = join(directory, entry.name);
+			if ([...excludedPackages].some((p) => subPath === p || subPath.startsWith(p + "/"))) continue;
+			collectTypescriptFiles(subPath);
 			continue;
 		}
 
